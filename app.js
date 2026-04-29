@@ -16,8 +16,7 @@
   };
 
   const root = document.documentElement;
-  const statusDeck = document.getElementById("status-deck");
-  const spotlight = document.getElementById("spotlight");
+  const catalogSummary = document.getElementById("catalog-summary");
   const grid = document.getElementById("project-grid");
   const resultSummary = document.getElementById("result-summary");
   const searchInput = document.getElementById("search-input");
@@ -28,7 +27,6 @@
   const drawerShell = document.getElementById("drawer-shell");
   const drawerBackdrop = document.getElementById("drawer-backdrop");
   const drawer = document.getElementById("project-drawer");
-  const openFeaturedDrawer = document.getElementById("open-featured-drawer");
 
   const filterConfig = [
     { key: "status", values: uniqueValues("status"), mount: statusFilters, set: state.selectedStatuses },
@@ -66,15 +64,15 @@
     });
   }
 
-  function isProjectVisible(project) {
-    return getVisibleProjects().some((candidate) => candidate.id === project.id);
-  }
-
   function getLocalPrimaryAction(project) {
     return project.actions.find((action) => action.kind === "primary" && !action.disabled) || null;
   }
 
   function getPublicRoute(project) {
+    if (project.publicPath) {
+      return project.publicPath;
+    }
+
     return `/games/${encodeURIComponent(project.slug)}/`;
   }
 
@@ -96,18 +94,21 @@
       case "local_only":
         return "Tracked here, but still local-only until a public build exists.";
       default:
-        return "Reserved public route with a branded placeholder until the build is staged.";
+        return "Reserved public route until the build is staged.";
     }
   }
 
   function getPrimaryActionLabel(project) {
     const localPrimaryAction = getLocalPrimaryAction(project);
+
     if (project.publicStatus === "live" && localPrimaryAction) {
       return localPrimaryAction.label;
     }
+
     if (project.publicStatus === "local_only") {
       return "Local Build";
     }
+
     return "Coming Soon";
   }
 
@@ -131,17 +132,6 @@
     return actions;
   }
 
-  function getLaunchStateTitle(project) {
-    switch (project.publicStatus) {
-      case "live":
-        return "Public Route Live";
-      case "local_only":
-        return "Local Build Only";
-      default:
-        return "Placeholder Route";
-    }
-  }
-
   function statusLabel(status) {
     if (status === "wip") {
       return "WIP";
@@ -154,6 +144,15 @@
     return href ? encodeURI(href) : "";
   }
 
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
   function setTheme(project) {
     root.style.setProperty("--signal", project.visualTheme.accent);
     root.style.setProperty("--signal-strong", project.visualTheme.accentAlt);
@@ -163,39 +162,22 @@
   function projectCoverStyle(project) {
     const { accent, accentAlt, glow, base } = project.visualTheme;
     return [
-      `radial-gradient(circle at 20% 26%, ${glow}, transparent 32%)`,
-      `radial-gradient(circle at 76% 24%, ${accentAlt}22, transparent 24%)`,
-      `linear-gradient(135deg, ${base} 0%, ${accent}22 55%, ${accentAlt}18 100%)`,
+      `radial-gradient(circle at 18% 22%, ${glow}, transparent 32%)`,
+      `radial-gradient(circle at 78% 22%, ${accentAlt}22, transparent 24%)`,
+      `linear-gradient(135deg, ${base} 0%, ${accent}20 58%, ${accentAlt}16 100%)`,
     ].join(", ");
   }
 
-  function renderStatusDeck() {
+  function renderCatalogSummary() {
     const hostedCount = projects.filter((project) => project.publicStatus === "live").length;
     const placeholderCount = projects.filter((project) => project.publicStatus === "placeholder").length;
     const localOnlyCount = projects.filter((project) => project.publicStatus === "local_only").length;
-    const browserCount = projects.filter((project) => project.platform.includes("Browser")).length;
 
-    statusDeck.innerHTML = `
-      <article class="status-card">
-        <span>Tracked projects</span>
-        <strong>${projects.length}</strong>
-        <span>Curated entries with stable slugs and public route planning.</span>
-      </article>
-      <article class="status-card">
-        <span>Hosted now</span>
-        <strong>${hostedCount}</strong>
-        <span>Projects with a real public build under the main domain.</span>
-      </article>
-      <article class="status-card">
-        <span>Queued routes</span>
-        <strong>${placeholderCount}</strong>
-        <span>Projects with public placeholder routes ready for future staging.</span>
-      </article>
-      <article class="status-card">
-        <span>Local-only entries</span>
-        <strong>${localOnlyCount}</strong>
-        <span>${browserCount} browser-focused projects are tracked here overall.</span>
-      </article>
+    catalogSummary.innerHTML = `
+      <span class="summary-pill"><strong>${projects.length}</strong> tracked</span>
+      <span class="summary-pill"><strong>${hostedCount}</strong> live</span>
+      <span class="summary-pill"><strong>${placeholderCount}</strong> queued</span>
+      <span class="summary-pill"><strong>${localOnlyCount}</strong> local-only</span>
     `;
   }
 
@@ -220,82 +202,6 @@
     return `${primaryAction ? renderAction(primaryAction) : ""}${secondaryActions
       .map((action) => renderAction(action, "button-secondary"))
       .join("")}`;
-  }
-
-  function renderSpotlight() {
-    const project = getSelectedProject();
-    const projectIsVisible = isProjectVisible(project);
-    const publicActions = getPublicActions(project);
-
-    setTheme(project);
-
-    spotlight.innerHTML = `
-      <div class="eyebrow">Selected Dossier</div>
-      <div class="spotlight-cover" style="background:${projectCoverStyle(project)}"></div>
-      <div class="spotlight-body">
-        <div class="spotlight-meta">
-          <span class="status-pill" data-status="${project.status}">${statusLabel(project.status)}</span>
-          <span class="meta-pill">${escapeHtml(project.genre)}</span>
-          <span class="meta-pill">${escapeHtml(project.platform)}</span>
-          <span class="meta-pill" data-public-status="${project.publicStatus}">${getPublicStatusLabel(project.publicStatus)}</span>
-          ${project.featured ? '<span class="meta-pill">Featured</span>' : ""}
-          ${projectIsVisible ? "" : '<span class="meta-pill">Outside current filter</span>'}
-        </div>
-
-        <div class="spotlight-title-row">
-          <div>
-            <h3>${escapeHtml(project.title)}</h3>
-            <p class="spotlight-summary">${escapeHtml(project.detailSummary)}</p>
-          </div>
-          <button class="drawer-close" id="open-drawer-button" type="button" aria-label="Open full project details">
-            +
-          </button>
-        </div>
-
-        <div class="stat-blocks">
-          <div class="stat-block">
-            <span>Launch state</span>
-            <strong>${escapeHtml(getLaunchStateTitle(project))}</strong>
-          </div>
-          <div class="stat-block">
-            <span>Public route</span>
-            <strong>${escapeHtml(getPublicRoute(project))}</strong>
-          </div>
-          <div class="stat-block">
-            <span>Control set</span>
-            <strong>${escapeHtml(project.controls[0])}</strong>
-          </div>
-        </div>
-
-        <div class="drawer-section">
-          <h4>Public availability</h4>
-          <p class="drawer-summary">${escapeHtml(getPublicStatusSummary(project))}</p>
-        </div>
-
-        <div class="drawer-section">
-          <h4>Tech stack</h4>
-          <div class="stack-list">
-            ${project.tech.map((item) => `<span class="stack-chip">${escapeHtml(item)}</span>`).join("")}
-          </div>
-        </div>
-
-        <div class="drawer-section">
-          <h4>Control snapshot</h4>
-          <div class="control-list">
-            ${project.controls.map((item) => `<span class="control-chip">${escapeHtml(item)}</span>`).join("")}
-          </div>
-        </div>
-
-        <div class="drawer-section">
-          <h4>Launch actions</h4>
-          <div class="action-row">
-            ${renderActionRow(publicActions)}
-          </div>
-        </div>
-      </div>
-    `;
-
-    spotlight.querySelector("#open-drawer-button")?.addEventListener("click", openDrawer);
   }
 
   function renderFilters() {
@@ -329,7 +235,7 @@
         <article class="empty-state">
           <div class="eyebrow">No Matches</div>
           <h3>The current filter route returned zero projects.</h3>
-          <p>Reset the rail to restore the full catalog. Your selected project stays pinned in the dossier until you choose another.</p>
+          <p>Reset the filters to restore the full catalog. Your selected project stays ready in the details drawer.</p>
           <button class="button button-primary" id="empty-reset" type="button">Reset Filters</button>
         </article>
       `;
@@ -341,11 +247,12 @@
     grid.innerHTML = visibleProjects
       .map((project) => {
         const publicActions = getPublicActions(project);
+        const primaryAction = publicActions.find((action) => action.kind === "primary") || null;
 
         return `
           <article class="project-card ${project.id === selectedProject.id ? "is-selected" : ""}" role="listitem">
             <div class="project-card-header">
-              <button class="card-select" type="button" data-project-select="${escapeHtml(project.id)}">
+              <button class="card-select" type="button" data-project-open="${escapeHtml(project.id)}">
                 <div class="project-cover" style="background:${projectCoverStyle(project)}"></div>
                 <div class="card-meta">
                   <span class="status-pill" data-status="${project.status}">${statusLabel(project.status)}</span>
@@ -359,7 +266,10 @@
             </div>
 
             <div class="card-actions">
-              ${renderActionRow(publicActions, 2)}
+              ${primaryAction ? renderAction(primaryAction) : ""}
+              <button class="button button-secondary" type="button" data-project-open="${escapeHtml(project.id)}">
+                Details
+              </button>
             </div>
 
             <div class="card-footnote">${escapeHtml(project.tech.slice(0, 2).join(" • "))}</div>
@@ -373,10 +283,12 @@
     const project = getSelectedProject();
     const publicActions = getPublicActions(project);
 
+    setTheme(project);
+
     drawer.innerHTML = `
       <div class="drawer-header">
         <div>
-          <div class="eyebrow">Project Dossier</div>
+          <div class="eyebrow">Project Details</div>
           <h3 id="drawer-title">${escapeHtml(project.title)}</h3>
         </div>
         <button class="drawer-close" id="close-drawer" type="button" aria-label="Close project details">
@@ -400,11 +312,6 @@
         </div>
 
         <div class="drawer-section">
-          <h4>Public route</h4>
-          <p class="drawer-summary">${escapeHtml(getPublicRoute(project))} — ${escapeHtml(getPublicStatusSummary(project))}</p>
-        </div>
-
-        <div class="drawer-section">
           <h4>Controls</h4>
           <div class="drawer-control-list">
             ${project.controls
@@ -424,6 +331,11 @@
           <h4>Actions</h4>
           <div class="drawer-actions">${renderActionRow(publicActions)}</div>
         </div>
+
+        <div class="drawer-section">
+          <h4>Route</h4>
+          <p class="drawer-summary">${escapeHtml(getPublicRoute(project))} — ${escapeHtml(getPublicStatusSummary(project))}</p>
+        </div>
       </div>
     `;
 
@@ -431,11 +343,12 @@
   }
 
   function renderAll() {
-    renderStatusDeck();
+    renderCatalogSummary();
     renderFilters();
-    renderSpotlight();
     renderProjects();
-    renderDrawer();
+    if (state.drawerOpen) {
+      renderDrawer();
+    }
   }
 
   function toggleFilter(group, value) {
@@ -457,11 +370,6 @@
     renderAll();
   }
 
-  function selectProject(projectId) {
-    state.selectedProjectId = projectId;
-    renderAll();
-  }
-
   function openDrawer() {
     state.drawerOpen = true;
     drawerShell.hidden = false;
@@ -470,32 +378,27 @@
     window.requestAnimationFrame(() => drawer.focus());
   }
 
+  function openProject(projectId) {
+    state.selectedProjectId = projectId;
+    renderProjects();
+    openDrawer();
+  }
+
   function closeDrawer() {
     state.drawerOpen = false;
     drawerShell.hidden = true;
     document.body.classList.remove("drawer-open");
   }
 
-  function escapeHtml(value) {
-    return String(value)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#39;");
-  }
-
   searchInput.addEventListener("input", (event) => {
     state.search = event.target.value;
     renderProjects();
-    renderSpotlight();
     if (state.drawerOpen) {
       renderDrawer();
     }
   });
 
   clearFiltersButton.addEventListener("click", resetFilters);
-  openFeaturedDrawer.addEventListener("click", openDrawer);
   drawerBackdrop.addEventListener("click", closeDrawer);
 
   document.addEventListener("click", (event) => {
@@ -519,11 +422,11 @@
       return;
     }
 
-    const selectionTarget = event.target.closest("[data-project-select]");
-    if (selectionTarget) {
-      const projectId = selectionTarget.getAttribute("data-project-select");
+    const projectTarget = event.target.closest("[data-project-open]");
+    if (projectTarget) {
+      const projectId = projectTarget.getAttribute("data-project-open");
       if (projectId) {
-        selectProject(projectId);
+        openProject(projectId);
       }
     }
   });
@@ -534,5 +437,6 @@
     }
   });
 
+  setTheme(getSelectedProject());
   renderAll();
 })();

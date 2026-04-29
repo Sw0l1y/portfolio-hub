@@ -35,6 +35,7 @@
    *   featured: boolean
    *   sortOrder: number
    *   actions: ProjectAction[]
+   *   publicPath?: string
    *   repoUrl?: string
    *   notesUrl?: string
    * }} Project
@@ -168,6 +169,7 @@
       },
       featured: false,
       sortOrder: 5,
+      publicPath: "/games/clicker-game/",
       actions: [
         { label: "Play", href: "/Nathan games that he made/clicker game/Clicker.html", kind: "primary" },
         { label: "Dev Notes", href: "/Nathan games that he made/clicker game/progress.md", kind: "secondary" },
