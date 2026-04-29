@@ -208,9 +208,9 @@
       slug: "orbital-mechanics-sim",
       title: "Orbital Mechanics Sim",
       status: "prototype",
-      publicStatus: "placeholder",
+      publicStatus: "live",
       genre: "Simulation",
-      platform: "Build Preview",
+      platform: "Browser",
       tech: ["TypeScript", "Vite", "Simulation Logic", "Static Dist Build"],
       shortSummary: "A newer simulation track with TypeScript structure and a bundled browser build.",
       detailSummary:
@@ -225,9 +225,7 @@
       featured: false,
       sortOrder: 7,
       actions: [
-        { label: "Preview Build", href: "/orbital-mechanics-sim/dist/index.html", kind: "secondary" },
-        { label: "Source Files", href: "/orbital-mechanics-sim/src/", kind: "secondary" },
-        { label: "Project Root", href: "/orbital-mechanics-sim/", kind: "secondary" },
+        { label: "Play", href: "/games/orbital-mechanics-sim/", kind: "primary" },
       ],
     },
     {

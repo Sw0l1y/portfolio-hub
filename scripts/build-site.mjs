@@ -17,6 +17,10 @@ const EXTERNAL_GAME_SOURCES = {
     sourceDir: "clicker-game",
     entryFile: "Clicker.html",
   },
+  "orbital-mechanics-sim": {
+    sourceDir: "orbital-mechanics-sim",
+    buildDir: "dist",
+  },
 };
 
 async function main() {
@@ -40,7 +44,9 @@ async function main() {
     if (project.publicStatus === "live") {
       if (await directoryHasEntries(sourceRouteRoot)) {
         await copyDirectory(sourceRouteRoot, routeRoot);
-      } else if (externalSource && (await fileExists(externalSource.entryPath))) {
+      } else if (externalSource?.buildPath && (await directoryHasEntries(externalSource.buildPath))) {
+        await copyDirectory(externalSource.buildPath, routeRoot);
+      } else if (externalSource?.entryPath && (await fileExists(externalSource.entryPath))) {
         await fs.mkdir(routeRoot, { recursive: true });
         await fs.copyFile(externalSource.entryPath, routeIndex);
       } else {
@@ -61,6 +67,12 @@ function getExternalSource(slug) {
   const config = EXTERNAL_GAME_SOURCES[slug];
   if (!config) {
     return null;
+  }
+
+  if (config.buildDir) {
+    return {
+      buildPath: path.join(EXTERNAL_GAMES_ROOT, config.sourceDir, config.buildDir),
+    };
   }
 
   return {
