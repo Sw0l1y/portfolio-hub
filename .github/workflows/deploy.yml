@@ -1,0 +1,57 @@
+name: Deploy Portfolio
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build static site
+        run: npm run build
+
+      - name: Install SSH key
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: Trust VPS host key
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+        run: |
+          PORT="${VPS_PORT:-22}"
+          ssh-keyscan -p "$PORT" -H "$VPS_HOST" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Sync built site to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+        run: |
+          PORT="${VPS_PORT:-22}"
+          rsync -az --delete -e "ssh -p $PORT" ./dist/ "${VPS_USER}@${VPS_HOST}:/root/godot-physics-sandbox/deploy/webrtc/portfolio-build/"
+
+      - name: Verify remote directory
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+        run: |
+          PORT="${VPS_PORT:-22}"
+          ssh -p "$PORT" "${VPS_USER}@${VPS_HOST}" 'find /root/godot-physics-sandbox/deploy/webrtc/portfolio-build -maxdepth 3 -type f | sort | sed -n "1,80p"'

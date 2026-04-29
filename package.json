@@ -1,0 +1,10 @@
+{
+  "name": "portfolio-hub",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static portfolio site for sw0l1ylab.com",
+  "scripts": {
+    "build": "node ./scripts/build-site.mjs"
+  }
+}
+

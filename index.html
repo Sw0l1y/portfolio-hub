@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolio Hub</title>
+    <meta
+      name="description"
+      content="Mission-control portfolio for Nathan Kratz browser games, prototypes, and playable experiments."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23040f18'/%3E%3Cpath d='M14 18h13c9 0 14 4.7 14 12.2 0 7.8-5.5 12.8-14.6 12.8H22V54H14V18Zm8 6.7v11.8h4.1c4.5 0 6.9-2 6.9-5.9 0-3.8-2.4-5.9-6.7-5.9H22ZM45 18h8v36h-8V18Z' fill='%2379f0e0'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./catalog.js" defer></script>
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <div class="page-noise" aria-hidden="true"></div>
+    <div class="beam beam-a" aria-hidden="true"></div>
+    <div class="beam beam-b" aria-hidden="true"></div>
+
+    <main class="shell">
+      <section class="hero panel">
+        <div class="eyebrow">Portfolio Hub</div>
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <h1>Mission control for browser games, experiments, and playable systems.</h1>
+            <p class="lede">
+              This hub is built for quick scanning and quick launch. Every entry is curated by hand,
+              tagged by status, and routed into a real local project.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#catalog">Browse Catalog</a>
+              <button class="button button-secondary" id="open-featured-drawer" type="button">
+                Open Selected Dossier
+              </button>
+            </div>
+          </div>
+
+          <div class="status-deck" id="status-deck" aria-label="Catalog status cards"></div>
+        </div>
+      </section>
+
+      <section class="spotlight panel" id="spotlight" aria-live="polite"></section>
+
+      <section class="catalog panel" id="catalog">
+        <div class="catalog-header">
+          <div>
+            <div class="eyebrow">Project Index</div>
+            <h2>Curated launch board</h2>
+          </div>
+          <p class="result-summary" id="result-summary" aria-live="polite"></p>
+        </div>
+
+        <div class="control-rail">
+          <label class="search-field">
+            <span>Search title or summary</span>
+            <input
+              id="search-input"
+              type="search"
+              name="search"
+              placeholder="Search traversal, runner, clicker..."
+              autocomplete="off"
+            />
+          </label>
+
+          <div class="filter-group">
+            <div class="filter-label">Status</div>
+            <div class="chip-row" id="status-filters"></div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-label">Genre</div>
+            <div class="chip-row" id="genre-filters"></div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-label">Platform</div>
+            <div class="chip-row" id="platform-filters"></div>
+          </div>
+
+          <div class="rail-actions">
+            <button class="button button-secondary" id="clear-filters" type="button">
+              Reset Filters
+            </button>
+          </div>
+        </div>
+
+        <div class="project-grid" id="project-grid" role="list"></div>
+      </section>
+    </main>
+
+    <div class="drawer-shell" id="drawer-shell" hidden>
+      <div class="drawer-backdrop" id="drawer-backdrop"></div>
+      <aside
+        class="drawer"
+        id="project-drawer"
+        aria-labelledby="drawer-title"
+        aria-modal="true"
+        role="dialog"
+        tabindex="-1"
+      ></aside>
+    </div>
+  </body>
+</html>
