@@ -31,6 +31,12 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Build orbital-mechanics-sim
+        working-directory: external-games/orbital-mechanics-sim
+        env:
+          VITE_BASE_PATH: /games/orbital-mechanics-sim/
+        run: npm ci && npm run build
+
       - name: Build static site
         run: npm run build
 
