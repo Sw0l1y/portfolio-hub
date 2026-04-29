@@ -10,7 +10,14 @@ const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..");
 const DIST_ROOT = path.join(REPO_ROOT, "dist");
 const PUBLIC_GAMES_ROOT = path.join(REPO_ROOT, "public-games");
+const EXTERNAL_GAMES_ROOT = path.join(REPO_ROOT, "external-games");
 const ROOT_FILES = ["index.html", "app.js", "catalog.js", "styles.css"];
+const EXTERNAL_GAME_SOURCES = {
+  "clicker-game": {
+    sourceDir: "clicker-game",
+    entryFile: "Clicker.html",
+  },
+};
 
 async function main() {
   await fs.rm(DIST_ROOT, { recursive: true, force: true });
@@ -27,11 +34,15 @@ async function main() {
 
     const routeRoot = path.join(gamesRoot, project.slug);
     const sourceRouteRoot = path.join(PUBLIC_GAMES_ROOT, project.slug);
+    const externalSource = getExternalSource(project.slug);
     const routeIndex = path.join(routeRoot, "index.html");
 
     if (project.publicStatus === "live") {
-      if (await fileExists(sourceRouteRoot)) {
+      if (await directoryHasEntries(sourceRouteRoot)) {
         await copyDirectory(sourceRouteRoot, routeRoot);
+      } else if (externalSource && (await fileExists(externalSource.entryPath))) {
+        await fs.mkdir(routeRoot, { recursive: true });
+        await fs.copyFile(externalSource.entryPath, routeIndex);
       } else {
         await fs.mkdir(routeRoot, { recursive: true });
         await fs.writeFile(routeIndex, buildPlaceholderHtml(project, "live_missing"), "utf8");
@@ -44,6 +55,17 @@ async function main() {
   }
 
   console.log(`Built portfolio site in ${DIST_ROOT}`);
+}
+
+function getExternalSource(slug) {
+  const config = EXTERNAL_GAME_SOURCES[slug];
+  if (!config) {
+    return null;
+  }
+
+  return {
+    entryPath: path.join(EXTERNAL_GAMES_ROOT, config.sourceDir, config.entryFile),
+  };
 }
 
 async function copyRootFiles() {
@@ -233,6 +255,15 @@ async function fileExists(targetPath) {
   }
 }
 
+async function directoryHasEntries(targetPath) {
+  try {
+    const entries = await fs.readdir(targetPath);
+    return entries.length > 0;
+  } catch {
+    return false;
+  }
+}
+
 async function copyDirectory(sourceRoot, destinationRoot) {
   await fs.mkdir(destinationRoot, { recursive: true });
   const entries = await fs.readdir(sourceRoot, { withFileTypes: true });
@@ -251,4 +282,3 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
-

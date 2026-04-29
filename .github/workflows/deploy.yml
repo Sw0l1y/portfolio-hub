@@ -12,6 +12,13 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v5
 
+      - name: Check out clicker-game source
+        uses: actions/checkout@v5
+        with:
+          repository: Sw0l1y/clicker-game
+          token: ${{ secrets.CONTENT_REPO_TOKEN }}
+          path: external-games/clicker-game
+
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:

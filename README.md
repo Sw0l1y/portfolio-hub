@@ -31,7 +31,9 @@ The workflow syncs `dist/` to:
 
 To host a real game under `/games/<slug>/`:
 
-1. add its public build under `public-games/<slug>/`
-2. set that project's `publicStatus` to `live` in `catalog.js`
-3. push to `main`
+1. either add a bundled static build under `public-games/<slug>/`
+2. or have GitHub Actions check out the game's source repo into `external-games/<slug>/`
+3. set that project's `publicStatus` to `live` in `catalog.js`
+4. push to `main`
 
+`clicker-game` currently uses the second path and is pulled from its own GitHub repo during deploy.
