@@ -1,595 +1,4074 @@
 <!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Glowing Cookie Clicker</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: #000;
-      font-family: Arial, sans-serif;
-      color: #fff;
-    }
-    #mainContainer {
-      display: flex;
-      width: 100vw;
-      height: 100vh;
-      transition: transform 0.2s linear;
-      position: relative;
-      z-index: 0;
-      margin-right: 50px;
-      margin-left: 50px;
-    }
-    #sidePanel {
-      width: 180px;
-      background: rgba(0, 0, 0, 0.9);
-      box-shadow: 2px 0 8px rgba(0,0,0,0.7);
-      padding: 10px;
-      box-sizing: border-box;
-      overflow-y: auto;
-      overflow-x: visible;
-      position: relative;
-      z-index: 100;
-    }
-    #sidePanel h2 {
-      margin-top: 0;
-      color: #ffcc00;
-      text-shadow: 0 0 8px #ff0;
-      text-align: center;
-      font-size: 1.2em;
-    }
-    .upgrade-button, #settingsButton, #showAchievementsButton, #showAutomationButton, #customizationButton, #prestigeButton {
-      display: block;
-      width: 100%;
-      margin: 8px 0;
-      padding: 8px;
-      background: #111;
-      border: 1px solid #555;
-      color: #fff;
-      cursor: pointer;
-      box-sizing: border-box;
-      white-space: nowrap;
-      transition: background 0.2s;
-    }
-    .upgrade-button:hover, #settingsButton:hover, #showAchievementsButton:hover, #showAutomationButton:hover, #customizationButton:hover, #prestigeButton:hover {
-      background: #333;
-    }
-    .upgrade-button:disabled {
-      opacity: 0.5;
-      cursor: default;
-      background: #222;
-      color: #777;
-    }
-    #mainGame {
-      flex: 1;
-      position: relative;
-      overflow: visible;
-    }
-    #cookieButton {
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 250px;
-      height: 250px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #ffdd33, #ff9900);
-      box-shadow: 0 0 20px #ff0;
-      cursor: pointer;
-      transition: transform 0.1s, background 0.3s;
-      border: none;
-      z-index: 1;
-      overflow: visible;
-    }
-    #cookieButton:hover { transform: translate(-50%, -50%) scale(1.05); }
-    #cookieCount {
-      position: absolute;
-      top: 5px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.5em;
-      text-shadow: 0 0 10px #fff;
-      z-index: 100;
-    }
-    #comboDisplay {
-      position: absolute;
-      top: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1em;
-      color: #ffcc00;
-      text-shadow: 0 0 10px #ff0;
-      z-index: 100;
-    }
-    #prestigeInfo {
-      position: absolute;
-      top: 70px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1em;
-      color: #00ffcc;
-      text-shadow: 0 0 10px #0ff;
-      z-index: 100;
-    }
-    #cpsDisplay {
-      position: absolute;
-      top: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1em;
-      color: #ffcc00;
-      text-shadow: 0 0 10px #fff;
-      z-index: 100;
-    }
-    #autoClickerDisplay {
-      position: absolute;
-      top: 130px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.9em;
-      color: #aaffaa;
-      text-shadow: 0 0 6px #0f0;
-      z-index: 100;
-    }
-    .particle {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 99;
-      animation: floatUp 1s forwards;
-    }
-    @keyframes floatUp {
-      0% { opacity: 1; transform: translateY(0) scale(1); }
-      100% { opacity: 0; transform: translateY(-50px) scale(0); }
-    }
-    #notification {
-      position: absolute;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.8);
-      padding: 10px 20px;
-      border-radius: 5px;
-      font-size: 1.2em;
-      display: none;
-      z-index: 200;
-      text-shadow: 0 0 8px #fff;
-    }
-    .modal {
-      display: none;
-      position: absolute;
-      top: 10%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      max-width: 400px;
-      background: rgba(0,0,0,0.95);
-      border: 2px solid #555;
-      border-radius: 8px;
-      padding: 20px;
-      z-index: 300;
-      box-shadow: 0 0 20px #000;
-    }
-    .modal h3 {
-      margin-top: 0;
-      color: #ffcc00;
-      text-align: center;
-    }
-    .modal button {
-      margin-top: 10px;
-      padding: 8px;
-      width: 100%;
-      background: #111;
-      border: 1px solid #555;
-      color: #fff;
-      cursor: pointer;
-    }
-    .modal button:hover { background: #333; }
-    .dropdown {
-      position: relative;
-      width: 100%;
-      display: block;
-      overflow: visible;
-    }
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      left: 100%;
-      top: 0;
-      background: rgba(0,0,0,0.95);
-      min-width: 200px;
-      border: 1px solid #555;
-      z-index: 400;
-      padding: 8px;
-      box-sizing: border-box;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    }
-    .dropdown:hover .dropdown-content {
-      display: block;
-    }
-    .dropdown-content button {
-      width: 100%;
-      margin: 5px 0;
-      padding: 6px;
-      background: #111;
-      border: 1px solid #555;
-      color: #fff;
-      cursor: pointer;
-      box-sizing: border-box;
-      text-align: left;
-    }
-    .dropdown-content button:hover {
-      background: #333;
-    }
-    .dropdown-content button.selected {
-      border-color: gold;
-      color: gold;
-    }
-  </style>
-</head>
-<body>
-  <div id="notification"></div>
-  <div id="mainContainer">
-    <div id="sidePanel">
-      <h2>Upgrades</h2>
-      <button id="upgrade1" class="upgrade-button">Buy A Piece (+1 CPS) - 10 cookies</button>
-      <button id="upgrade2" class="upgrade-button">Sprinkles (+2 CPS) - 50 cookies</button>
-      <button id="upgrade3" class="upgrade-button">Cookie Factory (+5 CPS) - 250 cookies</button>
-      <button id="upgrade4" class="upgrade-button">Double Click Power - 100 cookies</button>
-      <button id="upgrade5" class="upgrade-button">Auto-clicker (+0.5 CPS) - 200 cookies</button>
-      <button id="upgrade6" class="upgrade-button">Combo Boost (+1 max combo) - 300 cookies</button>
-      <button id="upgrade7" class="upgrade-button">Golden Click Chance +5% - 500 cookies</button>
-      <button id="upgrade8" class="upgrade-button">Particle Storm - 700 cookies</button>
-      <button id="upgrade9" class="upgrade-button">Critical Click +10% - 1000 cookies</button>
-      <button id="upgrade10" class="upgrade-button">Cookie Multiplier x1.5 - 2000 cookies</button>
-      <button id="upgrade11" class="upgrade-button">Cookie Empire (+20 CPS) - 5000 cookies</button>
-      <button id="upgrade12" class="upgrade-button">Nuclear Oven (+100 CPS) - 10000 cookies</button>
-      <button id="prestigeButton" class="upgrade-button">Prestige Reset</button>
-      <button id="customizationButton" class="upgrade-button">Customization</button>
-      <button id="showAchievementsButton" class="upgrade-button">Achievements</button>
-      <button id="showAutomationButton" class="upgrade-button">Automation</button>
-      <button id="settingsButton" class="upgrade-button">Settings</button>
-    </div>
-    <div id="mainGame">
-      <div id="cookieCount">Cookies: 0</div>
-      <div id="comboDisplay">Combo: 0 / 3</div>
-      <div id="prestigeInfo">Prestige: 0 (Multiplier x1)</div>
-      <div id="cpsDisplay">Cookies per second: 0</div>
-      <div id="autoClickerDisplay">Auto-clickers: 0</div>
-      <button id="cookieButton"></button>
-    </div>
-  </div>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clicker Game</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
 
-  <div id="settingsModal" class="modal">
-    <h3>Settings</h3>
-    <button id="saveGameBtn">Save Game</button>
-    <button id="loadGameBtn">Load Game</button>
-    <button id="exportSaveBtn">Export Save</button>
-    <button id="importSaveBtn">Import Save</button>
-    <button id="resetGameBtn">Reset Game</button>
-    <button id="closeSettingsBtn">Close</button>
-  </div>
+      body {
+        font-family: Georgia, "Times New Roman", serif;
+        background: #000000;
+        color: #ffffff;
+        overflow: hidden;
+        --theme-hue: 220;
+        --panel-bg: hsl(var(--theme-hue) 34% 16% / 0.16);
+        --panel-border: hsl(var(--theme-hue) 80% 82% / 0.16);
+        --panel-button-bg: hsl(var(--theme-hue) 92% 78% / 0.1);
+        --panel-button-border: hsl(var(--theme-hue) 86% 86% / 0.16);
+        --panel-button-hover: hsl(var(--theme-hue) 92% 78% / 0.18);
+        --accent-soft: hsl(var(--theme-hue) 78% 76% / 0.18);
+        --accent-mid: hsl(var(--theme-hue) 90% 82%);
+        --accent-bright: hsl(var(--theme-hue) 100% 94%);
+        --effect-soft: hsl(var(--theme-hue) 82% 72% / 0.14);
+        --effect-mid: hsl(var(--theme-hue) 92% 82% / 0.58);
+        --effect-bright: hsl(var(--theme-hue) 100% 96%);
+        --live-color: hsl(var(--theme-hue) 96% 84%);
+        --button-face: hsl(var(--theme-hue) 42% 82%);
+        --button-face-deep: hsl(var(--theme-hue) 32% 72%);
+        --button-shadow: hsl(var(--theme-hue) 34% 44%);
+        --button-shadow-deep: hsl(var(--theme-hue) 28% 26%);
+      }
 
-  <div id="customizationModal" class="modal">
-    <h3>Customization</h3>
-    <div class="dropdown">
-      <button id="cookieColorDropdownBtn" class="upgrade-button">Select Cookie Color</button>
-      <div id="cookieColorDropdown" class="dropdown-content">
-        <button data-color="classic">Classic</button>
-        <button data-color="red">Red</button>
-        <button data-color="blue">Blue</button>
-        <button data-color="rainbow">Rainbow</button>
+      body[data-theme="white"] .screen-fx,
+      body[data-theme="white"] .ripple-layer,
+      body[data-theme="white"] .sidebar,
+      body[data-theme="white"] .sidebar-toggle,
+      body[data-theme="white"] .customization-menu,
+      body[data-theme="white"] .save-menu,
+      body[data-theme="white"] .panel,
+      body[data-theme="white"] .combo-meter {
+        filter: saturate(0);
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      .screen-fx,
+      .ripple-layer {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .screen-fx {
+        opacity: var(--vignette-opacity, 0);
+        background:
+          radial-gradient(circle at var(--focus-x, 50%) var(--focus-y, 50%), transparent 34%, hsl(var(--theme-hue) 70% 78% / 0.04) 58%, hsl(var(--theme-hue) 82% 84% / 0.12) 72%, hsl(var(--theme-hue) 92% 88% / 0.26) 88%, hsl(var(--theme-hue) 100% 92% / 0.42) 100%),
+          repeating-radial-gradient(circle at var(--focus-x, 50%) var(--focus-y, 50%), transparent 0 110px, hsl(var(--theme-hue) 90% 86% / 0.06) 126px 132px, transparent 156px 226px);
+        mix-blend-mode: screen;
+      }
+
+      .ripple-layer {
+        overflow: hidden;
+      }
+
+      .ripple {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        margin-left: -15px;
+        margin-top: -15px;
+        border-radius: 999px;
+        border: 2px solid var(--effect-bright);
+        box-shadow:
+          0 0 34px var(--effect-soft),
+          inset 0 0 24px hsl(var(--theme-hue) 90% 88% / 0.18);
+        animation: ripple-wave 1100ms cubic-bezier(0.08, 0.52, 0.22, 1) forwards;
+        will-change: transform, opacity;
+      }
+
+      .ripple.is-secondary {
+        border-color: hsl(var(--theme-hue) 90% 88% / 0.46);
+        animation-duration: 1280ms;
+      }
+
+      .ripple-core {
+        position: absolute;
+        width: 52px;
+        height: 52px;
+        margin-left: -26px;
+        margin-top: -26px;
+        border-radius: 999px;
+        background: radial-gradient(circle, hsl(var(--theme-hue) 100% 96% / 0.24) 0%, hsl(var(--theme-hue) 92% 84% / 0.08) 34%, rgba(255, 255, 255, 0) 72%);
+        animation: halo-core 420ms ease-out forwards;
+        will-change: transform, opacity;
+      }
+
+      .ray-burst {
+        position: absolute;
+        width: var(--ray-length, 420px);
+        height: var(--ray-thickness, 4px);
+        margin-top: calc(var(--ray-thickness, 4px) / -2);
+        transform-origin: 0 50%;
+        border-radius: 999px;
+        background: linear-gradient(
+          90deg,
+          var(--effect-bright) 0%,
+          hsl(var(--theme-hue) 100% 94% / 0.75) 18%,
+          hsl(var(--theme-hue) 92% 84% / 0.16) 62%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        filter: blur(0.7px);
+        animation: ray-burst 650ms ease-out forwards;
+        will-change: transform, opacity;
+      }
+
+      .comet-streak {
+        position: absolute;
+        width: var(--comet-length, 240px);
+        height: var(--comet-thickness, 10px);
+        margin-top: calc(var(--comet-thickness, 10px) / -2);
+        transform-origin: 0 50%;
+        border-radius: 999px;
+        background: linear-gradient(
+          90deg,
+          hsl(var(--theme-hue) 100% 98%) 0%,
+          hsl(var(--theme-hue) 100% 94% / 0.9) 14%,
+          hsl(var(--theme-hue) 94% 86% / 0.44) 48%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        filter: blur(0.5px);
+        animation: comet-streak 760ms cubic-bezier(0.12, 0.72, 0.22, 1) forwards;
+        will-change: transform, opacity;
+      }
+
+      .comet-head {
+        position: absolute;
+        width: var(--comet-head-size, 18px);
+        height: var(--comet-head-size, 18px);
+        margin-left: calc(var(--comet-head-size, 18px) / -2);
+        margin-top: calc(var(--comet-head-size, 18px) / -2);
+        border-radius: 999px;
+        background: radial-gradient(circle, hsl(var(--theme-hue) 100% 98%) 0%, hsl(var(--theme-hue) 100% 94% / 0.92) 40%, hsl(var(--theme-hue) 92% 84% / 0.12) 74%, rgba(255, 255, 255, 0) 100%);
+        box-shadow: 0 0 18px hsl(var(--theme-hue) 100% 92% / 0.22);
+        animation: comet-head 760ms cubic-bezier(0.12, 0.72, 0.22, 1) forwards;
+        will-change: transform, opacity;
+      }
+
+      .starburst-spike {
+        position: absolute;
+        width: var(--spike-length, 220px);
+        height: var(--spike-thickness, 18px);
+        margin-top: calc(var(--spike-thickness, 18px) / -2);
+        transform-origin: 0 50%;
+        border-radius: 999px;
+        background: linear-gradient(
+          90deg,
+          hsl(var(--theme-hue) 100% 98%) 0%,
+          hsl(var(--theme-hue) 100% 94% / 0.88) 18%,
+          hsl(var(--theme-hue) 92% 84% / 0.26) 72%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        box-shadow: 0 0 16px hsl(var(--theme-hue) 92% 84% / 0.12);
+        filter: blur(0.2px);
+        animation: starburst-spike 520ms ease-out forwards;
+        will-change: transform, opacity;
+      }
+
+      .grid-wave {
+        position: absolute;
+        width: var(--grid-size, 280px);
+        height: var(--grid-size, 280px);
+        margin-left: calc(var(--grid-size, 280px) / -2);
+        margin-top: calc(var(--grid-size, 280px) / -2);
+        border-radius: 26px;
+        border: 2px solid hsl(var(--theme-hue) 100% 94% / 0.4);
+        background:
+          repeating-linear-gradient(
+            0deg,
+            hsl(var(--theme-hue) 100% 96% / 0.18) 0 2px,
+            transparent 2px var(--grid-cell, 42px)
+          ),
+          repeating-linear-gradient(
+            90deg,
+            hsl(var(--theme-hue) 100% 96% / 0.18) 0 2px,
+            transparent 2px var(--grid-cell, 42px)
+          );
+        box-shadow:
+          0 0 28px hsl(var(--theme-hue) 90% 84% / 0.18),
+          inset 0 0 24px hsl(var(--theme-hue) 100% 94% / 0.08);
+        animation: grid-wave 900ms cubic-bezier(0.12, 0.62, 0.22, 1) forwards;
+        will-change: transform, opacity;
+      }
+
+      .grid-wave::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background:
+          repeating-linear-gradient(
+            45deg,
+            hsl(var(--theme-hue) 100% 96% / 0.08) 0 2px,
+            transparent 2px calc(var(--grid-cell, 42px) * 0.9)
+          );
+        opacity: 0.45;
+      }
+
+      .overcharge-overlay {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        mix-blend-mode: screen;
+        transform-origin: 50% 50%;
+        animation: overcharge-overlay 8000ms linear forwards;
+      }
+
+      .overcharge-overlay .lane-group {
+        transform-box: fill-box;
+        transform-origin: 50% 50%;
+        animation: overcharge-lanes 8000ms linear forwards;
+      }
+
+      .overcharge-overlay .frame {
+        fill: none;
+        stroke: hsl(var(--theme-hue) 100% 78% / 0.92);
+        stroke-width: 2.5;
+      }
+
+      .overcharge-overlay .frame-glow {
+        fill: none;
+        stroke: hsl(calc(var(--theme-hue) - 14) 92% 56% / 0.42);
+        stroke-width: 12;
+        filter: blur(8px);
+      }
+
+      .overcharge-overlay .lane {
+        fill: none;
+        stroke-linecap: round;
+      }
+
+      .overcharge-overlay .lane.outer {
+        stroke: hsl(calc(var(--theme-hue) - 18) 88% 52% / 0.62);
+        stroke-width: 3.2;
+      }
+
+      .overcharge-overlay .lane.mid {
+        stroke: hsl(calc(var(--theme-hue) - 6) 94% 58% / 0.74);
+        stroke-width: 2.8;
+      }
+
+      .overcharge-overlay .lane.inner {
+        stroke: hsl(var(--theme-hue) 100% 76% / 0.88);
+        stroke-width: 2.2;
+      }
+
+      .overcharge-overlay .center-box {
+        fill: hsl(calc(var(--theme-hue) - 8) 92% 62% / 0.06);
+        stroke: hsl(var(--theme-hue) 100% 82% / 0.94);
+        stroke-width: 2;
+      }
+
+      .overcharge-overlay .center-box.glow {
+        fill: none;
+        stroke: hsl(calc(var(--theme-hue) - 12) 90% 58% / 0.32);
+        stroke-width: 12;
+        filter: blur(10px);
+      }
+
+      .overcharge-overlay .sweep {
+        fill: url(#overcharge-sweep-gradient);
+        opacity: 0.72;
+        animation: overcharge-sweep 8000ms linear forwards;
+      }
+
+      .neural-branch {
+        position: absolute;
+        width: var(--neural-length, 190px);
+        height: var(--neural-thickness, 4px);
+        margin-top: calc(var(--neural-thickness, 4px) / -2);
+        transform-origin: 0 50%;
+        background: linear-gradient(
+          90deg,
+          var(--effect-bright) 0%,
+          hsl(var(--theme-hue) 100% 94% / 0.94) 46%,
+          hsl(var(--theme-hue) 92% 84% / 0.28) 82%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        box-shadow: 0 0 18px var(--effect-soft);
+        animation: neural-branch 600ms ease-out forwards;
+        will-change: transform, opacity;
+      }
+
+      .neural-branch::before,
+      .neural-branch::after {
+        content: "";
+        position: absolute;
+        right: 16%;
+        width: 42%;
+        height: 100%;
+        background: inherit;
+        opacity: 0.9;
+        transform-origin: 0 50%;
+      }
+
+      .neural-branch::before {
+        transform: rotate(28deg);
+      }
+
+      .neural-branch::after {
+        transform: rotate(-24deg);
+      }
+
+      .neural-core {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        margin-left: -6px;
+        margin-top: -6px;
+        border-radius: 999px;
+        background: radial-gradient(circle, hsl(var(--theme-hue) 100% 96% / 0.92) 0%, hsl(var(--theme-hue) 92% 84% / 0.22) 52%, rgba(255, 255, 255, 0) 100%);
+        box-shadow: 0 0 14px var(--effect-soft);
+        animation: neural-core 220ms ease-out forwards;
+        will-change: transform, opacity;
+      }
+
+      .crack-svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        opacity: 1;
+        will-change: opacity;
+      }
+
+      .neural-svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        animation: crack-fade 900ms ease-out forwards;
+        will-change: opacity;
+      }
+
+      .crack-svg.is-fading {
+        animation: crack-fade 1400ms ease-out forwards;
+      }
+
+      .lightning-svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        animation: lightning-fade 520ms ease-out forwards;
+        will-change: opacity;
+      }
+
+      .lightning-bolt-glow,
+      .lightning-bolt-core {
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .lightning-bolt-glow {
+        stroke: hsl(var(--theme-hue) 100% 92% / 0.22);
+        filter: blur(3px);
+      }
+
+      .lightning-bolt-core {
+        stroke: hsl(var(--theme-hue) 100% 96% / 0.92);
+        filter: drop-shadow(0 0 8px hsl(var(--theme-hue) 100% 90% / 0.3));
+      }
+
+      .lightning-flash {
+        fill: hsl(var(--theme-hue) 100% 96% / 0.08);
+        animation: lightning-flash 420ms ease-out forwards;
+      }
+
+      .crack-path {
+        fill: none;
+        stroke: hsl(var(--theme-hue) 100% 96% / 0.88);
+        stroke-linecap: butt;
+        stroke-linejoin: miter;
+        filter: drop-shadow(0 0 8px hsl(var(--theme-hue) 90% 84% / 0.14));
+      }
+
+      .crack-path.is-secondary {
+        stroke: hsl(var(--theme-hue) 90% 84% / 0.4);
+      }
+
+      .ice-vein-shadow,
+      .ice-vein-glow,
+      .ice-vein-core {
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .ice-vein-shadow {
+        stroke: rgba(255, 255, 255, 0.05);
+        filter: blur(1.8px);
+      }
+
+      .ice-vein-glow {
+        opacity: 0.52;
+        filter: blur(0.8px);
+      }
+
+      .ice-vein-core {
+        stroke: rgba(255, 255, 255, 0.28);
+        filter: none;
+      }
+
+      .ice-dust {
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: center;
+        filter: blur(0.2px);
+        animation: ice-dust 900ms ease-out forwards;
+      }
+
+      @keyframes ice-dust {
+        0% {
+          opacity: 0;
+          transform: translate(0, 0) scale(0.38);
+        }
+
+        18% {
+          opacity: 0.48;
+          transform: translate(calc(var(--dust-dx, 0px) * -0.08), calc(var(--dust-dy, 0px) * -0.08)) scale(0.82);
+        }
+
+        100% {
+          opacity: 0;
+          transform: translate(var(--dust-dx, 0px), var(--dust-dy, 0px)) scale(1);
+        }
+      }
+
+      @keyframes ripple-wave {
+        0% {
+          transform: scale(0.5);
+          opacity: 0.95;
+        }
+
+        100% {
+          transform: scale(14);
+          opacity: 0;
+        }
+      }
+
+      @keyframes ray-burst {
+        0% {
+          transform: rotate(var(--ray-angle, 0deg)) scaleX(0.08);
+          opacity: 0.98;
+        }
+
+        100% {
+          transform: rotate(var(--ray-angle, 0deg)) scaleX(1);
+          opacity: 0;
+        }
+      }
+
+      @keyframes comet-streak {
+        0% {
+          transform: rotate(var(--comet-angle, 0deg)) scaleX(0.12);
+          opacity: 0;
+        }
+
+        12% {
+          opacity: 0.96;
+        }
+
+        100% {
+          transform: translate(var(--comet-dx, 0px), var(--comet-dy, 0px)) rotate(var(--comet-angle, 0deg)) scaleX(1);
+          opacity: 0;
+        }
+      }
+
+      @keyframes comet-head {
+        0% {
+          transform: translate(0, 0) scale(0.4);
+          opacity: 0;
+        }
+
+        12% {
+          opacity: 0.98;
+        }
+
+        100% {
+          transform: translate(var(--comet-dx, 0px), var(--comet-dy, 0px)) scale(1);
+          opacity: 0;
+        }
+      }
+
+      @keyframes starburst-spike {
+        0% {
+          transform: rotate(var(--spike-angle, 0deg)) scaleX(0.1);
+          opacity: 0;
+        }
+
+        16% {
+          opacity: 0.98;
+        }
+
+        100% {
+          transform: rotate(var(--spike-angle, 0deg)) scaleX(1.16);
+          opacity: 0;
+        }
+      }
+
+      @keyframes grid-wave {
+        0% {
+          transform: scale(0.24) rotate(var(--grid-rotate, 0deg));
+          opacity: 0;
+        }
+
+        16% {
+          opacity: 0.9;
+        }
+
+        100% {
+          transform: scale(1.72) rotate(var(--grid-rotate, 0deg));
+          opacity: 0;
+        }
+      }
+
+      @keyframes neural-branch {
+        0% {
+          transform: rotate(var(--neural-angle, 0deg)) scaleX(0.08);
+          opacity: 1;
+        }
+
+        100% {
+          transform: rotate(var(--neural-angle, 0deg)) scaleX(1);
+          opacity: 0;
+        }
+      }
+
+      @keyframes crack-fade {
+        0% {
+          opacity: 0.98;
+        }
+
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes halo-core {
+        0% {
+          transform: scale(0.7);
+          opacity: 0.9;
+        }
+
+        100% {
+          transform: scale(2.2);
+          opacity: 0;
+        }
+      }
+
+      @keyframes neural-core {
+        0% {
+          transform: scale(0.6);
+          opacity: 1;
+        }
+
+        100% {
+          transform: scale(1.8);
+          opacity: 0;
+        }
+      }
+
+      @keyframes button-pop {
+        0% {
+          transform: translateY(0) scale(1);
+          box-shadow:
+            inset 0 10px 0 hsl(var(--theme-hue) 100% 98% / 0.45),
+            inset 0 -14px 0 hsl(var(--theme-hue) 24% 18% / 0.18),
+            0 12px 0 var(--button-shadow),
+            0 20px 34px rgba(0, 0, 0, 0.26);
+        }
+
+        22% {
+          transform: translateY(8px) scale(0.96);
+          box-shadow:
+            inset 0 6px 0 hsl(var(--theme-hue) 100% 98% / 0.3),
+            inset 0 -8px 0 hsl(var(--theme-hue) 24% 18% / 0.12),
+            0 6px 0 var(--button-shadow),
+            0 12px 22px rgba(0, 0, 0, 0.2);
+        }
+
+        58% {
+          transform: translateY(-2px) scale(1.025);
+          box-shadow:
+            inset 0 11px 0 hsl(var(--theme-hue) 100% 98% / 0.54),
+            inset 0 -14px 0 hsl(var(--theme-hue) 24% 18% / 0.18),
+            0 13px 0 var(--button-shadow),
+            0 24px 38px rgba(0, 0, 0, 0.3);
+        }
+
+        100% {
+          transform: translateY(0) scale(1);
+          box-shadow:
+            inset 0 10px 0 hsl(var(--theme-hue) 100% 98% / 0.45),
+            inset 0 -14px 0 hsl(var(--theme-hue) 24% 18% / 0.18),
+            0 12px 0 var(--button-shadow),
+            0 20px 34px rgba(0, 0, 0, 0.26);
+        }
+      }
+
+      @keyframes button-flash {
+        0% {
+          opacity: 0;
+        }
+
+        18% {
+          opacity: 0.9;
+        }
+
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .app {
+        min-height: 100vh;
+        position: relative;
+        padding: 24px;
+        box-sizing: border-box;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 72px;
+        left: 24px;
+        width: min(280px, calc(100vw - 48px));
+        max-height: calc(100vh - 96px);
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 22px 18px 34px;
+        border: 1px solid var(--panel-border);
+        border-radius: 20px;
+        background: var(--panel-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        transition: transform 180ms ease, opacity 180ms ease;
+        z-index: 3;
+      }
+
+      .sidebar.is-collapsed {
+        transform: translateX(calc(-100% - 24px));
+        opacity: 0;
+      }
+
+      .sidebar-toggle {
+        position: fixed;
+        top: 24px;
+        left: 24px;
+        z-index: 4;
+        appearance: none;
+        border: 1px solid var(--panel-button-border);
+        border-radius: 999px;
+        background: var(--panel-button-bg);
+        color: #ffffff;
+        padding: 10px 16px;
+        font: inherit;
+        cursor: pointer;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+
+      .customization-menu {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 4;
+      }
+
+      .customization-toggle {
+        appearance: none;
+        border: 1px solid var(--panel-button-border);
+        border-radius: 999px;
+        background: var(--panel-button-bg);
+        color: #ffffff;
+        padding: 10px 16px;
+        font: inherit;
+        cursor: pointer;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+
+      .customization-menu-panel {
+        position: absolute;
+        top: 48px;
+        right: 0;
+        width: min(280px, calc(100vw - 48px));
+        display: grid;
+        gap: 10px;
+        padding: 18px;
+        border: 1px solid var(--panel-border);
+        border-radius: 20px;
+        background: var(--panel-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+      }
+
+      .save-menu {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 4;
+      }
+
+      .save-menu-toggle {
+        appearance: none;
+        border: 1px solid var(--panel-button-border);
+        border-radius: 999px;
+        background: var(--panel-button-bg);
+        color: #ffffff;
+        height: 42px;
+        padding: 0 16px;
+        line-height: 1;
+        font: inherit;
+        cursor: pointer;
+        box-sizing: border-box;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .save-menu-panel {
+        position: absolute;
+        right: 0;
+        bottom: calc(100% + 10px);
+        width: min(320px, calc(100vw - 48px));
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 18px;
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+      }
+
+      .sidebar-label {
+        margin: 0 0 8px;
+        font-size: 0.85rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: hsl(var(--theme-hue) 86% 90% / 0.62);
+      }
+
+      .panel-wrap {
+        min-height: calc(100vh - 48px);
+        display: grid;
+        place-items: center;
+      }
+
+      .panel {
+        width: min(100%, 520px);
+        min-height: calc(100vh - 48px);
+        display: grid;
+        grid-template-rows: 1fr auto 1fr;
+        text-align: center;
+        background: transparent;
+        border: 0;
+        border-radius: 20px;
+        padding: 24px 24px 28px;
+        box-shadow: none;
+      }
+
+      .upgrade-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      .panel-top {
+        display: grid;
+        gap: 12px;
+        align-content: start;
+        justify-items: center;
+      }
+
+      .score-wrap {
+        position: relative;
+        display: inline-grid;
+        justify-items: center;
+      }
+
+      .panel-center {
+        display: grid;
+        place-items: center;
+      }
+
+      .achievement-banner {
+        margin: -18px 0 14px;
+        min-height: 3.6rem;
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 180ms ease, transform 180ms ease;
+        pointer-events: none;
+      }
+
+      .achievement-banner.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .achievement-banner-kicker {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.58);
+        font-size: 0.78rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .achievement-banner-title {
+        margin: 6px 0 0;
+        color: var(--accent-bright);
+        font-size: clamp(1rem, 2vw, 1.25rem);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-shadow: 0 0 16px var(--effect-soft);
+      }
+
+      .panel-bottom {
+        display: grid;
+        gap: 10px;
+        align-content: end;
+      }
+
+      .action-row {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 100%;
+        z-index: 2;
+      }
+
+      .combo-meter {
+        position: absolute;
+        left: calc(50% + 132px);
+        top: 50%;
+        transform: translateY(-50%);
+        width: min(280px, 34vw);
+        margin: 0;
+        transition: opacity 140ms ease, transform 140ms ease;
+      }
+
+      .combo-meter.is-hidden {
+        opacity: 0;
+        transform: translateY(-50%) translateX(10px);
+        visibility: hidden;
+      }
+
+      .combo-meter-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+
+      .combo-display {
+        margin: 0;
+        font-size: clamp(1.1rem, 3vw, 1.6rem);
+        font-weight: 700;
+        font-style: italic;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--combo-color, #ffd54a);
+        text-shadow:
+          0 2px 0 rgba(0, 0, 0, 0.65),
+          0 0 14px color-mix(in srgb, var(--combo-color, #ffd54a) 50%, transparent);
+        transform: skewX(-10deg);
+        opacity: var(--combo-opacity, 0.82);
+        transition: color 140ms ease, opacity 140ms ease, transform 140ms ease;
+      }
+
+      .combo-value {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 0.95rem;
+      }
+
+      .combo-bar {
+        height: 18px;
+        border-radius: 999px;
+        background: hsl(var(--theme-hue) 36% 14% / 0.24);
+        border: 1px solid var(--panel-border);
+        overflow: hidden;
+        box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.35);
+      }
+
+      .combo-fill {
+        width: var(--combo-fill, 0%);
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, hsl(var(--theme-hue) 100% 82%) 0%, hsl(calc(var(--theme-hue) + 18) 88% 62%) 55%, hsl(calc(var(--theme-hue) - 12) 72% 34%) 100%);
+        box-shadow: 0 0 18px hsl(var(--theme-hue) 88% 68% / 0.35);
+        transition: width 120ms linear, filter 140ms ease;
+      }
+
+      .score {
+        margin: 0;
+        font-size: clamp(3rem, 10vw, 5rem);
+        font-weight: 700;
+      }
+
+      .gain-popups {
+        position: absolute;
+        left: calc(100% - 26px);
+        top: calc(100% - 16px);
+        width: 156px;
+        height: 96px;
+        pointer-events: none;
+        overflow: visible;
+      }
+
+      .gain-popup {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: hsl(var(--theme-hue) 100% 94%);
+        text-shadow:
+          0 1px 0 rgba(0, 0, 0, 0.55),
+          0 0 12px hsl(var(--theme-hue) 100% 80% / 0.28);
+        opacity: 0;
+        transform: translate3d(0, 0, 0) scale(0.88) rotate(0deg);
+        animation: gain-popup 640ms cubic-bezier(0.16, 0.84, 0.26, 1) forwards;
+        will-change: transform, opacity;
+      }
+
+      .gain-popup.is-echo {
+        font-size: 1rem;
+        color: hsl(var(--theme-hue) 86% 86% / 0.78);
+        text-shadow:
+          0 1px 0 rgba(0, 0, 0, 0.5),
+          0 0 10px hsl(var(--theme-hue) 90% 72% / 0.16);
+      }
+
+      @keyframes gain-popup {
+        0% {
+          opacity: 0;
+          transform: translate3d(0, 6px, 0) scale(0.78) rotate(var(--gain-tilt, 0deg));
+        }
+
+        18% {
+          opacity: 0.98;
+          transform: translate3d(0, 0, 0) scale(1.02) rotate(var(--gain-tilt, 0deg));
+        }
+
+        100% {
+          opacity: 0;
+          transform: translate3d(var(--gain-drift-x, 0px), -36px, 0) scale(1.02) rotate(var(--gain-tilt, 0deg));
+        }
+      }
+
+      @keyframes overcharge-overlay {
+        0% {
+          opacity: 0;
+          transform: scale(1.08);
+        }
+
+        7% {
+          opacity: 1;
+        }
+
+        82% {
+          opacity: 0.94;
+        }
+
+        100% {
+          opacity: 0;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes overcharge-lanes {
+        0% {
+          transform: scale(0.94, 0.92);
+        }
+
+        10% {
+          transform: scale(1, 1);
+        }
+
+        58% {
+          transform: scale(1.02, 1.08);
+        }
+
+        86% {
+          transform: scale(1.03, 1.12);
+        }
+
+        100% {
+          transform: scale(1.04, 1.16);
+        }
+      }
+
+      @keyframes overcharge-sweep {
+        0% {
+          opacity: 0;
+          transform: translateX(-4%) scaleX(0.9);
+        }
+
+        8% {
+          opacity: 0.92;
+        }
+
+        55% {
+          opacity: 0.72;
+          transform: translateX(2%) scaleX(1.02);
+        }
+
+        88% {
+          opacity: 0.42;
+          transform: translateX(5%) scaleX(1.06);
+        }
+
+        100% {
+          opacity: 0;
+          transform: translateX(7%) scaleX(1.08);
+        }
+      }
+
+      @keyframes lightning-fade {
+        0% {
+          opacity: 0;
+        }
+
+        10% {
+          opacity: 1;
+        }
+
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes lightning-flash {
+        0% {
+          opacity: 0;
+        }
+
+        12% {
+          opacity: 1;
+        }
+
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .overdrive-status {
+        margin: -2px 0 0;
+        min-height: 1.1em;
+        color: var(--accent-mid);
+        font-size: 0.98rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0;
+        transition: opacity 140ms ease;
+      }
+
+      .overdrive-status.is-visible {
+        opacity: 1;
+      }
+
+      .save-status {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.62);
+        font-size: 0.92rem;
+        letter-spacing: 0.03em;
+        transition: color 140ms ease, opacity 140ms ease;
+      }
+
+      .save-debug-panel,
+      .reset-save-confirm {
+        display: grid;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: hsl(var(--theme-hue) 34% 16% / 0.12);
+        border: 1px solid hsl(var(--theme-hue) 86% 86% / 0.08);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+
+      .save-subpanel {
+        display: grid;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: hsl(var(--theme-hue) 34% 16% / 0.12);
+        border: 1px solid hsl(var(--theme-hue) 86% 86% / 0.08);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+
+      .save-debug-line {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 0.88rem;
+        line-height: 1.35;
+      }
+
+      .save-code-textarea {
+        width: 100%;
+        min-height: 96px;
+        box-sizing: border-box;
+        resize: vertical;
+        border: 1px solid var(--panel-border);
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.24);
+        color: #ffffff;
+        padding: 10px 12px;
+        font: 0.8rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+
+      .save-panel-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .achievement-list {
+        display: grid;
+        gap: 6px;
+      }
+
+      .achievement-item {
+        display: grid;
+        gap: 6px;
+      }
+
+      .achievement-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        align-items: start;
+      }
+
+      .achievement-line {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 0.88rem;
+        line-height: 1.35;
+      }
+
+      .achievement-line.is-complete {
+        color: var(--live-color);
+      }
+
+      .achievement-requirement {
+        margin: -2px 0 0;
+        color: rgba(255, 255, 255, 0.56);
+        font-size: 0.82rem;
+        line-height: 1.35;
+      }
+
+      .achievement-progress {
+        margin: -2px 0 0;
+        color: hsl(var(--theme-hue) 90% 92% / 0.62);
+        font-size: 0.78rem;
+        letter-spacing: 0.02em;
+      }
+
+      .prestige-note {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.62);
+        font-size: 0.82rem;
+        line-height: 1.4;
+      }
+
+      .reset-save-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .danger-button {
+        border-color: rgba(255, 120, 120, 0.34);
+        color: rgba(255, 200, 200, 0.96);
+      }
+
+      .stats {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 1rem;
+        transition: color 140ms ease, opacity 140ms ease;
+      }
+
+      .pressure-label {
+        margin: 0;
+        color: hsl(var(--theme-hue) 100% 95% / 0.82);
+        font-size: 0.98rem;
+        letter-spacing: 0.04em;
+      }
+
+      .click-button {
+        appearance: none;
+        border: 0;
+        border-radius: 999px;
+        position: relative;
+        width: 198px;
+        height: 198px;
+        background: var(--button-face);
+        color: transparent;
+        padding: 0;
+        font-size: 0;
+        cursor: pointer;
+        box-shadow:
+          inset 0 10px 0 hsl(var(--theme-hue) 100% 96% / 0.45),
+          inset 0 -14px 0 hsl(var(--theme-hue) 24% 18% / 0.18),
+          0 12px 0 var(--button-shadow),
+          0 20px 34px rgba(0, 0, 0, 0.26);
+        transition: transform 120ms ease, box-shadow 120ms ease;
+        will-change: transform, box-shadow;
+      }
+
+      .click-button::before {
+        content: "";
+        position: absolute;
+        inset: 12px;
+        border-radius: 999px;
+        background:
+          radial-gradient(circle at 34% 30%, hsl(var(--theme-hue) 100% 98% / 0.9) 0%, hsl(var(--theme-hue) 94% 92% / 0.22) 26%, rgba(255, 255, 255, 0) 48%),
+          linear-gradient(180deg, hsl(var(--theme-hue) 70% 92%) 0%, var(--button-face-deep) 100%);
+        box-shadow:
+          inset 0 2px 0 hsl(var(--theme-hue) 100% 98% / 0.55),
+          inset 0 -6px 0 hsl(var(--theme-hue) 24% 16% / 0.08);
+        opacity: 1;
+      }
+
+      .click-button::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 0;
+        height: 0;
+        transform: translate(-50%, -50%);
+        border-radius: 999px;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      .click-button.is-animating {
+        animation: button-pop 300ms cubic-bezier(0.2, 0.9, 0.2, 1);
+      }
+
+      .click-button.is-animating::before {
+        animation: button-flash 240ms ease-out;
+      }
+
+      .click-button:hover {
+        transform: translateY(1px);
+        box-shadow:
+          inset 0 10px 0 hsl(var(--theme-hue) 100% 98% / 0.5),
+          inset 0 -14px 0 hsl(var(--theme-hue) 24% 18% / 0.18),
+          0 11px 0 var(--button-shadow),
+          0 22px 36px rgba(0, 0, 0, 0.28);
+      }
+
+      .click-button:active {
+        transform: translateY(6px);
+        box-shadow:
+          inset 0 6px 0 hsl(var(--theme-hue) 100% 98% / 0.3),
+          inset 0 -8px 0 hsl(var(--theme-hue) 24% 18% / 0.12),
+          0 6px 0 var(--button-shadow),
+          0 12px 22px rgba(0, 0, 0, 0.2);
+      }
+
+      .upgrade-button {
+        appearance: none;
+        border: 1px solid var(--panel-border);
+        border-radius: 16px;
+        background: hsl(var(--theme-hue) 92% 78% / 0.08);
+        color: #ffffff;
+        padding: 14px 16px;
+        text-align: left;
+        font: inherit;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+      }
+
+      .upgrade-info-button {
+        appearance: none;
+        align-self: start;
+        width: 40px;
+        min-width: 40px;
+        height: 40px;
+        border: 1px solid var(--panel-border);
+        border-radius: 999px;
+        background: hsl(var(--theme-hue) 92% 78% / 0.08);
+        color: rgba(255, 255, 255, 0.9);
+        font: inherit;
+        font-style: italic;
+        cursor: pointer;
+      }
+
+      .upgrade-button:hover:not(:disabled) {
+        background: var(--panel-button-hover);
+        border-color: var(--accent-soft);
+        transform: translateY(-1px);
+      }
+
+      .upgrade-button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      .upgrade-meta {
+        color: hsl(var(--theme-hue) 90% 92% / 0.58);
+        font-size: 0.9rem;
+      }
+
+      .upgrade-info {
+        margin: -4px 0 2px;
+        color: rgba(255, 255, 255, 0.66);
+        font-size: 0.92rem;
+        line-height: 1.4;
+      }
+
+      .upgrade-live {
+        display: block;
+        margin-top: 6px;
+        color: var(--live-color);
+      }
+
+      .inline-toggle {
+        margin-top: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.88rem;
+      }
+
+      .toggle-switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        appearance: none;
+        border: 0;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.22);
+        cursor: pointer;
+        transition: background 140ms ease;
+      }
+
+      .toggle-switch::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        background: #ffffff;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.22);
+        transition: transform 140ms ease;
+      }
+
+      .toggle-switch.is-on {
+        background: rgba(255, 255, 255, 0.46);
+      }
+
+      .toggle-switch.is-on::after {
+        transform: translateX(20px);
+      }
+
+      .customization-panel {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .style-button {
+        appearance: none;
+        border: 1px solid var(--panel-border);
+        border-radius: 999px;
+        background: hsl(var(--theme-hue) 92% 78% / 0.08);
+        color: #ffffff;
+        padding: 8px 14px;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .style-button.is-active {
+        border-color: var(--accent-soft);
+        background: hsl(var(--theme-hue) 92% 78% / 0.2);
+      }
+
+      .style-button.is-locked {
+        opacity: 0.82;
+      }
+
+      @media (max-width: 720px) {
+        .sidebar {
+          top: 68px;
+        }
+
+        .combo-meter {
+          position: static;
+          transform: none;
+          width: min(100%, 320px);
+        }
+
+        .combo-meter.is-hidden {
+          transform: translateY(0) translateX(0);
+        }
+
+        .panel {
+          width: 100%;
+        }
+
+        .action-row {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="screen-fx" class="screen-fx" aria-hidden="true"></div>
+    <div id="ripple-layer" class="ripple-layer" aria-hidden="true"></div>
+      <div class="save-menu" id="save-menu">
+        <div id="save-menu-panel" class="save-menu-panel" hidden>
+          <p class="save-status" id="save-status">Save status: ready</p>
+          <button
+            id="stats-toggle"
+            class="upgrade-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="stats-panel"
+          >
+            Stats
+          </button>
+          <div id="stats-panel" class="save-subpanel" hidden>
+            <p class="save-debug-line" id="stats-total-clicks">Clicks: 0</p>
+            <p class="save-debug-line" id="stats-total-manual">Manual score: 0</p>
+            <p class="save-debug-line" id="stats-total-auto">Idle score: 0</p>
+            <p class="save-debug-line" id="stats-total-echo">Echo score: 0</p>
+            <p class="save-debug-line" id="stats-high-score">Highest score: 0</p>
+            <p class="save-debug-line" id="stats-high-combo">Highest combo: 1.0x</p>
+            <p class="save-debug-line" id="stats-overcharges">Overcharges: 0</p>
+            <p class="save-debug-line" id="stats-prestiges">Prestiges: 0</p>
+            <p class="save-debug-line" id="stats-prestige-bonus">Permanent bonus: +0%</p>
+          </div>
+          <button
+            id="prestige-toggle"
+            class="upgrade-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="prestige-panel"
+          >
+            Prestige
+          </button>
+          <div id="prestige-panel" class="save-subpanel" hidden>
+            <p class="save-debug-line" id="prestige-level">Prestiges: 0</p>
+            <p class="save-debug-line" id="prestige-bonus">Permanent bonus: +0%</p>
+            <p class="save-debug-line" id="prestige-requirement">Next prestige: 1.0M score</p>
+            <p class="prestige-note">Prestige resets score and upgrades, but keeps themes, styles, stats, achievements, and grants +10% to all future earnings.</p>
+            <button id="prestige-button" class="upgrade-button" type="button">Prestige Now</button>
+          </div>
+          <button
+            id="achievements-toggle"
+            class="upgrade-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="achievements-panel"
+          >
+            Achievements
+          </button>
+          <div id="achievements-panel" class="save-subpanel" hidden>
+            <div id="achievement-list" class="achievement-list"></div>
+          </div>
+          <button
+            id="save-tools-toggle"
+            class="upgrade-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="save-tools-panel"
+          >
+            Saves
+          </button>
+          <div id="save-tools-panel" class="save-subpanel" hidden>
+            <button
+              id="export-save-button"
+              class="upgrade-button"
+              type="button"
+            >
+              Export Code
+            </button>
+            <button
+              id="import-save-toggle"
+              class="upgrade-button"
+              type="button"
+              aria-expanded="false"
+              aria-controls="import-save-panel"
+            >
+              Import Code
+            </button>
+            <div id="import-save-panel" class="save-subpanel" hidden>
+              <textarea
+                id="save-code-textarea"
+                class="save-code-textarea"
+                spellcheck="false"
+                placeholder="Paste save code here"
+              ></textarea>
+              <div class="save-panel-actions">
+                <button id="copy-save-code-button" class="upgrade-button" type="button">Copy Code</button>
+                <button id="apply-save-code-button" class="upgrade-button" type="button">Apply Code</button>
+              </div>
+            </div>
+            <button
+              id="save-debug-toggle"
+              class="upgrade-button"
+              type="button"
+              aria-expanded="false"
+              aria-controls="save-debug-panel"
+            >
+              Debug Saves
+            </button>
+            <div id="save-debug-panel" class="save-debug-panel" hidden>
+              <p class="save-debug-line" id="save-debug-summary">No save debug info yet.</p>
+              <p class="save-debug-line" id="save-debug-storage">Storage key: clicker-game-save</p>
+              <p class="save-debug-line" id="save-debug-updated">Last save: never</p>
+              <p class="save-debug-line" id="save-debug-score">Saved score: 0.0</p>
+            </div>
+            <button
+              id="reset-save-toggle"
+              class="upgrade-button danger-button"
+              type="button"
+              aria-expanded="false"
+              aria-controls="reset-save-confirm"
+            >
+              Reset Save
+            </button>
+            <div id="reset-save-confirm" class="reset-save-confirm" hidden>
+              <p class="save-debug-line">This clears local progress and reloads the run.</p>
+              <div class="reset-save-actions">
+                <button id="reset-save-confirm-button" class="upgrade-button danger-button" type="button">
+                  Confirm Reset
+                </button>
+                <button id="reset-save-cancel-button" class="upgrade-button" type="button">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button
+          id="save-menu-toggle"
+          class="save-menu-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="save-menu-panel"
+        >
+          Menu
+        </button>
       </div>
-    </div>
-    <div class="dropdown">
-      <button id="backgroundDropdownBtn" class="upgrade-button">Select Background</button>
-      <div id="backgroundDropdown" class="dropdown-content">
-        <button data-bg="default">Default</button>
-        <button data-bg="space">Space</button>
-        <button data-bg="sunset">Sunset</button>
-        <button data-bg="matrix">Matrix</button>
+    <button
+      id="sidebar-toggle"
+      class="sidebar-toggle"
+      type="button"
+      aria-expanded="true"
+      aria-controls="upgrade-sidebar"
+    >
+      Upgrades
+    </button>
+    <div class="customization-menu">
+      <button
+        id="customization-toggle"
+        class="customization-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="customization-panel"
+      >
+        Customization
+      </button>
+        <div id="customization-panel" class="customization-menu-panel" hidden>
+          <p class="sidebar-label">Customization</p>
+          <p class="upgrade-meta" id="visual-style-label">Current: Ripple</p>
+          <div class="customization-panel">
+            <button class="style-button is-active" data-style="ripple" data-label="Ripple" data-cost="0" type="button">Ripple</button>
+            <button class="style-button" data-style="ray" data-label="Ray Burst" data-cost="5000" type="button">Ray Burst</button>
+            <button class="style-button" data-style="neural" data-label="Neural" data-cost="5000" type="button">Neural</button>
+            <button class="style-button" data-style="lightning" data-label="Lightning" data-cost="15000" type="button">Lightning</button>
+            <button class="style-button" data-style="comet" data-label="Comet" data-cost="10000" type="button">Comet</button>
+            <button class="style-button" data-style="starburst" data-label="Starburst" data-cost="10000" type="button">Starburst</button>
+            <button class="style-button" data-style="grid" data-label="Shockwave Grid" data-cost="10000" type="button">Shockwave Grid</button>
+          </div>
+          <p class="sidebar-label" style="margin-top: 6px;">Themes</p>
+          <p class="upgrade-meta" id="theme-label">Current: Blue</p>
+          <div class="customization-panel">
+            <button class="style-button theme-button" data-theme="white" type="button">White</button>
+            <button class="style-button theme-button" data-theme="red" type="button">Red</button>
+            <button class="style-button theme-button" data-theme="orange" type="button">Orange</button>
+            <button class="style-button theme-button" data-theme="yellow" type="button">Yellow</button>
+            <button class="style-button theme-button" data-theme="green" type="button">Green</button>
+            <button class="style-button theme-button" data-theme="cyan" type="button">Cyan</button>
+            <button class="style-button theme-button is-active" data-theme="blue" type="button">Blue</button>
+            <button class="style-button theme-button" data-theme="purple" type="button">Purple</button>
+            <button class="style-button theme-button" data-theme="pink" type="button">Pink</button>
+          </div>
+        </div>
       </div>
-    </div>
-    <button id="closeCustomizationBtn">Close</button>
-  </div>
+    <main class="app">
+      <aside id="upgrade-sidebar" class="sidebar">
+        <p class="sidebar-label">Upgrades</p>
+        <div class="upgrade-row">
+          <button id="power-upgrade" class="upgrade-button" type="button">
+            Better Click
+            <span id="power-cost" class="upgrade-meta">Cost: 10</span>
+          </button>
+          <button
+            class="upgrade-info-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="power-info"
+            data-info-target="power-info"
+          >
+            i
+          </button>
+        </div>
+        <p id="power-info" class="upgrade-info" hidden>
+          Raises your base score gained from each manual click.
+          <span class="upgrade-live" id="power-live">Base click: 1.0</span>
+        </p>
 
-  <div id="achievementsModal" class="modal">
-    <h3>Achievements</h3>
-    <ul id="achievementsList" style="list-style: none; padding-left: 0;"></ul>
-    <button id="closeAchievementsBtn">Close</button>
-  </div>
+        <div class="upgrade-row">
+          <button id="auto-upgrade" class="upgrade-button" type="button">
+            Auto Click
+            <span id="auto-cost" class="upgrade-meta">Cost: 25</span>
+          </button>
+          <button
+            class="upgrade-info-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="auto-info"
+            data-info-target="auto-info"
+          >
+            i
+          </button>
+        </div>
+        <p id="auto-info" class="upgrade-info" hidden>
+          Adds steady automatic score pulses over time.
+          <span class="upgrade-live" id="auto-live">Auto power: 0.0/sec</span>
+          <span class="inline-toggle">
+            Auto enabled
+            <button
+              id="auto-toggle"
+              class="toggle-switch is-on"
+              type="button"
+              aria-pressed="true"
+              aria-label="Toggle auto click"
+            ></button>
+          </span>
+        </p>
 
-  <div id="automationModal" class="modal">
-    <h3>Automation</h3>
-    <p>Automation features coming soon!</p>
-    <button id="closeAutomationBtn">Close</button>
-  </div>
+        <div class="upgrade-row">
+          <button id="frequency-upgrade" class="upgrade-button" type="button">
+            Auto Frequency
+            <span id="frequency-cost" class="upgrade-meta">Cost: 60</span>
+          </button>
+          <button
+            class="upgrade-info-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="frequency-info"
+            data-info-target="frequency-info"
+          >
+            i
+          </button>
+        </div>
+        <p id="frequency-info" class="upgrade-info" hidden>
+          Makes the auto-click pulses happen faster.
+          <span class="upgrade-live" id="frequency-live">Pulse every 1000ms</span>
+        </p>
 
-  <script>
-    let cookies = 0;
-    let cps = 0;
-    let clickPower = 1;
-    let autoClickers = 0;
-    let combo = 0;
-    let maxCombo = 3;
-    let prestige = 0;
-    let multiplier = 1;
-    let goldenChance = 0.05;
-    let critChance = 0.1;
-    let achievements = [];
-    let purchasedUpgrades = [];
+        <div class="upgrade-row">
+          <button id="combo-retention-upgrade" class="upgrade-button" type="button">
+            Combo Retention
+            <span id="combo-retention-cost" class="upgrade-meta">Cost: 90</span>
+          </button>
+          <button
+            class="upgrade-info-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="combo-retention-info"
+            data-info-target="combo-retention-info"
+          >
+            i
+          </button>
+        </div>
+        <p id="combo-retention-info" class="upgrade-info" hidden>
+          Slows combo decay so fast clicking is easier to keep alive.
+          <span class="upgrade-live" id="combo-retention-live">Decay shield: 0%</span>
+        </p>
 
-    const achievementDefinitions = [
-      { key: "firstClick", name: "First Click", check: () => cookies >= 1 },
-      { key: "hundredCookies", name: "Hundred Cookies", check: () => cookies >= 100 },
-      { key: "thousandCookies", name: "Thousand Cookies", check: () => cookies >= 1000 },
-      { key: "firstPrestige", name: "First Prestige", check: () => prestige >= 1 }
-    ];
+        <div class="upgrade-row">
+          <button id="combo-ceiling-upgrade" class="upgrade-button" type="button">
+            Combo Ceiling
+            <span id="combo-ceiling-cost" class="upgrade-meta">Cost: 260</span>
+          </button>
+          <button
+            class="upgrade-info-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="combo-ceiling-info"
+            data-info-target="combo-ceiling-info"
+          >
+            i
+          </button>
+        </div>
+        <p id="combo-ceiling-info" class="upgrade-info" hidden>
+          Raises the maximum combo multiplier by +0.1x each level.
+          <span class="upgrade-live" id="combo-ceiling-live">Max combo: 2.5x</span>
+        </p>
 
-    const cookieCount = document.getElementById("cookieCount");
-    const comboDisplay = document.getElementById("comboDisplay");
-    const prestigeInfo = document.getElementById("prestigeInfo");
-    const cpsDisplay = document.getElementById("cpsDisplay");
-    const autoClickerDisplay = document.getElementById("autoClickerDisplay");
-    const cookieButton = document.getElementById("cookieButton");
-    const notification = document.getElementById("notification");
+        <div class="upgrade-row">
+          <button id="pressure-gain-upgrade" class="upgrade-button" type="button">
+            Charge Gain
+            <span id="pressure-gain-cost" class="upgrade-meta">Cost: 180</span>
+          </button>
+          <button
+            class="upgrade-info-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="pressure-gain-info"
+            data-info-target="pressure-gain-info"
+          >
+            i
+          </button>
+        </div>
+        <p id="pressure-gain-info" class="upgrade-info" hidden>
+          Makes clicks and idle pulses build overcharge faster.
+          <span class="upgrade-live" id="pressure-gain-live">Charge gain: x1.00</span>
+        </p>
 
-    const upgradeButtons = [
-      { id: "upgrade1", cost: 10, action: () => cps += 1 },
-      { id: "upgrade2", cost: 50, action: () => cps += 2 },
-      { id: "upgrade3", cost: 250, action: () => cps += 5 },
-      { id: "upgrade4", cost: 100, action: () => clickPower *= 2 },
-      { id: "upgrade5", cost: 200, action: () => autoClickers += 1 },
-      { id: "upgrade6", cost: 300, action: () => maxCombo += 1 },
-      { id: "upgrade7", cost: 500, action: () => goldenChance += 0.05 },
-      { id: "upgrade8", cost: 700, action: () => triggerParticleStorm() },
-      { id: "upgrade9", cost: 1000, action: () => critChance += 0.1 },
-      { id: "upgrade10", cost: 2000, action: () => multiplier *= 1.5 },
-      { id: "upgrade11", cost: 5000, action: () => cps += 20 },
-      { id: "upgrade12", cost: 10000, action: () => cps += 100 }
-    ];
+        <div class="upgrade-row">
+          <button id="aftershock-upgrade" class="upgrade-button" type="button">
+            Aftershock
+            <span id="aftershock-cost" class="upgrade-meta">Cost: 220</span>
+          </button>
+          <button
+            class="upgrade-info-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="aftershock-info"
+            data-info-target="aftershock-info"
+          >
+            i
+          </button>
+        </div>
+        <p id="aftershock-info" class="upgrade-info" hidden>
+          Manual clicks fire a delayed echo hit a moment later.
+          <span class="upgrade-live" id="aftershock-live">Echo hit: +0% click</span>
+          <span class="inline-toggle">
+            Aftershock enabled
+            <button
+              id="aftershock-toggle"
+              class="toggle-switch is-on"
+              type="button"
+              aria-pressed="true"
+              aria-label="Toggle aftershock"
+            ></button>
+          </span>
+        </p>
 
-    upgradeButtons.forEach((upgrade, index) => {
-      const button = document.getElementById(upgrade.id);
-      button.addEventListener("click", () => buyUpgrade(index));
-    });
+        <div class="upgrade-row">
+          <button id="overdrive-upgrade" class="upgrade-button" type="button">
+            Overcharge
+            <span id="overdrive-cost" class="upgrade-meta">Cost: 2000</span>
+          </button>
+          <button
+            class="upgrade-info-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="overdrive-info"
+            data-info-target="overdrive-info"
+          >
+            i
+          </button>
+        </div>
+        <p id="overdrive-info" class="upgrade-info" hidden>
+          Unlocks overcharge and makes Shift-triggered overcharge stronger.
+          <span class="upgrade-live" id="overdrive-live">Overcharge: locked</span>
+        </p>
+      </aside>
 
-    function showNotification(text) {
-      notification.textContent = text;
-      notification.style.display = "block";
-      clearTimeout(showNotification.timeout);
-      showNotification.timeout = setTimeout(() => {
-        notification.style.display = "none";
-      }, 2000);
-    }
+      <section class="panel-wrap">
+        <div class="panel">
+          <div class="panel-top">
+            <div class="score-wrap">
+              <p class="score" id="score">0</p>
+              <div class="gain-popups" id="gain-popups" aria-hidden="true"></div>
+            </div>
+            <p class="overdrive-status" id="overdrive-status"></p>
+          </div>
 
-    function updateDisplays() {
-      cookieCount.textContent = "Cookies: " + Math.floor(cookies);
-      comboDisplay.textContent = "Combo: " + combo + " / " + maxCombo;
-      prestigeInfo.textContent = "Prestige: " + prestige + " (Multiplier x" + multiplier.toFixed(2) + ")";
-      cpsDisplay.textContent = "Cookies per second: " + (cps * multiplier + autoClickers * 0.5 * multiplier).toFixed(1);
-      autoClickerDisplay.textContent = "Auto-clickers: " + autoClickers;
+          <div class="panel-center">
+            <div id="achievement-banner" class="achievement-banner" aria-live="polite">
+              <p class="achievement-banner-kicker">Achievement Unlocked</p>
+              <p id="achievement-banner-title" class="achievement-banner-title"></p>
+            </div>
+            <div class="action-row">
+              <button id="click-button" class="click-button" type="button" aria-label="Click"></button>
+              <div id="combo-meter" class="combo-meter is-hidden">
+                <div class="combo-meter-top">
+                  <p class="combo-display" id="combo-display">Combo 1.0x</p>
+                  <p class="combo-value" id="combo-value">0%</p>
+                </div>
+                <div class="combo-bar">
+                  <div class="combo-fill" id="combo-fill"></div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      upgradeButtons.forEach((upgrade) => {
-        const button = document.getElementById(upgrade.id);
-        button.disabled = cookies < upgrade.cost;
+          <div class="panel-bottom">
+            <p class="pressure-label" id="pressure-label">Overcharge: 0%</p>
+            <p class="stats" id="stats">Total CPS: 0.0</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const scoreEl = document.getElementById("score");
+      const gainPopupsEl = document.getElementById("gain-popups");
+      const bodyEl = document.body;
+      const saveStatusEl = document.getElementById("save-status");
+      const saveMenuToggleButton = document.getElementById("save-menu-toggle");
+      const saveMenuPanelEl = document.getElementById("save-menu-panel");
+      const statsToggleButton = document.getElementById("stats-toggle");
+      const statsPanelEl = document.getElementById("stats-panel");
+      const statsTotalClicksEl = document.getElementById("stats-total-clicks");
+      const statsTotalManualEl = document.getElementById("stats-total-manual");
+      const statsTotalAutoEl = document.getElementById("stats-total-auto");
+      const statsTotalEchoEl = document.getElementById("stats-total-echo");
+      const statsHighScoreEl = document.getElementById("stats-high-score");
+      const statsHighComboEl = document.getElementById("stats-high-combo");
+      const statsOverchargesEl = document.getElementById("stats-overcharges");
+      const statsPrestigesEl = document.getElementById("stats-prestiges");
+      const statsPrestigeBonusEl = document.getElementById("stats-prestige-bonus");
+      const prestigeToggleButton = document.getElementById("prestige-toggle");
+      const prestigePanelEl = document.getElementById("prestige-panel");
+      const prestigeLevelEl = document.getElementById("prestige-level");
+      const prestigeBonusEl = document.getElementById("prestige-bonus");
+      const prestigeRequirementEl = document.getElementById("prestige-requirement");
+      const prestigeButton = document.getElementById("prestige-button");
+      const achievementsToggleButton = document.getElementById("achievements-toggle");
+      const achievementsPanelEl = document.getElementById("achievements-panel");
+      const achievementListEl = document.getElementById("achievement-list");
+      const saveToolsToggleButton = document.getElementById("save-tools-toggle");
+      const saveToolsPanelEl = document.getElementById("save-tools-panel");
+      const exportSaveButton = document.getElementById("export-save-button");
+      const importSaveToggleButton = document.getElementById("import-save-toggle");
+      const importSavePanelEl = document.getElementById("import-save-panel");
+      const saveCodeTextareaEl = document.getElementById("save-code-textarea");
+      const copySaveCodeButton = document.getElementById("copy-save-code-button");
+      const applySaveCodeButton = document.getElementById("apply-save-code-button");
+      const saveDebugToggleButton = document.getElementById("save-debug-toggle");
+      const saveDebugPanelEl = document.getElementById("save-debug-panel");
+      const saveDebugSummaryEl = document.getElementById("save-debug-summary");
+      const saveDebugStorageEl = document.getElementById("save-debug-storage");
+      const saveDebugUpdatedEl = document.getElementById("save-debug-updated");
+      const saveDebugScoreEl = document.getElementById("save-debug-score");
+      const resetSaveToggleButton = document.getElementById("reset-save-toggle");
+      const resetSaveConfirmEl = document.getElementById("reset-save-confirm");
+      const resetSaveConfirmButton = document.getElementById("reset-save-confirm-button");
+      const resetSaveCancelButton = document.getElementById("reset-save-cancel-button");
+      const overdriveStatusEl = document.getElementById("overdrive-status");
+      const achievementBannerEl = document.getElementById("achievement-banner");
+      const achievementBannerTitleEl = document.getElementById("achievement-banner-title");
+      const comboMeterEl = document.getElementById("combo-meter");
+      const comboDisplayEl = document.getElementById("combo-display");
+      const comboValueEl = document.getElementById("combo-value");
+      const comboFillEl = document.getElementById("combo-fill");
+      const pressureLabelEl = document.getElementById("pressure-label");
+      const statsEl = document.getElementById("stats");
+      const clickButton = document.getElementById("click-button");
+      const rippleLayer = document.getElementById("ripple-layer");
+      const screenFx = document.getElementById("screen-fx");
+      const sidebarEl = document.getElementById("upgrade-sidebar");
+      const sidebarToggleButton = document.getElementById("sidebar-toggle");
+      const customizationToggleButton = document.getElementById("customization-toggle");
+      const customizationPanelEl = document.getElementById("customization-panel");
+      const visualStyleLabelEl = document.getElementById("visual-style-label");
+      const themeLabelEl = document.getElementById("theme-label");
+      const powerUpgradeButton = document.getElementById("power-upgrade");
+      const autoUpgradeButton = document.getElementById("auto-upgrade");
+      const autoToggleButton = document.getElementById("auto-toggle");
+      const frequencyUpgradeButton = document.getElementById("frequency-upgrade");
+      const comboRetentionUpgradeButton = document.getElementById("combo-retention-upgrade");
+      const comboCeilingUpgradeButton = document.getElementById("combo-ceiling-upgrade");
+      const pressureGainUpgradeButton = document.getElementById("pressure-gain-upgrade");
+      const aftershockUpgradeButton = document.getElementById("aftershock-upgrade");
+      const aftershockToggleButton = document.getElementById("aftershock-toggle");
+      const overdriveUpgradeButton = document.getElementById("overdrive-upgrade");
+      const powerCostEl = document.getElementById("power-cost");
+      const autoCostEl = document.getElementById("auto-cost");
+      const frequencyCostEl = document.getElementById("frequency-cost");
+      const comboRetentionCostEl = document.getElementById("combo-retention-cost");
+      const comboCeilingCostEl = document.getElementById("combo-ceiling-cost");
+      const pressureGainCostEl = document.getElementById("pressure-gain-cost");
+      const aftershockCostEl = document.getElementById("aftershock-cost");
+      const overdriveCostEl = document.getElementById("overdrive-cost");
+      const powerLiveEl = document.getElementById("power-live");
+      const autoLiveEl = document.getElementById("auto-live");
+      const frequencyLiveEl = document.getElementById("frequency-live");
+      const comboRetentionLiveEl = document.getElementById("combo-retention-live");
+      const comboCeilingLiveEl = document.getElementById("combo-ceiling-live");
+      const pressureGainLiveEl = document.getElementById("pressure-gain-live");
+      const aftershockLiveEl = document.getElementById("aftershock-live");
+      const overdriveLiveEl = document.getElementById("overdrive-live");
+      const infoButtons = document.querySelectorAll(".upgrade-info-button");
+      const styleButtons = document.querySelectorAll(".style-button[data-style]");
+      const themeButtons = document.querySelectorAll(".theme-button");
+
+      achievementListEl.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-achievement-target]");
+        if (!button) return;
+        const achievementIndex = Number(button.dataset.achievementIndex);
+        const targetId = button.dataset.achievementTarget;
+        const requirementEl = document.getElementById(targetId);
+        if (!requirementEl) return;
+        const nextHidden = !requirementEl.hidden;
+        requirementEl.hidden = nextHidden;
+        if (nextHidden) {
+          expandedAchievementRequirements.delete(achievementIndex);
+        } else {
+          expandedAchievementRequirements.add(achievementIndex);
+        }
+        button.setAttribute("aria-expanded", String(!nextHidden));
       });
-    }
 
-    function spawnParticle(x, y, color = "#fff") {
-      const particle = document.createElement("div");
-      particle.className = "particle";
-      particle.style.left = x + "px";
-      particle.style.top = y + "px";
-      particle.style.background = color;
-      document.body.appendChild(particle);
-      setTimeout(() => particle.remove(), 1000);
-    }
+      const SAVE_KEY = "clicker-game-save";
+      const SAVE_VERSION = 2;
+      const SAVE_WIPE_MARKER_KEY = "clicker-game-save-wiped-v2";
+      const STYLE_LABELS = {
+        ripple: "Ripple",
+        ray: "Ray Burst",
+        neural: "Neural",
+        lightning: "Lightning",
+        comet: "Comet",
+        starburst: "Starburst",
+        grid: "Shockwave Grid",
+      };
 
-    function triggerParticleStorm() {
-      for (let i = 0; i < 30; i++) {
-        spawnParticle(
-          Math.random() * window.innerWidth,
-          Math.random() * window.innerHeight,
-          ["#ff0", "#0ff", "#f0f", "#fff"][Math.floor(Math.random() * 4)]
+      const THEMES = {
+        white: { label: "White", hue: 0 },
+        red: { label: "Red", hue: 0 },
+        orange: { label: "Orange", hue: 22 },
+        yellow: { label: "Yellow", hue: 52 },
+        green: { label: "Green", hue: 132 },
+        cyan: { label: "Cyan", hue: 184 },
+        blue: { label: "Blue", hue: 220 },
+        purple: { label: "Purple", hue: 274 },
+        pink: { label: "Pink", hue: 338 },
+      };
+
+      const state = {
+        score: 0,
+        clickPower: 1,
+        autoPower: 0,
+        autoEnabled: true,
+        aftershockEnabled: true,
+        autoIntervalMs: 1000,
+        powerLevel: 0,
+        autoLevel: 0,
+        frequencyLevel: 0,
+        comboRetentionLevel: 0,
+        comboCeilingLevel: 0,
+        pressureGainLevel: 0,
+        aftershockLevel: 0,
+        overdriveLevel: 0,
+        powerCost: 10,
+        autoCost: 25,
+        frequencyCost: 60,
+        comboRetentionCost: 90,
+        comboCeilingCost: 260,
+        pressureGainCost: 180,
+        aftershockCost: 220,
+        overdriveCost: 2000,
+        comboCharge: 0,
+        comboMultiplier: 1,
+        pressureCharge: 0,
+        overdriveUntil: 0,
+        lastClickAt: 0,
+        lastShatteredIceAt: 0,
+        autoAccumulator: 0,
+        recentGains: [],
+        pendingEchoes: [],
+        visualStyle: "ripple",
+        themeId: "blue",
+        unlockedStyles: ["ripple"],
+        themesSeen: ["blue"],
+        saveMessage: "Save system ready",
+        saveTone: "idle",
+        lastSaveAt: null,
+        lastSaveScore: 0,
+        lifetimeClicks: 0,
+        totalManualScore: 0,
+        totalAutoScore: 0,
+        totalEchoScore: 0,
+        highestScore: 0,
+        highestCombo: 1,
+        totalOvercharges: 0,
+        prestigeCount: 0,
+      };
+
+      let saveStatusTimeoutId = null;
+      let achievementBannerTimeoutId = null;
+      let activeCrackCluster = null;
+      const expandedAchievementRequirements = new Set();
+      let lastAchievementRenderSignature = "";
+      const announcedAchievements = new Set();
+
+      function applyVisualStyleSelection() {
+        for (const button of styleButtons) {
+          const styleId = button.dataset.style;
+          const label = button.dataset.label || styleId;
+          const cost = Number(button.dataset.cost || 0);
+          const unlocked = state.unlockedStyles.includes(styleId);
+          button.classList.toggle("is-active", styleId === state.visualStyle);
+          button.classList.toggle("is-locked", !unlocked);
+          button.textContent = unlocked ? label : `${label} · ${formatNumber(cost)}`;
+        }
+      }
+
+      function getThemeHue() {
+        return THEMES[state.themeId]?.hue ?? THEMES.blue.hue;
+      }
+
+      function applyThemeSelection() {
+        for (const button of themeButtons) {
+          button.classList.toggle("is-active", button.dataset.theme === state.themeId);
+        }
+      }
+
+      function applyTheme() {
+        bodyEl.dataset.theme = state.themeId;
+        bodyEl.style.setProperty("--theme-hue", String(getThemeHue()));
+        if (state.themeId === "white") {
+          bodyEl.style.setProperty("--panel-bg", "rgba(255, 255, 255, 0.06)");
+          bodyEl.style.setProperty("--panel-border", "rgba(255, 255, 255, 0.16)");
+          bodyEl.style.setProperty("--panel-button-bg", "rgba(255, 255, 255, 0.08)");
+          bodyEl.style.setProperty("--panel-button-border", "rgba(255, 255, 255, 0.16)");
+          bodyEl.style.setProperty("--panel-button-hover", "rgba(255, 255, 255, 0.18)");
+          bodyEl.style.setProperty("--accent-soft", "rgba(255, 255, 255, 0.18)");
+          bodyEl.style.setProperty("--accent-mid", "rgba(255, 255, 255, 0.9)");
+          bodyEl.style.setProperty("--accent-bright", "rgba(255, 255, 255, 0.98)");
+          bodyEl.style.setProperty("--effect-soft", "rgba(255, 255, 255, 0.14)");
+          bodyEl.style.setProperty("--effect-mid", "rgba(255, 255, 255, 0.58)");
+          bodyEl.style.setProperty("--effect-bright", "rgba(255, 255, 255, 0.96)");
+          bodyEl.style.setProperty("--live-color", "rgba(255, 255, 255, 0.88)");
+          bodyEl.style.setProperty("--button-face", "#d9d9d9");
+          bodyEl.style.setProperty("--button-face-deep", "#cbcbcb");
+          bodyEl.style.setProperty("--button-shadow", "#7d7d7d");
+          bodyEl.style.setProperty("--button-shadow-deep", "#474747");
+        } else {
+          bodyEl.style.setProperty("--panel-bg", "");
+          bodyEl.style.setProperty("--panel-border", "");
+          bodyEl.style.setProperty("--panel-button-bg", "");
+          bodyEl.style.setProperty("--panel-button-border", "");
+          bodyEl.style.setProperty("--panel-button-hover", "");
+          bodyEl.style.setProperty("--accent-soft", "");
+          bodyEl.style.setProperty("--accent-mid", "");
+          bodyEl.style.setProperty("--accent-bright", "");
+          bodyEl.style.setProperty("--effect-soft", "");
+          bodyEl.style.setProperty("--effect-mid", "");
+          bodyEl.style.setProperty("--effect-bright", "");
+          bodyEl.style.setProperty("--live-color", "");
+          bodyEl.style.setProperty("--button-face", "");
+          bodyEl.style.setProperty("--button-face-deep", "");
+          bodyEl.style.setProperty("--button-shadow", "");
+          bodyEl.style.setProperty("--button-shadow-deep", "");
+        }
+        bodyEl.style.filter = "none";
+      }
+
+      function setSaveStatus(message, tone = "idle", resetDelayMs = 1600) {
+        state.saveMessage = message;
+        state.saveTone = tone;
+        render();
+
+        if (saveStatusTimeoutId) {
+          window.clearTimeout(saveStatusTimeoutId);
+        }
+
+        if (resetDelayMs > 0) {
+          saveStatusTimeoutId = window.setTimeout(() => {
+            state.saveMessage = "Save system ready";
+            state.saveTone = "idle";
+            render();
+          }, resetDelayMs);
+        }
+      }
+
+      function maybeWipeOldSave() {
+        try {
+          const marker = window.localStorage.getItem(SAVE_WIPE_MARKER_KEY);
+          if (marker) return;
+          window.localStorage.removeItem(SAVE_KEY);
+          window.localStorage.setItem(SAVE_WIPE_MARKER_KEY, "done");
+          setSaveStatus("Old save wiped", "ok", 2200);
+        } catch (error) {
+          console.warn("Failed to wipe old save:", error);
+        }
+      }
+
+      function loadState() {
+        try {
+          const raw = window.localStorage.getItem(SAVE_KEY);
+          if (!raw) {
+            setSaveStatus("Fresh run", "idle", 1800);
+            return;
+          }
+
+          const parsed = JSON.parse(raw);
+          if (!parsed || parsed.version !== SAVE_VERSION) {
+            setSaveStatus("Incompatible save ignored", "warn", 2200);
+            return;
+          }
+
+          state.score = Number.isFinite(parsed.score) ? Math.max(0, Math.round(parsed.score)) : 0;
+          state.clickPower = Number.isFinite(parsed.clickPower) ? Math.max(1, parsed.clickPower) : 1;
+          state.autoPower = Number.isFinite(parsed.autoPower) ? Math.max(0, parsed.autoPower) : 0;
+          state.autoEnabled = parsed.autoEnabled !== false;
+          state.aftershockEnabled = parsed.aftershockEnabled !== false;
+          state.autoIntervalMs = Number.isFinite(parsed.autoIntervalMs) ? Math.max(200, parsed.autoIntervalMs) : 1000;
+          state.powerLevel = Number.isFinite(parsed.powerLevel) ? Math.max(0, parsed.powerLevel) : 0;
+          state.autoLevel = Number.isFinite(parsed.autoLevel) ? Math.max(0, parsed.autoLevel) : 0;
+          state.frequencyLevel = Number.isFinite(parsed.frequencyLevel) ? Math.max(0, parsed.frequencyLevel) : 0;
+          state.comboRetentionLevel = Number.isFinite(parsed.comboRetentionLevel) ? Math.max(0, parsed.comboRetentionLevel) : 0;
+          state.comboCeilingLevel = Number.isFinite(parsed.comboCeilingLevel) ? Math.max(0, parsed.comboCeilingLevel) : 0;
+          state.pressureGainLevel = Number.isFinite(parsed.pressureGainLevel) ? Math.max(0, parsed.pressureGainLevel) : 0;
+          state.aftershockLevel = Number.isFinite(parsed.aftershockLevel) ? Math.max(0, parsed.aftershockLevel) : 0;
+          state.overdriveLevel = Number.isFinite(parsed.overdriveLevel) ? Math.max(0, parsed.overdriveLevel) : 0;
+          state.powerCost = Number.isFinite(parsed.powerCost) ? Math.max(1, parsed.powerCost) : 10;
+          state.autoCost = Number.isFinite(parsed.autoCost) ? Math.max(1, parsed.autoCost) : 25;
+          state.frequencyCost = Number.isFinite(parsed.frequencyCost) ? Math.max(1, parsed.frequencyCost) : 60;
+          state.comboRetentionCost = Number.isFinite(parsed.comboRetentionCost) ? Math.max(1, parsed.comboRetentionCost) : 90;
+          state.comboCeilingCost = Number.isFinite(parsed.comboCeilingCost) ? Math.max(1, parsed.comboCeilingCost) : 260;
+          state.pressureGainCost = Number.isFinite(parsed.pressureGainCost) ? Math.max(1, parsed.pressureGainCost) : 180;
+          state.aftershockCost = Number.isFinite(parsed.aftershockCost) ? Math.max(1, parsed.aftershockCost) : 220;
+          state.overdriveCost = Number.isFinite(parsed.overdriveCost) ? Math.max(1, parsed.overdriveCost) : 2000;
+          state.comboCharge = Number.isFinite(parsed.comboCharge) ? Math.max(0, parsed.comboCharge) : 0;
+          state.comboMultiplier = Number.isFinite(parsed.comboMultiplier) ? Math.max(1, parsed.comboMultiplier) : 1;
+          state.pressureCharge = Number.isFinite(parsed.pressureCharge) ? Math.min(100, Math.max(0, Math.round(parsed.pressureCharge))) : 0;
+          state.overdriveUntil = 0;
+          const savedVisualStyle = parsed.visualStyle === "crack" ? "lightning" : parsed.visualStyle;
+          state.visualStyle = STYLE_LABELS[savedVisualStyle] ? savedVisualStyle : "ripple";
+          state.themeId = THEMES[parsed.themeId] ? parsed.themeId : "blue";
+          state.themesSeen = Array.isArray(parsed.themesSeen)
+            ? parsed.themesSeen.filter((theme, index, themes) => THEMES[theme] && themes.indexOf(theme) === index)
+            : ["blue"];
+          if (!state.themesSeen.includes(state.themeId)) {
+            state.themesSeen.push(state.themeId);
+          }
+          state.unlockedStyles = Array.isArray(parsed.unlockedStyles)
+            ? parsed.unlockedStyles
+                .map((style) => {
+                  if (style === "halo" || style === "shard") return "ripple";
+                  if (style === "crack") return "lightning";
+                  return style;
+                })
+                .filter((style, index, styles) => STYLE_LABELS[style] && styles.indexOf(style) === index)
+            : ["ripple"];
+          if (!state.unlockedStyles.includes("ripple")) {
+            state.unlockedStyles.unshift("ripple");
+          }
+          if (!state.unlockedStyles.includes(state.visualStyle)) {
+            state.visualStyle = "ripple";
+          }
+          state.lastSaveAt = parsed.lastSaveAt ?? null;
+          state.lastSaveScore = Number.isFinite(parsed.lastSaveScore) ? Math.round(parsed.lastSaveScore) : state.score;
+          state.lifetimeClicks = Number.isFinite(parsed.lifetimeClicks) ? Math.max(0, Math.round(parsed.lifetimeClicks)) : 0;
+          state.totalManualScore = Number.isFinite(parsed.totalManualScore) ? Math.max(0, Math.round(parsed.totalManualScore)) : 0;
+          state.totalAutoScore = Number.isFinite(parsed.totalAutoScore) ? Math.max(0, Math.round(parsed.totalAutoScore)) : 0;
+          state.totalEchoScore = Number.isFinite(parsed.totalEchoScore) ? Math.max(0, Math.round(parsed.totalEchoScore)) : 0;
+          state.highestScore = Number.isFinite(parsed.highestScore) ? Math.max(0, Math.round(parsed.highestScore)) : state.score;
+          state.highestCombo = Number.isFinite(parsed.highestCombo) ? Math.max(1, parsed.highestCombo) : Math.max(1, state.comboMultiplier);
+          state.totalOvercharges = Number.isFinite(parsed.totalOvercharges) ? Math.max(0, Math.round(parsed.totalOvercharges)) : 0;
+          state.prestigeCount = Number.isFinite(parsed.prestigeCount) ? Math.max(0, Math.round(parsed.prestigeCount)) : 0;
+          setSaveStatus("Save loaded", "ok", 2000);
+        } catch (error) {
+          console.warn("Failed to load save:", error);
+          setSaveStatus("Load failed", "warn", 2600);
+        }
+      }
+
+      function saveState() {
+        try {
+          const payload = buildSavePayload();
+          window.localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+          state.lastSaveAt = payload.lastSaveAt;
+          state.lastSaveScore = state.score;
+          setSaveStatus("Saved", "ok", 1200);
+        } catch (error) {
+          console.warn("Failed to save:", error);
+          setSaveStatus("Save failed", "warn", 2600);
+        }
+      }
+
+      function formatLastSaveTime(timestamp) {
+        if (!timestamp) return "never";
+        return new Date(timestamp).toLocaleTimeString([], {
+          hour: "numeric",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+      }
+
+      function updateSaveDebugPanel() {
+        saveDebugSummaryEl.textContent = `State: ${state.saveMessage}`;
+        saveDebugStorageEl.textContent = `Storage key: ${SAVE_KEY} (v${SAVE_VERSION})`;
+        saveDebugUpdatedEl.textContent = `Last save: ${formatLastSaveTime(state.lastSaveAt)}`;
+        saveDebugScoreEl.textContent = `Saved score: ${formatPreciseNumber(state.lastSaveScore)}`;
+      }
+
+      function getVignetteStrength() {
+        return Math.min(1, state.pressureCharge / 100);
+      }
+
+      function getPressureGainMultiplier() {
+        return 1 + state.pressureGainLevel * 0.15;
+      }
+
+      function getPrestigeMultiplier() {
+        return 1 + state.prestigeCount * 0.1;
+      }
+
+      function getPrestigeBonusPercent() {
+        return state.prestigeCount * 10;
+      }
+
+      function getPrestigeRequirement() {
+        return 1000000 * (state.prestigeCount + 1);
+      }
+
+      function canPrestige() {
+        return state.score >= getPrestigeRequirement();
+      }
+
+      function getComboDecayShieldPercent() {
+        return Math.min(75, state.comboRetentionLevel * 15);
+      }
+
+      function isComboRetentionMaxed() {
+        return getComboDecayShieldPercent() >= 75;
+      }
+
+      function getMaxComboMultiplier() {
+        return Math.min(5, 2.5 + state.comboCeilingLevel * 0.1);
+      }
+
+      function isComboCeilingMaxed() {
+        return getMaxComboMultiplier() >= 5;
+      }
+
+      function getComboMultiplierFromCharge() {
+        const comboProgress = Math.max(0, (state.comboCharge - 12) / 88);
+        const shapedProgress = Math.pow(comboProgress, 1.8);
+        return 1 + shapedProgress * (getMaxComboMultiplier() - 1);
+      }
+
+      function getAftershockPercent() {
+        return state.aftershockLevel * 25;
+      }
+
+      function isOverdriveActive(now = Date.now()) {
+        return state.overdriveUntil > now;
+      }
+
+      function hasOverdriveUnlocked() {
+        return state.overdriveLevel > 0;
+      }
+
+      function getOverdriveUnlockedMultiplier() {
+        return 1 + state.overdriveLevel * 0.25;
+      }
+
+      function getOverdriveMultiplier(now = Date.now()) {
+        return isOverdriveActive(now) ? getOverdriveUnlockedMultiplier() : 1;
+      }
+
+      function addPressure(amount) {
+        const appliedAmount = amount > 0 ? Math.max(1, Math.round(amount)) : 0;
+        state.pressureCharge = Math.min(100, state.pressureCharge + appliedAmount);
+      }
+
+      function spawnOverdriveBurst() {
+        const rect = clickButton.getBoundingClientRect();
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const boxWidth = 210;
+        const boxHeight = 132;
+        const boxLeft = centerX - boxWidth / 2;
+        const boxRight = centerX + boxWidth / 2;
+        const boxTop = centerY - boxHeight / 2;
+        const boxBottom = centerY + boxHeight / 2;
+
+        const overlay = createSvgNode("svg");
+        overlay.setAttribute("class", "overcharge-overlay");
+        overlay.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        overlay.setAttribute("width", String(width));
+        overlay.setAttribute("height", String(height));
+
+        const defs = createSvgNode("defs");
+        const sweepGradient = createSvgNode("linearGradient");
+        sweepGradient.setAttribute("id", "overcharge-sweep-gradient");
+        sweepGradient.setAttribute("x1", "0%");
+        sweepGradient.setAttribute("x2", "100%");
+        sweepGradient.setAttribute("y1", "0%");
+        sweepGradient.setAttribute("y2", "0%");
+
+        const hue = getThemeHue();
+        const gradientStops = state.themeId === "white"
+          ? [
+              ["0%", "rgba(255, 255, 255, 0)"],
+              ["28%", "rgba(255, 255, 255, 0.12)"],
+              ["50%", "rgba(255, 255, 255, 0.74)"],
+              ["72%", "rgba(255, 255, 255, 0.12)"],
+              ["100%", "rgba(255, 255, 255, 0)"],
+            ]
+          : [
+              ["0%", `hsl(${hue - 20} 92% 46% / 0)`],
+              ["28%", `hsl(${hue - 14} 92% 54% / 0.12)`],
+              ["50%", `hsl(${hue} 100% 76% / 0.74)`],
+              ["72%", `hsl(${hue - 10} 94% 56% / 0.12)`],
+              ["100%", `hsl(${hue - 20} 92% 46% / 0)`],
+            ];
+        for (const [offset, color] of gradientStops) {
+          const stop = createSvgNode("stop");
+          stop.setAttribute("offset", offset);
+          stop.setAttribute("stop-color", color);
+          sweepGradient.appendChild(stop);
+        }
+        defs.appendChild(sweepGradient);
+        overlay.appendChild(defs);
+
+        const glowFrame = createSvgNode("rect");
+        glowFrame.setAttribute("class", "frame-glow");
+        glowFrame.setAttribute("x", "18");
+        glowFrame.setAttribute("y", "18");
+        glowFrame.setAttribute("width", String(width - 36));
+        glowFrame.setAttribute("height", String(height - 36));
+        glowFrame.setAttribute("rx", "28");
+        overlay.appendChild(glowFrame);
+
+        const frame = createSvgNode("rect");
+        frame.setAttribute("class", "frame");
+        frame.setAttribute("x", "18");
+        frame.setAttribute("y", "18");
+        frame.setAttribute("width", String(width - 36));
+        frame.setAttribute("height", String(height - 36));
+        frame.setAttribute("rx", "28");
+        overlay.appendChild(frame);
+
+        const laneGroup = createSvgNode("g");
+        laneGroup.setAttribute("class", "lane-group");
+
+        const centerGlow = createSvgNode("rect");
+        centerGlow.setAttribute("class", "center-box glow");
+        centerGlow.setAttribute("x", String(boxLeft - 10));
+        centerGlow.setAttribute("y", String(boxTop - 10));
+        centerGlow.setAttribute("width", String(boxWidth + 20));
+        centerGlow.setAttribute("height", String(boxHeight + 20));
+        centerGlow.setAttribute("rx", "20");
+        laneGroup.appendChild(centerGlow);
+
+        const centerBox = createSvgNode("rect");
+        centerBox.setAttribute("class", "center-box");
+        centerBox.setAttribute("x", String(boxLeft));
+        centerBox.setAttribute("y", String(boxTop));
+        centerBox.setAttribute("width", String(boxWidth));
+        centerBox.setAttribute("height", String(boxHeight));
+        centerBox.setAttribute("rx", "18");
+        laneGroup.appendChild(centerBox);
+
+        const lanePoints = [0.12, 0.22, 0.32, 0.42, 0.58, 0.68, 0.78, 0.88];
+        lanePoints.forEach((ratio, index) => {
+          const leftLine = createSvgNode("line");
+          const rightLine = createSvgNode("line");
+          const y = height * ratio;
+          const endY = boxTop + (boxHeight / (lanePoints.length - 1)) * index;
+          const laneClass = index <= 1 || index >= lanePoints.length - 2 ? "lane outer" : index === 3 || index === 4 ? "lane inner" : "lane mid";
+
+          leftLine.setAttribute("class", laneClass);
+          leftLine.setAttribute("x1", "28");
+          leftLine.setAttribute("y1", String(y));
+          leftLine.setAttribute("x2", String(boxLeft));
+          leftLine.setAttribute("y2", String(endY));
+
+          rightLine.setAttribute("class", laneClass);
+          rightLine.setAttribute("x1", String(width - 28));
+          rightLine.setAttribute("y1", String(y));
+          rightLine.setAttribute("x2", String(boxRight));
+          rightLine.setAttribute("y2", String(endY));
+
+          laneGroup.appendChild(leftLine);
+          laneGroup.appendChild(rightLine);
+        });
+
+        const topRail = createSvgNode("line");
+        topRail.setAttribute("class", "lane mid");
+        topRail.setAttribute("x1", "54");
+        topRail.setAttribute("y1", "54");
+        topRail.setAttribute("x2", String(boxLeft + 18));
+        topRail.setAttribute("y2", String(boxTop));
+        laneGroup.appendChild(topRail);
+
+        const topRailRight = createSvgNode("line");
+        topRailRight.setAttribute("class", "lane mid");
+        topRailRight.setAttribute("x1", String(width - 54));
+        topRailRight.setAttribute("y1", "54");
+        topRailRight.setAttribute("x2", String(boxRight - 18));
+        topRailRight.setAttribute("y2", String(boxTop));
+        laneGroup.appendChild(topRailRight);
+
+        const bottomRail = createSvgNode("line");
+        bottomRail.setAttribute("class", "lane mid");
+        bottomRail.setAttribute("x1", "54");
+        bottomRail.setAttribute("y1", String(height - 54));
+        bottomRail.setAttribute("x2", String(boxLeft + 18));
+        bottomRail.setAttribute("y2", String(boxBottom));
+        laneGroup.appendChild(bottomRail);
+
+        const bottomRailRight = createSvgNode("line");
+        bottomRailRight.setAttribute("class", "lane mid");
+        bottomRailRight.setAttribute("x1", String(width - 54));
+        bottomRailRight.setAttribute("y1", String(height - 54));
+        bottomRailRight.setAttribute("x2", String(boxRight - 18));
+        bottomRailRight.setAttribute("y2", String(boxBottom));
+        laneGroup.appendChild(bottomRailRight);
+
+        const sweep = createSvgNode("rect");
+        sweep.setAttribute("class", "sweep");
+        sweep.setAttribute("x", String(width * 0.08));
+        sweep.setAttribute("y", String(centerY - 54));
+        sweep.setAttribute("width", String(width * 0.84));
+        sweep.setAttribute("height", "108");
+        sweep.setAttribute("rx", "54");
+        laneGroup.appendChild(sweep);
+        overlay.appendChild(laneGroup);
+
+        rippleLayer.appendChild(overlay);
+        overlay.addEventListener("animationend", () => {
+          overlay.remove();
+        });
+      }
+
+      function activateOverdrive() {
+        if (!hasOverdriveUnlocked()) {
+          return;
+        }
+
+        if (state.pressureCharge < 100) {
+          setSaveStatus("Need full overcharge", "warn", 1200);
+          return;
+        }
+
+        state.pressureCharge = 0;
+        state.overdriveUntil = Date.now() + 8000;
+        state.totalOvercharges += 1;
+        setSaveStatus("Overcharge engaged", "ok", 1400);
+        spawnOverdriveBurst();
+        clickButton.classList.remove("is-animating");
+        void clickButton.offsetWidth;
+        clickButton.classList.add("is-animating");
+        render();
+      }
+
+      function getComboColor(comboBonus) {
+        if (state.themeId === "white") {
+          if (comboBonus <= 1.05) return "#f0f0f0";
+          if (comboBonus <= 1.25) return "#d7d7d7";
+          if (comboBonus <= 1.5) return "#b8b8b8";
+          if (comboBonus <= 1.85) return "#8e8e8e";
+          if (comboBonus <= 2.2) return "#656565";
+          return "#3b3b3b";
+        }
+        const hue = getThemeHue();
+        if (comboBonus <= 1.05) return `hsl(${hue} 100% 82%)`;
+        if (comboBonus <= 1.25) return `hsl(${hue} 96% 72%)`;
+        if (comboBonus <= 1.5) return `hsl(${hue} 90% 62%)`;
+        if (comboBonus <= 1.85) return `hsl(${hue} 84% 52%)`;
+        if (comboBonus <= 2.2) return `hsl(${hue} 78% 40%)`;
+        return `hsl(${hue} 72% 28%)`;
+      }
+
+      function formatNumber(value) {
+        return formatCompactNumber(value);
+      }
+
+      function formatScore(value) {
+        return formatCompactNumber(value);
+      }
+
+      function formatCompactNumber(value) {
+        const rounded = Math.round(value);
+        const abs = Math.abs(rounded);
+        if (abs < 1000) return String(rounded);
+        if (abs < 1000000) return `${(rounded / 1000).toFixed(abs >= 100000 ? 0 : 1)}K`;
+        if (abs < 1000000000) return `${(rounded / 1000000).toFixed(abs >= 100000000 ? 0 : 1)}M`;
+        if (abs < 1000000000000) return `${(rounded / 1000000000).toFixed(abs >= 100000000000 ? 0 : 1)}B`;
+        return `${(rounded / 1000000000000).toFixed(1)}T`;
+      }
+
+      function formatPreciseNumber(value) {
+        return String(Math.round(value));
+      }
+
+      function normalizeGain(amount) {
+        if (amount <= 0) return 0;
+        return Math.max(1, Math.round(amount));
+      }
+
+      function updateProgressRecords() {
+        state.highestScore = Math.max(state.highestScore, state.score);
+        state.highestCombo = Math.max(state.highestCombo, state.comboMultiplier);
+      }
+
+      function getAchievementStates() {
+        const totalThemes = Object.keys(THEMES).length;
+        return [
+          {
+            label: "First Thousand",
+            requirement: "Reach 1,000 score.",
+            done: state.highestScore >= 1000,
+            progress: `${formatNumber(Math.min(state.highestScore, 1000))} / 1K`,
+          },
+          {
+            label: "Six Figures",
+            requirement: "Reach 100,000 score.",
+            done: state.highestScore >= 100000,
+            progress: `${formatNumber(Math.min(state.highestScore, 100000))} / 100K`,
+          },
+          {
+            label: "Eight Digits",
+            requirement: "Reach 10,000,000 score.",
+            done: state.highestScore >= 10000000,
+            progress: `${formatNumber(Math.min(state.highestScore, 10000000))} / 10M`,
+          },
+          {
+            label: "Pulsebreaker",
+            requirement: "Max out Auto Frequency at 200ms.",
+            done: state.autoIntervalMs <= 200,
+            progress: `${formatPreciseNumber(state.autoIntervalMs)}ms / 200ms`,
+          },
+          {
+            label: "Hold The Line",
+            requirement: "Max out Combo Retention.",
+            done: isComboRetentionMaxed(),
+            progress: `${getComboDecayShieldPercent()}% / 75%`,
+          },
+          {
+            label: "Ceiling Shattered",
+            requirement: "Max out Combo Ceiling at 5.0x.",
+            done: isComboCeilingMaxed(),
+            progress: `${getMaxComboMultiplier().toFixed(1)}x / 5.0x`,
+          },
+          {
+            label: "Fresh Coat",
+            requirement: "Switch to any non-default theme.",
+            done: state.themesSeen.length > 1,
+            progress: `${Math.min(1, Math.max(0, state.themesSeen.length - 1))} / 1`,
+          },
+          {
+            label: "Full Spectrum",
+            requirement: "Use every available theme at least once.",
+            done: state.themesSeen.length >= totalThemes,
+            progress: `${state.themesSeen.length} / ${totalThemes}`,
+          },
+        ];
+      }
+
+      function getAchievementSignature(achievements) {
+        return achievements.map((achievement) => `${achievement.label}:${achievement.done ? 1 : 0}:${achievement.progress}`).join("|");
+      }
+
+      function showAchievementBanner(title) {
+        achievementBannerTitleEl.textContent = title;
+        achievementBannerEl.classList.add("is-visible");
+        if (achievementBannerTimeoutId) {
+          window.clearTimeout(achievementBannerTimeoutId);
+        }
+        achievementBannerTimeoutId = window.setTimeout(() => {
+          achievementBannerEl.classList.remove("is-visible");
+        }, 3200);
+      }
+
+      function syncAnnouncedAchievements() {
+        for (const achievement of getAchievementStates()) {
+          if (achievement.done) {
+            announcedAchievements.add(achievement.label);
+          }
+        }
+      }
+
+      function encodeSaveCode(payload) {
+        const json = JSON.stringify(payload);
+        const bytes = new TextEncoder().encode(json);
+        let binary = "";
+        for (const byte of bytes) {
+          binary += String.fromCharCode(byte);
+        }
+        return btoa(binary);
+      }
+
+      function decodeSaveCode(code) {
+        const binary = atob(code.trim());
+        const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+        return JSON.parse(new TextDecoder().decode(bytes));
+      }
+
+      function createSvgNode(tag) {
+        return document.createElementNS("http://www.w3.org/2000/svg", tag);
+      }
+
+      function createSeededRandom(seed) {
+        let value = seed >>> 0;
+        return () => {
+          value += 0x6D2B79F5;
+          let t = value;
+          t = Math.imul(t ^ (t >>> 15), t | 1);
+          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      function clampPoint(x, y, width, height, padding = 48) {
+        return {
+          x: Math.max(-padding, Math.min(width + padding, x)),
+          y: Math.max(-padding, Math.min(height + padding, y)),
+        };
+      }
+
+      function buildCrackPoints(startX, startY, angle, totalLength, segments, width, height, rng, branchiness = 1) {
+        const points = [{ x: startX, y: startY }];
+        let x = startX;
+        let y = startY;
+        let heading = angle;
+
+        for (let i = 0; i < segments; i += 1) {
+          const step = (totalLength / segments) * (0.82 + rng() * 0.42);
+          heading += (-0.22 + rng() * 0.44) * branchiness;
+          x += Math.cos(heading) * step;
+          y += Math.sin(heading) * step;
+          const clamped = clampPoint(x, y, width, height);
+          x = clamped.x;
+          y = clamped.y;
+          points.push({ x, y });
+        }
+
+        return points;
+      }
+
+      function pointsToString(points) {
+        return points.map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(" ");
+      }
+
+      function addCrackPolyline(svg, points, thickness, secondary = false) {
+        const polyline = createSvgNode("polyline");
+        polyline.setAttribute("points", pointsToString(points));
+        polyline.setAttribute("stroke-width", String(thickness));
+        polyline.setAttribute("class", secondary ? "crack-path is-secondary" : "crack-path");
+        svg.appendChild(polyline);
+      }
+
+      function lerp(start, end, t) {
+        return start + (end - start) * t;
+      }
+
+      function createIceGradient(defs, id, startX, startY, endX, endY, secondary = false) {
+        const gradient = createSvgNode("linearGradient");
+        gradient.setAttribute("id", id);
+        gradient.setAttribute("gradientUnits", "userSpaceOnUse");
+        gradient.setAttribute("x1", String(startX));
+        gradient.setAttribute("y1", String(startY));
+        gradient.setAttribute("x2", String(endX));
+        gradient.setAttribute("y2", String(endY));
+
+        const stops = state.themeId === "white"
+          ? secondary
+            ? [
+                ["0%", "rgba(205, 220, 236, 0.03)"],
+                ["34%", "rgba(188, 206, 226, 0.12)"],
+                ["56%", "rgba(232, 240, 248, 0.28)"],
+                ["100%", "rgba(180, 198, 216, 0.05)"],
+              ]
+            : [
+                ["0%", "rgba(192, 210, 226, 0.04)"],
+                ["20%", "rgba(168, 188, 208, 0.12)"],
+                ["44%", "rgba(236, 244, 250, 0.34)"],
+                ["74%", "rgba(174, 194, 214, 0.14)"],
+                ["100%", "rgba(192, 210, 226, 0.04)"],
+              ]
+          : secondary
+            ? [
+                ["0%", `hsl(${getThemeHue()} 28% 70% / 0.03)`],
+                ["34%", `hsl(${getThemeHue()} 34% 76% / 0.12)`],
+                ["56%", `hsl(${getThemeHue()} 42% 88% / 0.26)`],
+                ["100%", `hsl(${getThemeHue()} 28% 70% / 0.05)`],
+              ]
+            : [
+                ["0%", `hsl(${getThemeHue()} 26% 66% / 0.04)`],
+                ["20%", `hsl(${getThemeHue()} 34% 74% / 0.12)`],
+                ["44%", `hsl(${getThemeHue()} 48% 88% / 0.34)`],
+                ["74%", `hsl(${getThemeHue()} 36% 76% / 0.14)`],
+                ["100%", `hsl(${getThemeHue()} 26% 66% / 0.04)`],
+              ];
+
+        for (const [offset, color] of stops) {
+          const stop = createSvgNode("stop");
+          stop.setAttribute("offset", offset);
+          stop.setAttribute("stop-color", color);
+          gradient.appendChild(stop);
+        }
+
+        defs.appendChild(gradient);
+        return `url(#${id})`;
+      }
+
+      function buildLakeCrackPath(startX, startY, targetX, targetY, segments, width, height, rng, intensity = 1) {
+        const points = [{ x: startX, y: startY }];
+        const dx = targetX - startX;
+        const dy = targetY - startY;
+        const distance = Math.max(1, Math.hypot(dx, dy));
+        const dirX = dx / distance;
+        const dirY = dy / distance;
+        const normalX = -dirY;
+        const normalY = dirX;
+        const jagAmount = 26 + intensity * 9;
+
+        for (let i = 1; i < segments; i += 1) {
+          const t = i / segments;
+          const bend = Math.sin(Math.PI * t) * jagAmount * (0.45 + rng() * 0.9) * (rng() > 0.5 ? 1 : -1);
+          const forward = (-0.5 + rng()) * 18 * intensity;
+          const x = lerp(startX, targetX, t) + normalX * bend + dirX * forward;
+          const y = lerp(startY, targetY, t) + normalY * bend + dirY * forward;
+          points.push(clampPoint(x, y, width, height, 64));
+        }
+
+        points.push(clampPoint(targetX, targetY, width, height, 64));
+        return points;
+      }
+
+      function buildIceSheetNodes(centerX, centerY, radiusX, radiusY, count, width, height, rng) {
+        const nodes = [];
+        for (let i = 0; i < count; i += 1) {
+          const angle = rng() * Math.PI * 2;
+          const dist = Math.pow(rng(), 0.78);
+          const x = centerX + Math.cos(angle) * radiusX * dist + (-18 + rng() * 36);
+          const y = centerY + Math.sin(angle) * radiusY * dist + (-18 + rng() * 36);
+          nodes.push(clampPoint(x, y, width, height, 64));
+        }
+        return nodes;
+      }
+
+      function buildThreadPath(start, end, width, height, rng, tension = 1) {
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        const distance = Math.max(1, Math.hypot(dx, dy));
+        const dirX = dx / distance;
+        const dirY = dy / distance;
+        const normalX = -dirY;
+        const normalY = dirX;
+        const bendBase = Math.min(34, distance * 0.18) * tension;
+        const mid1T = 0.28 + rng() * 0.14;
+        const mid2T = 0.62 + rng() * 0.12;
+        const bend1 = (-1 + rng() * 2) * bendBase;
+        const bend2 = (-1 + rng() * 2) * bendBase * 0.92;
+
+        return [
+          start,
+          clampPoint(lerp(start.x, end.x, mid1T) + normalX * bend1, lerp(start.y, end.y, mid1T) + normalY * bend1, width, height, 64),
+          clampPoint(lerp(start.x, end.x, mid2T) + normalX * bend2, lerp(start.y, end.y, mid2T) + normalY * bend2, width, height, 64),
+          end,
+        ];
+      }
+
+      function addIceVein(svg, defs, points, cluster, pathIndex, thickness, secondary = false) {
+        const gradientId = `ice-grad-${cluster.seed}-${pathIndex}-${secondary ? "b" : "a"}`;
+        const gradient = createIceGradient(
+          defs,
+          gradientId,
+          points[0].x,
+          points[0].y,
+          points[points.length - 1].x,
+          points[points.length - 1].y,
+          secondary,
+        );
+        const pointString = pointsToString(points);
+
+        const shadow = createSvgNode("polyline");
+        shadow.setAttribute("points", pointString);
+        shadow.setAttribute("stroke-width", String(thickness * 4.2));
+        shadow.setAttribute("class", "ice-vein-shadow");
+        svg.appendChild(shadow);
+
+        const glow = createSvgNode("polyline");
+        glow.setAttribute("points", pointString);
+        glow.setAttribute("stroke-width", String(thickness * 2.35));
+        glow.setAttribute("stroke", gradient);
+        glow.setAttribute("class", "ice-vein-glow");
+        svg.appendChild(glow);
+
+        const core = createSvgNode("polyline");
+        core.setAttribute("points", pointString);
+        core.setAttribute("stroke-width", String(thickness));
+        core.setAttribute("class", "ice-vein-core");
+        svg.appendChild(core);
+      }
+
+      function addIceDust(svg, points, cluster, rng, density = 1) {
+        const dustCount = Math.max(2, Math.round(points.length * density));
+        for (let i = 0; i < dustCount; i += 1) {
+          const point = points[Math.min(points.length - 1, 1 + Math.floor(rng() * Math.max(1, points.length - 1)))];
+          const dust = createSvgNode("circle");
+          const spread = 8 + rng() * 26;
+          const angle = Math.atan2(point.y - cluster.y, point.x - cluster.x) + (-0.7 + rng() * 1.4);
+          dust.setAttribute("class", "ice-dust");
+          dust.setAttribute("cx", String(point.x + (-4 + rng() * 8)));
+          dust.setAttribute("cy", String(point.y + (-4 + rng() * 8)));
+          dust.setAttribute("r", String(0.8 + rng() * 2.2));
+          dust.style.setProperty("--dust-dx", `${Math.cos(angle) * spread}px`);
+          dust.style.setProperty("--dust-dy", `${Math.sin(angle) * spread}px`);
+          dust.style.animationDelay = `${Math.round(rng() * 140)}ms`;
+          dust.setAttribute(
+            "fill",
+            state.themeId === "white"
+              ? `rgba(225, 235, 244, ${0.14 + rng() * 0.14})`
+              : `hsl(${getThemeHue()} 24% 82% / ${0.12 + rng() * 0.14})`,
+          );
+          svg.appendChild(dust);
+        }
+      }
+
+      function buildLightningBoltPoints(startX, startY, endX, endY, segments, width, height, rng, jitter = 1) {
+        const points = [{ x: startX, y: startY }];
+        const dx = endX - startX;
+        const dy = endY - startY;
+        const distance = Math.max(1, Math.hypot(dx, dy));
+        const dirX = dx / distance;
+        const dirY = dy / distance;
+        const normalX = -dirY;
+        const normalY = dirX;
+        const spread = Math.min(90, distance * 0.22) * jitter;
+
+        for (let i = 1; i < segments; i += 1) {
+          const t = i / segments;
+          const offset = (-1 + rng() * 2) * spread * (0.55 + (1 - Math.abs(0.5 - t) * 2) * 0.45);
+          const forward = (-0.5 + rng()) * 20 * jitter;
+          const x = lerp(startX, endX, t) + normalX * offset + dirX * forward;
+          const y = lerp(startY, endY, t) + normalY * offset + dirY * forward;
+          points.push(clampPoint(x, y, width, height, 48));
+        }
+
+        points.push(clampPoint(endX, endY, width, height, 48));
+        return points;
+      }
+
+      function addLightningBolt(svg, points, coreWidth, glowWidth) {
+        const pointString = pointsToString(points);
+
+        const glow = createSvgNode("polyline");
+        glow.setAttribute("points", pointString);
+        glow.setAttribute("stroke-width", String(glowWidth));
+        glow.setAttribute("class", "lightning-bolt-glow");
+        svg.appendChild(glow);
+
+        const core = createSvgNode("polyline");
+        core.setAttribute("points", pointString);
+        core.setAttribute("stroke-width", String(coreWidth));
+        core.setAttribute("class", "lightning-bolt-core");
+        svg.appendChild(core);
+      }
+
+      function spawnLightningBurst(centerX, centerY) {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const svg = createSvgNode("svg");
+        svg.setAttribute("class", "lightning-svg");
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        svg.setAttribute("preserveAspectRatio", "none");
+
+        const flash = createSvgNode("rect");
+        flash.setAttribute("class", "lightning-flash");
+        flash.setAttribute("x", "0");
+        flash.setAttribute("y", "0");
+        flash.setAttribute("width", String(width));
+        flash.setAttribute("height", String(height));
+        svg.appendChild(flash);
+
+        const rng = createSeededRandom(Math.floor(Math.random() * 1_000_000_000));
+        const primaryTargets = [
+          { x: centerX + (-80 + rng() * 160), y: -40 },
+          { x: width + 30, y: centerY + (-120 + rng() * 240) },
+          { x: centerX + (-80 + rng() * 160), y: height + 40 },
+          { x: -30, y: centerY + (-120 + rng() * 240) },
+        ];
+
+        const primaryCount = 2 + Math.floor(rng() * 2);
+        for (let i = 0; i < primaryCount; i += 1) {
+          const target = primaryTargets[(i + Math.floor(rng() * primaryTargets.length)) % primaryTargets.length];
+          const mainPoints = buildLightningBoltPoints(centerX, centerY, target.x, target.y, 6 + Math.floor(rng() * 3), width, height, rng, 1);
+          addLightningBolt(svg, mainPoints, 2.1 + rng() * 0.6, 10 + rng() * 4);
+
+          const branchCount = 1 + Math.floor(rng() * 2);
+          for (let branchIndex = 0; branchIndex < branchCount; branchIndex += 1) {
+            const anchor = mainPoints[1 + Math.floor(rng() * Math.max(1, mainPoints.length - 2))];
+            const branchTarget = {
+              x: anchor.x + (-220 + rng() * 440),
+              y: anchor.y + (-220 + rng() * 440),
+            };
+            const branchPoints = buildLightningBoltPoints(anchor.x, anchor.y, branchTarget.x, branchTarget.y, 4 + Math.floor(rng() * 2), width, height, rng, 0.7);
+            addLightningBolt(svg, branchPoints, 1.2 + rng() * 0.3, 6 + rng() * 2);
+          }
+        }
+
+        rippleLayer.appendChild(svg);
+        svg.addEventListener("animationend", () => {
+          svg.remove();
+        }, { once: true });
+      }
+
+      function spawnCometBurst(centerX, centerY) {
+        const cometCount = 3 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < cometCount; i += 1) {
+          const comet = document.createElement("div");
+          const head = document.createElement("div");
+          const angle = Math.random() * 360;
+          const radians = (angle * Math.PI) / 180;
+          const distance = 120 + Math.random() * 170;
+          comet.className = "comet-streak";
+          head.className = "comet-head";
+          comet.style.left = `${centerX}px`;
+          comet.style.top = `${centerY}px`;
+          head.style.left = `${centerX}px`;
+          head.style.top = `${centerY}px`;
+          comet.style.setProperty("--comet-angle", `${angle}deg`);
+          comet.style.setProperty("--comet-length", `${180 + Math.random() * 140}px`);
+          comet.style.setProperty("--comet-thickness", `${10 + Math.random() * 8}px`);
+          comet.style.setProperty("--comet-dx", `${Math.cos(radians) * distance}px`);
+          comet.style.setProperty("--comet-dy", `${Math.sin(radians) * distance}px`);
+          head.style.setProperty("--comet-dx", `${Math.cos(radians) * distance}px`);
+          head.style.setProperty("--comet-dy", `${Math.sin(radians) * distance}px`);
+          head.style.setProperty("--comet-head-size", `${14 + Math.random() * 12}px`);
+          rippleLayer.appendChild(comet);
+          rippleLayer.appendChild(head);
+          comet.addEventListener("animationend", () => {
+            comet.remove();
+          });
+          head.addEventListener("animationend", () => {
+            head.remove();
+          });
+        }
+      }
+
+      function spawnStarburst(centerX, centerY) {
+        const spikeCount = 8 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < spikeCount; i += 1) {
+          const spike = document.createElement("div");
+          const angle = (360 / spikeCount) * i + (-10 + Math.random() * 20);
+          spike.className = "starburst-spike";
+          spike.style.left = `${centerX}px`;
+          spike.style.top = `${centerY}px`;
+          spike.style.setProperty("--spike-angle", `${angle}deg`);
+          spike.style.setProperty("--spike-length", `${180 + Math.random() * 140}px`);
+          spike.style.setProperty("--spike-thickness", `${16 + Math.random() * 10}px`);
+          rippleLayer.appendChild(spike);
+          spike.addEventListener("animationend", () => {
+            spike.remove();
+          });
+        }
+      }
+
+      function spawnShockwaveGrid(centerX, centerY) {
+        const sizes = [180, 320, 500];
+        const rotations = [-8, 0, 8];
+        for (let i = 0; i < sizes.length; i += 1) {
+          const grid = document.createElement("div");
+          grid.className = "grid-wave";
+          grid.style.left = `${centerX}px`;
+          grid.style.top = `${centerY}px`;
+          grid.style.setProperty("--grid-size", `${sizes[i]}px`);
+          grid.style.setProperty("--grid-cell", `${26 + i * 12}px`);
+          grid.style.setProperty("--grid-rotate", `${rotations[i]}deg`);
+          grid.style.animationDelay = `${i * 70}ms`;
+          rippleLayer.appendChild(grid);
+          grid.addEventListener("animationend", () => {
+            grid.remove();
+          });
+        }
+      }
+
+      function spawnNeuralFracture(centerX, centerY) {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const svg = createSvgNode("svg");
+        svg.setAttribute("class", "neural-svg");
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        svg.setAttribute("preserveAspectRatio", "none");
+
+        const maxReach = Math.max(width, height) * 0.7;
+        const mainCracks = 7;
+        const rng = createSeededRandom(Math.floor(Math.random() * 1_000_000_000));
+
+        for (let i = 0; i < mainCracks; i += 1) {
+          const baseAngle = (Math.PI * 2 * i) / mainCracks + (-0.18 + rng() * 0.36);
+          const points = buildCrackPoints(
+            centerX,
+            centerY,
+            baseAngle,
+            maxReach * (0.72 + rng() * 0.28),
+            7 + Math.floor(rng() * 5),
+            width,
+            height,
+            rng,
+            1,
+          );
+
+          addCrackPolyline(svg, points, 1.7 + rng() * 1.4);
+
+          const branchCount = 1 + Math.floor(rng() * 3);
+          for (let branchIndex = 0; branchIndex < branchCount; branchIndex += 1) {
+            const anchorPoint = points[2 + Math.floor(rng() * Math.max(1, points.length - 3))];
+            const branchDirection = baseAngle + (rng() > 0.5 ? 1 : -1) * (0.35 + rng() * 0.8);
+            const branchPoints = buildCrackPoints(
+              anchorPoint.x,
+              anchorPoint.y,
+              branchDirection,
+              maxReach * (0.18 + rng() * 0.22),
+              3 + Math.floor(rng() * 3),
+              width,
+              height,
+              rng,
+              1.4,
+            );
+            addCrackPolyline(svg, branchPoints, 0.8 + rng() * 0.8, true);
+          }
+        }
+
+        rippleLayer.appendChild(svg);
+        svg.addEventListener(
+          "animationend",
+          () => {
+            svg.remove();
+          },
+          { once: true },
         );
       }
-      showNotification("Particle Storm!");
-    }
 
-    function clickCookie(event) {
-      let gained = clickPower * multiplier;
-      combo = Math.min(combo + 1, maxCombo);
-      gained *= 1 + combo * 0.1;
+      function drawCrackCluster(cluster) {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const { svg, x: centerX, y: centerY, depth, seed } = cluster;
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        svg.setAttribute("preserveAspectRatio", "none");
+        svg.classList.remove("is-fading");
+        cluster.fading = false;
+        svg.replaceChildren();
 
-      if (Math.random() < goldenChance) {
-        gained *= 5;
-        showNotification("Golden Click!");
+        const defs = createSvgNode("defs");
+        svg.appendChild(defs);
+        const rng = createSeededRandom(seed + depth * 193);
+        const radiusX = Math.min(width * 0.44, 160 + depth * 52);
+        const radiusY = Math.min(height * 0.4, 132 + depth * 44);
+        const nodeCount = 12 + depth * 5;
+        const nodes = buildIceSheetNodes(centerX, centerY, radiusX, radiusY, nodeCount, width, height, rng);
+        const localCenter = clampPoint(centerX, centerY, width, height, 64);
+        nodes.push(localCenter);
+
+        let pathIndex = 0;
+
+        for (let i = 0; i < nodes.length; i += 1) {
+          const start = nodes[i];
+          const candidateDistances = [];
+          for (let j = i + 1; j < nodes.length; j += 1) {
+            const end = nodes[j];
+            const dist = Math.hypot(end.x - start.x, end.y - start.y);
+            if (dist < 42 || dist > Math.max(radiusX, radiusY) * 0.9) continue;
+            candidateDistances.push({ j, dist });
+          }
+          candidateDistances.sort((a, b) => a.dist - b.dist);
+          const connectionCount = i === nodes.length - 1 ? 6 + Math.min(4, depth) : 1 + (i % 3 === 0 ? 1 : 0);
+          for (let k = 0; k < Math.min(connectionCount, candidateDistances.length); k += 1) {
+            const end = nodes[candidateDistances[k].j];
+            const thread = buildThreadPath(start, end, width, height, rng, 0.65 + depth * 0.03);
+            const isPrimary = i === nodes.length - 1 || k === 0;
+            addIceVein(
+              svg,
+              defs,
+              thread,
+              cluster,
+              pathIndex,
+              isPrimary ? 0.88 + depth * 0.05 + rng() * 0.08 : 0.46 + depth * 0.03 + rng() * 0.05,
+              !isPrimary,
+            );
+            if (isPrimary || depth >= 3) {
+              addIceDust(svg, thread, cluster, rng, isPrimary ? 0.12 : 0.05);
+            }
+            pathIndex += 1;
+          }
+        }
       }
-      if (Math.random() < critChance) {
-        gained *= 2;
-        showNotification("Critical Click!");
+
+      function createCrackCluster(x, y) {
+        const svg = createSvgNode("svg");
+        svg.setAttribute("class", "crack-svg");
+        rippleLayer.appendChild(svg);
+        return {
+          svg,
+          x,
+          y,
+          depth: 1,
+          seed: Math.floor(Math.random() * 1_000_000_000),
+          fading: false,
+          lastAdvanceAt: Date.now(),
+        };
       }
 
-      cookies += gained;
-      updateDisplays();
-      spawnParticle(event.clientX, event.clientY, "#ffcc00");
-      checkAchievements();
-    }
+      function getNextCrackOrigin(fallbackX, fallbackY) {
+        if (!activeCrackCluster) {
+          return { x: fallbackX, y: fallbackY };
+        }
 
-    function buyUpgrade(index) {
-      const upgrade = upgradeButtons[index];
-      if (cookies >= upgrade.cost) {
-        cookies -= upgrade.cost;
-        upgrade.action();
-        purchasedUpgrades.push(upgrade.id);
-        updateDisplays();
-        showNotification("Upgrade purchased!");
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const fromButton = Math.random() < 0.45;
+
+        if (fromButton) {
+          return { x: fallbackX, y: fallbackY };
+        }
+
+        const edge = Math.floor(Math.random() * 4);
+        const inset = 18;
+
+        if (edge === 0) {
+          return { x: Math.random() * width, y: -inset };
+        }
+
+        if (edge === 1) {
+          return { x: width + inset, y: Math.random() * height };
+        }
+
+        if (edge === 2) {
+          return { x: Math.random() * width, y: height + inset };
+        }
+
+        return { x: -inset, y: Math.random() * height };
       }
-    }
 
-    function checkAchievements() {
-      achievementDefinitions.forEach((achievement) => {
-        if (!achievements.includes(achievement.key) && achievement.check()) {
-          achievements.push(achievement.key);
-          showNotification("Achievement unlocked: " + achievement.name);
-          renderAchievements();
+      function fadeCrackCluster(cluster) {
+        if (!cluster || cluster.fading) return;
+        cluster.fading = true;
+        cluster.svg.classList.add("is-fading");
+        cluster.svg.addEventListener(
+          "animationend",
+          () => {
+            cluster.svg.remove();
+            if (activeCrackCluster === cluster) {
+              activeCrackCluster = null;
+            }
+          },
+          { once: true },
+        );
+      }
+
+      function spawnCrackGlass(centerX, centerY) {
+        const maxDepth = 5;
+        const advanceCooldownMs = 220;
+        const now = Date.now();
+        state.lastShatteredIceAt = Date.now();
+
+        if (activeCrackCluster && !activeCrackCluster.svg.isConnected) {
+          activeCrackCluster = null;
+        }
+
+        if (!activeCrackCluster) {
+          const origin = getNextCrackOrigin(centerX, centerY);
+          activeCrackCluster = createCrackCluster(origin.x, origin.y);
+          drawCrackCluster(activeCrackCluster);
+          return;
+        }
+
+        if (now - activeCrackCluster.lastAdvanceAt < advanceCooldownMs) {
+          return;
+        }
+
+        if (activeCrackCluster.depth < maxDepth) {
+          activeCrackCluster.depth += 1;
+          activeCrackCluster.lastAdvanceAt = now;
+          drawCrackCluster(activeCrackCluster);
+          return;
+        }
+
+        fadeCrackCluster(activeCrackCluster);
+        const nextOrigin = getNextCrackOrigin(centerX, centerY);
+        activeCrackCluster = createCrackCluster(nextOrigin.x, nextOrigin.y);
+        drawCrackCluster(activeCrackCluster);
+      }
+
+      function pruneRecentGains(now = Date.now()) {
+        state.recentGains = state.recentGains.filter((entry) => now - entry.time <= 1000);
+      }
+
+      function recordGain(amount, source = "manual") {
+        state.recentGains.push({ time: Date.now(), amount, source });
+      }
+
+      function spawnGainPopup(amount, kind = "manual") {
+        if (!gainPopupsEl || amount <= 0) return;
+
+        const popup = document.createElement("p");
+        popup.className = kind === "echo" ? "gain-popup is-echo" : "gain-popup";
+        popup.textContent = `+${formatScore(amount)}`;
+        popup.style.setProperty("--gain-drift-x", `${Math.round((Math.random() - 0.5) * 28)}px`);
+        popup.style.setProperty("--gain-tilt", `${((Math.random() - 0.5) * 10).toFixed(2)}deg`);
+        popup.style.right = `${Math.round(Math.random() * 22)}px`;
+        popup.style.bottom = `${Math.round(Math.random() * 10)}px`;
+
+        gainPopupsEl.appendChild(popup);
+
+        while (gainPopupsEl.childElementCount > 12) {
+          gainPopupsEl.firstElementChild.remove();
+        }
+
+        popup.addEventListener("animationend", () => {
+          popup.remove();
+        });
+      }
+
+      function render() {
+        pruneRecentGains();
+        const now = Date.now();
+        const overdriveMultiplier = getOverdriveMultiplier(now);
+        const basePerClick = state.clickPower;
+        const comboIsActive = state.comboCharge >= 12;
+        const effectiveComboMultiplier = comboIsActive ? state.comboMultiplier : 1;
+        const manualRollingCps = Math.round(
+          state.recentGains
+            .filter((entry) => entry.source !== "auto")
+            .reduce((sum, entry) => sum + entry.amount, 0),
+        );
+        const autoPerPulse = state.autoPower * overdriveMultiplier;
+        const autoConstantCps = state.autoIntervalMs > 0
+          ? Math.round((state.autoEnabled ? autoPerPulse : 0) * (1000 / state.autoIntervalMs))
+          : 0;
+        const totalCps = manualRollingCps + autoConstantCps;
+        const comboColor = getComboColor(effectiveComboMultiplier);
+        const pressurePercent = Math.round(state.pressureCharge);
+        const pressureGainMultiplier = getPressureGainMultiplier();
+        const maxComboMultiplier = getMaxComboMultiplier();
+        const overdriveSeconds = Math.max(0, (state.overdriveUntil - now) / 1000);
+        const overdriveReady = state.pressureCharge >= 100;
+        const overdriveUnlocked = hasOverdriveUnlocked();
+        const achievements = getAchievementStates();
+        for (const achievement of achievements) {
+          if (achievement.done && !announcedAchievements.has(achievement.label)) {
+            announcedAchievements.add(achievement.label);
+            showAchievementBanner(achievement.label);
+            break;
+          }
+        }
+
+        scoreEl.textContent = formatScore(state.score);
+        overdriveStatusEl.textContent = isOverdriveActive(now)
+          ? `Overcharge ${Math.ceil(overdriveSeconds)}s`
+          : overdriveReady && overdriveUnlocked
+            ? "Overcharge Ready · Shift"
+            : "";
+        overdriveStatusEl.classList.toggle("is-visible", isOverdriveActive(now) || (overdriveReady && overdriveUnlocked));
+        saveStatusEl.textContent = state.saveMessage;
+        saveStatusEl.style.color =
+          state.saveTone === "ok"
+            ? "rgba(139, 255, 182, 0.88)"
+            : state.saveTone === "warn"
+              ? "rgba(255, 182, 122, 0.92)"
+              : "rgba(255, 255, 255, 0.62)";
+        comboDisplayEl.textContent = `Combo ${effectiveComboMultiplier.toFixed(1)}x`;
+        comboValueEl.textContent = `${Math.round(state.comboCharge)}%`;
+        pressureLabelEl.textContent = `Overcharge: ${pressurePercent}%`;
+        statsEl.textContent = `Total CPS: ${totalCps}`;
+        statsEl.style.color = "rgba(255, 255, 255, 0.68)";
+        statsEl.style.opacity = "0.82";
+        powerCostEl.textContent = `Cost: ${formatNumber(state.powerCost)}`;
+        autoCostEl.textContent = `Cost: ${formatNumber(state.autoCost)}`;
+        frequencyCostEl.textContent = state.autoIntervalMs <= 200
+          ? `Maxed · ${formatPreciseNumber(state.autoIntervalMs)}ms`
+          : `Cost: ${formatNumber(state.frequencyCost)} · ${formatPreciseNumber(state.autoIntervalMs)}ms`;
+        comboRetentionCostEl.textContent = isComboRetentionMaxed()
+          ? "Maxed"
+          : `Cost: ${formatNumber(state.comboRetentionCost)}`;
+        comboCeilingCostEl.textContent = isComboCeilingMaxed()
+          ? "Maxed"
+          : `Cost: ${formatNumber(state.comboCeilingCost)}`;
+        pressureGainCostEl.textContent = `Cost: ${formatNumber(state.pressureGainCost)}`;
+        aftershockCostEl.textContent = `Cost: ${formatNumber(state.aftershockCost)}`;
+        overdriveCostEl.textContent = `Cost: ${formatNumber(state.overdriveCost)}`;
+        powerLiveEl.textContent = `Base click: ${formatNumber(basePerClick)}`;
+        autoLiveEl.textContent = `Auto power: ${formatNumber(autoPerPulse)}/pulse (${formatPreciseNumber(state.autoIntervalMs)}ms)`;
+        autoToggleButton.classList.toggle("is-on", state.autoEnabled);
+        autoToggleButton.setAttribute("aria-pressed", String(state.autoEnabled));
+        frequencyLiveEl.textContent = `Pulse every ${formatPreciseNumber(state.autoIntervalMs)}ms`;
+        comboRetentionLiveEl.textContent = `Decay shield: ${getComboDecayShieldPercent()}%`;
+        comboCeilingLiveEl.textContent = `Max combo: ${maxComboMultiplier.toFixed(1)}x`;
+        pressureGainLiveEl.textContent = overdriveUnlocked
+          ? `Overcharge gain: x${pressureGainMultiplier.toFixed(2)}`
+          : "Requires overcharge unlock";
+        aftershockLiveEl.textContent = state.aftershockEnabled
+          ? `Echo hit: +${getAftershockPercent()}% click`
+          : `Echo hit: +${getAftershockPercent()}% click · off`;
+        aftershockToggleButton.classList.toggle("is-on", state.aftershockEnabled);
+        aftershockToggleButton.setAttribute("aria-pressed", String(state.aftershockEnabled));
+        overdriveLiveEl.textContent = overdriveUnlocked
+          ? `Overcharge: x${getOverdriveUnlockedMultiplier().toFixed(2)} for 8s at full charge`
+          : "Overcharge: locked";
+        visualStyleLabelEl.textContent = `Current: ${STYLE_LABELS[state.visualStyle]}`;
+        themeLabelEl.textContent = `Current: ${THEMES[state.themeId].label}`;
+        applyTheme();
+        applyVisualStyleSelection();
+        applyThemeSelection();
+        powerUpgradeButton.disabled = state.score < state.powerCost;
+        autoUpgradeButton.disabled = state.score < state.autoCost;
+        frequencyUpgradeButton.disabled = state.score < state.frequencyCost || state.autoIntervalMs <= 200;
+        comboRetentionUpgradeButton.disabled = state.score < state.comboRetentionCost || isComboRetentionMaxed();
+        comboCeilingUpgradeButton.disabled = state.score < state.comboCeilingCost || isComboCeilingMaxed();
+        pressureGainUpgradeButton.disabled = state.score < state.pressureGainCost || !overdriveUnlocked;
+        aftershockUpgradeButton.disabled = state.score < state.aftershockCost;
+        overdriveUpgradeButton.disabled = state.score < state.overdriveCost;
+        pressureLabelEl.hidden = !overdriveUnlocked;
+        screenFx.style.setProperty("--vignette-opacity", (getVignetteStrength() * 0.95).toFixed(3));
+        const buttonRect = clickButton.getBoundingClientRect();
+        screenFx.style.setProperty("--focus-x", `${buttonRect.left + buttonRect.width / 2}px`);
+        screenFx.style.setProperty("--focus-y", `${buttonRect.top + buttonRect.height / 2}px`);
+        comboMeterEl.classList.toggle("is-hidden", !comboIsActive);
+        comboDisplayEl.style.setProperty("--combo-color", comboColor);
+        comboDisplayEl.style.setProperty("--combo-opacity", comboIsActive ? "1" : "0.82");
+        comboDisplayEl.style.transform = `skewX(-10deg) scale(${1 + Math.min(effectiveComboMultiplier - 1, 1.5) * 0.16})`;
+        comboFillEl.style.setProperty("--combo-fill", `${state.comboCharge.toFixed(1)}%`);
+        comboFillEl.style.filter = `saturate(${1 + state.comboCharge / 120})`;
+        updateSaveDebugPanel();
+        statsTotalClicksEl.textContent = `Clicks: ${formatNumber(state.lifetimeClicks)}`;
+        statsTotalManualEl.textContent = `Manual score: ${formatNumber(state.totalManualScore)}`;
+        statsTotalAutoEl.textContent = `Idle score: ${formatNumber(state.totalAutoScore)}`;
+        statsTotalEchoEl.textContent = `Echo score: ${formatNumber(state.totalEchoScore)}`;
+        statsHighScoreEl.textContent = `Highest score: ${formatNumber(state.highestScore)}`;
+        statsHighComboEl.textContent = `Highest combo: ${state.highestCombo.toFixed(1)}x`;
+        statsOverchargesEl.textContent = `Overcharges: ${formatNumber(state.totalOvercharges)}`;
+        statsPrestigesEl.textContent = `Prestiges: ${formatNumber(state.prestigeCount)}`;
+        statsPrestigeBonusEl.textContent = `Permanent bonus: +${getPrestigeBonusPercent()}%`;
+        prestigeLevelEl.textContent = `Prestiges: ${formatNumber(state.prestigeCount)}`;
+        prestigeBonusEl.textContent = `Permanent bonus: +${getPrestigeBonusPercent()}% to all earnings`;
+        prestigeRequirementEl.textContent = canPrestige()
+          ? "Prestige ready"
+          : `Next prestige: ${formatNumber(getPrestigeRequirement())} score`;
+        prestigeButton.disabled = !canPrestige();
+        const achievementSignature = getAchievementSignature(achievements);
+        if (achievementSignature !== lastAchievementRenderSignature || !achievementListEl.childElementCount) {
+          achievementListEl.innerHTML = achievements
+            .map(
+              (achievement, index) => `
+                <div class="achievement-item">
+                  <div class="achievement-row">
+                    <div>
+                      <p class="achievement-line${achievement.done ? " is-complete" : ""}">${achievement.done ? "[x]" : "[ ]"} ${achievement.label}</p>
+                      <p class="achievement-progress">${achievement.progress}</p>
+                    </div>
+                    <button
+                      class="upgrade-info-button"
+                      type="button"
+                      data-achievement-index="${index}"
+                      data-achievement-target="achievement-requirement-${index}"
+                      aria-expanded="${expandedAchievementRequirements.has(index) ? "true" : "false"}"
+                      aria-controls="achievement-requirement-${index}"
+                    >i</button>
+                  </div>
+                  <p id="achievement-requirement-${index}" class="achievement-requirement" ${expandedAchievementRequirements.has(index) ? "" : "hidden"}>${achievement.requirement}</p>
+                </div>
+              `,
+            )
+            .join("");
+          lastAchievementRenderSignature = achievementSignature;
+        }
+      }
+
+      function spawnRipple(origin = null) {
+        const rect = clickButton.getBoundingClientRect();
+        const centerX = origin?.x ?? rect.left + rect.width / 2;
+        const centerY = origin?.y ?? rect.top + rect.height / 2;
+
+        if (state.visualStyle === "ray") {
+          const rayCount = 4 + Math.floor(Math.random() * 3);
+          for (let i = 0; i < rayCount; i += 1) {
+            const ray = document.createElement("div");
+            const angle = Math.random() * 360;
+            const length = 320 + Math.random() * 380;
+            const thickness = 2 + Math.random() * 4;
+            ray.className = "ray-burst";
+            ray.style.left = `${centerX}px`;
+            ray.style.top = `${centerY}px`;
+            ray.style.setProperty("--ray-angle", `${angle}deg`);
+            ray.style.setProperty("--ray-length", `${length}px`);
+            ray.style.setProperty("--ray-thickness", `${thickness}px`);
+            rippleLayer.appendChild(ray);
+            ray.addEventListener("animationend", () => {
+              ray.remove();
+            });
+          }
+          return;
+        }
+
+        if (state.visualStyle === "neural") {
+          spawnNeuralFracture(centerX, centerY);
+          return;
+        }
+
+        if (state.visualStyle === "lightning") {
+          spawnLightningBurst(centerX, centerY);
+          return;
+        }
+
+        if (state.visualStyle === "comet") {
+          spawnCometBurst(centerX, centerY);
+          return;
+        }
+
+        if (state.visualStyle === "starburst") {
+          spawnStarburst(centerX, centerY);
+          return;
+        }
+
+        if (state.visualStyle === "grid") {
+          spawnShockwaveGrid(centerX, centerY);
+          return;
+        }
+
+        if (state.visualStyle === "ripple") {
+          const core = document.createElement("div");
+          core.className = "ripple-core";
+          core.style.left = `${centerX}px`;
+          core.style.top = `${centerY}px`;
+          const ripplePrimary = document.createElement("div");
+          ripplePrimary.className = "ripple";
+          ripplePrimary.style.left = `${centerX}px`;
+          ripplePrimary.style.top = `${centerY}px`;
+          const rippleSecondary = document.createElement("div");
+          rippleSecondary.className = "ripple is-secondary";
+          rippleSecondary.style.left = `${centerX}px`;
+          rippleSecondary.style.top = `${centerY}px`;
+          rippleLayer.appendChild(core);
+          rippleLayer.appendChild(ripplePrimary);
+          rippleLayer.appendChild(rippleSecondary);
+          core.addEventListener("animationend", () => {
+            core.remove();
+          });
+          ripplePrimary.addEventListener("animationend", () => {
+            ripplePrimary.remove();
+          });
+          rippleSecondary.addEventListener("animationend", () => {
+            rippleSecondary.remove();
+          });
+          return;
+        }
+      }
+
+      function incrementScore() {
+        const now = Date.now();
+        const rect = clickButton.getBoundingClientRect();
+        const rippleOrigin = {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+        };
+        const elapsed = now - state.lastClickAt;
+        const gain = elapsed <= 240 ? 5.2 : elapsed <= 340 ? 3.9 : elapsed <= 460 ? 2.5 : 0.9;
+        state.comboCharge = Math.min(100, state.comboCharge + gain);
+        state.lastClickAt = now;
+        state.comboMultiplier = getComboMultiplierFromCharge();
+        const effectiveComboMultiplier = state.comboCharge >= 12 ? state.comboMultiplier : 1;
+        if (hasOverdriveUnlocked()) {
+          addPressure((0.45 + effectiveComboMultiplier * 0.25) * getPressureGainMultiplier());
+        }
+        const amount = normalizeGain(state.clickPower * effectiveComboMultiplier * getOverdriveMultiplier(now) * getPrestigeMultiplier());
+        state.score += amount;
+        state.lifetimeClicks += 1;
+        state.totalManualScore += amount;
+        recordGain(amount, "manual");
+        updateProgressRecords();
+        spawnGainPopup(amount, "manual");
+        if (state.aftershockLevel > 0 && state.aftershockEnabled) {
+          state.pendingEchoes.push({
+            dueAt: now + 180,
+            amount: normalizeGain(amount * (getAftershockPercent() / 100)),
+          });
+        }
+        spawnRipple(rippleOrigin);
+        clickButton.classList.remove("is-animating");
+        void clickButton.offsetWidth;
+        clickButton.classList.add("is-animating");
+        render();
+        saveState();
+      }
+
+      clickButton.addEventListener("animationend", (event) => {
+        if (event.animationName === "button-pop") {
+          clickButton.classList.remove("is-animating");
         }
       });
-    }
 
-    function renderAchievements() {
-      const list = document.getElementById("achievementsList");
-      list.innerHTML = "";
-      achievementDefinitions.forEach((achievement) => {
-        const item = document.createElement("li");
-        item.textContent = achievements.includes(achievement.key)
-          ? "✓ " + achievement.name
-          : "○ " + achievement.name;
-        list.appendChild(item);
+      function buyPowerUpgrade() {
+        if (state.score < state.powerCost) return;
+        state.score -= state.powerCost;
+        state.powerLevel += 1;
+        state.clickPower += 1;
+        state.powerCost = Math.floor(state.powerCost * 1.8);
+        render();
+        saveState();
+      }
+
+      function buyAutoUpgrade() {
+        if (state.score < state.autoCost) return;
+        state.score -= state.autoCost;
+        state.autoLevel += 1;
+        state.autoPower += 2;
+        state.autoCost = Math.floor(state.autoCost * 2);
+        render();
+        saveState();
+      }
+
+      function toggleAutoEnabled() {
+        state.autoEnabled = !state.autoEnabled;
+        render();
+        saveState();
+      }
+
+      function toggleAftershockEnabled() {
+        state.aftershockEnabled = !state.aftershockEnabled;
+        if (!state.aftershockEnabled) {
+          state.pendingEchoes = [];
+        }
+        render();
+        saveState();
+      }
+
+      function buyFrequencyUpgrade() {
+        if (state.score < state.frequencyCost || state.autoIntervalMs <= 200) return;
+        state.score -= state.frequencyCost;
+        state.frequencyLevel += 1;
+        state.autoIntervalMs = Math.max(200, state.autoIntervalMs - 100);
+        state.frequencyCost = Math.floor(state.frequencyCost * 2.05);
+        render();
+        saveState();
+      }
+
+      function buyComboRetentionUpgrade() {
+        if (isComboRetentionMaxed()) return;
+        if (state.score < state.comboRetentionCost) return;
+        state.score -= state.comboRetentionCost;
+        state.comboRetentionLevel += 1;
+        state.comboRetentionCost = Math.floor(state.comboRetentionCost * 1.95);
+        render();
+        saveState();
+      }
+
+      function buyComboCeilingUpgrade() {
+        if (isComboCeilingMaxed()) return;
+        if (state.score < state.comboCeilingCost) return;
+        state.score -= state.comboCeilingCost;
+        state.comboCeilingLevel += 1;
+        state.comboCeilingCost = Math.floor(state.comboCeilingCost * 1.7);
+        render();
+        saveState();
+      }
+
+      function buyPressureGainUpgrade() {
+        if (state.score < state.pressureGainCost) return;
+        state.score -= state.pressureGainCost;
+        state.pressureGainLevel += 1;
+        state.pressureGainCost = Math.floor(state.pressureGainCost * 2.15);
+        render();
+        saveState();
+      }
+
+      function buyAftershockUpgrade() {
+        if (state.score < state.aftershockCost) return;
+        state.score -= state.aftershockCost;
+        state.aftershockLevel += 1;
+        state.aftershockCost = Math.floor(state.aftershockCost * 2.3);
+        render();
+        saveState();
+      }
+
+      function buyOverdriveUpgrade() {
+        if (state.score < state.overdriveCost) return;
+        state.score -= state.overdriveCost;
+        state.overdriveLevel += 1;
+        state.overdriveCost = Math.floor(state.overdriveCost * 2.6);
+        render();
+        saveState();
+      }
+
+      function prestigeReset() {
+        if (!canPrestige()) {
+          setSaveStatus("Need more score to prestige", "warn", 1400);
+          return;
+        }
+
+        state.prestigeCount += 1;
+        state.score = 0;
+        state.clickPower = 1;
+        state.autoPower = 0;
+        state.autoEnabled = true;
+        state.aftershockEnabled = true;
+        state.autoIntervalMs = 1000;
+        state.powerLevel = 0;
+        state.autoLevel = 0;
+        state.frequencyLevel = 0;
+        state.comboRetentionLevel = 0;
+        state.comboCeilingLevel = 0;
+        state.pressureGainLevel = 0;
+        state.aftershockLevel = 0;
+        state.overdriveLevel = 0;
+        state.powerCost = 10;
+        state.autoCost = 25;
+        state.frequencyCost = 60;
+        state.comboRetentionCost = 90;
+        state.comboCeilingCost = 260;
+        state.pressureGainCost = 180;
+        state.aftershockCost = 220;
+        state.overdriveCost = 2000;
+        state.comboCharge = 0;
+        state.comboMultiplier = 1;
+        state.pressureCharge = 0;
+        state.overdriveUntil = 0;
+        state.lastClickAt = 0;
+        state.lastShatteredIceAt = 0;
+        state.autoAccumulator = 0;
+        state.recentGains = [];
+        state.pendingEchoes = [];
+        activeCrackCluster = null;
+        rippleLayer.innerHTML = "";
+        clickButton.classList.remove("is-animating");
+        setSaveStatus("Prestiged", "ok", 1800);
+        render();
+        saveState();
+      }
+
+      function toggleSidebar() {
+        const isCollapsed = sidebarEl.classList.toggle("is-collapsed");
+        sidebarToggleButton.setAttribute("aria-expanded", String(!isCollapsed));
+        sidebarToggleButton.textContent = isCollapsed ? "Show Upgrades" : "Hide Upgrades";
+      }
+
+      function toggleCustomizationPanel() {
+        const nextHidden = !customizationPanelEl.hidden;
+        customizationPanelEl.hidden = nextHidden;
+        customizationToggleButton.setAttribute("aria-expanded", String(!nextHidden));
+      }
+
+      function toggleSaveMenu() {
+        const nextHidden = !saveMenuPanelEl.hidden;
+        saveMenuPanelEl.hidden = nextHidden;
+        saveMenuToggleButton.setAttribute("aria-expanded", String(!nextHidden));
+        if (nextHidden) {
+          statsPanelEl.hidden = true;
+          statsToggleButton.setAttribute("aria-expanded", "false");
+          prestigePanelEl.hidden = true;
+          prestigeToggleButton.setAttribute("aria-expanded", "false");
+          achievementsPanelEl.hidden = true;
+          achievementsToggleButton.setAttribute("aria-expanded", "false");
+          saveToolsPanelEl.hidden = true;
+          saveToolsToggleButton.setAttribute("aria-expanded", "false");
+          importSavePanelEl.hidden = true;
+          importSaveToggleButton.setAttribute("aria-expanded", "false");
+          saveDebugPanelEl.hidden = true;
+          saveDebugToggleButton.setAttribute("aria-expanded", "false");
+          resetSaveConfirmEl.hidden = true;
+          resetSaveToggleButton.setAttribute("aria-expanded", "false");
+        }
+      }
+
+      function toggleStatsPanel() {
+        const nextHidden = !statsPanelEl.hidden;
+        statsPanelEl.hidden = nextHidden;
+        statsToggleButton.setAttribute("aria-expanded", String(!nextHidden));
+      }
+
+      function togglePrestigePanel() {
+        const nextHidden = !prestigePanelEl.hidden;
+        prestigePanelEl.hidden = nextHidden;
+        prestigeToggleButton.setAttribute("aria-expanded", String(!nextHidden));
+      }
+
+      function toggleAchievementsPanel() {
+        const nextHidden = !achievementsPanelEl.hidden;
+        achievementsPanelEl.hidden = nextHidden;
+        achievementsToggleButton.setAttribute("aria-expanded", String(!nextHidden));
+      }
+
+      function toggleSaveToolsPanel() {
+        const nextHidden = !saveToolsPanelEl.hidden;
+        saveToolsPanelEl.hidden = nextHidden;
+        saveToolsToggleButton.setAttribute("aria-expanded", String(!nextHidden));
+        if (nextHidden) {
+          importSavePanelEl.hidden = true;
+          importSaveToggleButton.setAttribute("aria-expanded", "false");
+          saveDebugPanelEl.hidden = true;
+          saveDebugToggleButton.setAttribute("aria-expanded", "false");
+          resetSaveConfirmEl.hidden = true;
+          resetSaveToggleButton.setAttribute("aria-expanded", "false");
+        }
+      }
+
+      function toggleImportSavePanel(forceHidden = null) {
+        const nextHidden = forceHidden ?? !importSavePanelEl.hidden;
+        importSavePanelEl.hidden = nextHidden;
+        importSaveToggleButton.setAttribute("aria-expanded", String(!nextHidden));
+      }
+
+      function toggleSaveDebugPanel() {
+        const nextHidden = !saveDebugPanelEl.hidden;
+        saveDebugPanelEl.hidden = nextHidden;
+        saveDebugToggleButton.setAttribute("aria-expanded", String(!nextHidden));
+      }
+
+      function toggleResetConfirm(forceHidden = null) {
+        const nextHidden = forceHidden ?? !resetSaveConfirmEl.hidden;
+        resetSaveConfirmEl.hidden = nextHidden;
+        resetSaveToggleButton.setAttribute("aria-expanded", String(!nextHidden));
+      }
+
+      function resetSave() {
+        try {
+          window.localStorage.removeItem(SAVE_KEY);
+          window.localStorage.removeItem(SAVE_WIPE_MARKER_KEY);
+        } catch (error) {
+          console.warn("Failed to reset save:", error);
+        }
+        window.location.reload();
+      }
+
+      function buildSavePayload() {
+        return {
+          version: SAVE_VERSION,
+          score: state.score,
+          clickPower: state.clickPower,
+          autoPower: state.autoPower,
+          autoEnabled: state.autoEnabled,
+          aftershockEnabled: state.aftershockEnabled,
+          autoIntervalMs: state.autoIntervalMs,
+          powerLevel: state.powerLevel,
+          autoLevel: state.autoLevel,
+          frequencyLevel: state.frequencyLevel,
+          comboRetentionLevel: state.comboRetentionLevel,
+          comboCeilingLevel: state.comboCeilingLevel,
+          pressureGainLevel: state.pressureGainLevel,
+          aftershockLevel: state.aftershockLevel,
+          overdriveLevel: state.overdriveLevel,
+          powerCost: state.powerCost,
+          autoCost: state.autoCost,
+          frequencyCost: state.frequencyCost,
+          comboRetentionCost: state.comboRetentionCost,
+          comboCeilingCost: state.comboCeilingCost,
+          pressureGainCost: state.pressureGainCost,
+          aftershockCost: state.aftershockCost,
+          overdriveCost: state.overdriveCost,
+          comboCharge: state.comboCharge,
+          comboMultiplier: state.comboMultiplier,
+          pressureCharge: state.pressureCharge,
+          visualStyle: state.visualStyle,
+          themeId: state.themeId,
+          themesSeen: state.themesSeen,
+          unlockedStyles: state.unlockedStyles,
+          lastSaveAt: Date.now(),
+          lastSaveScore: state.score,
+          lifetimeClicks: state.lifetimeClicks,
+          totalManualScore: state.totalManualScore,
+          totalAutoScore: state.totalAutoScore,
+          totalEchoScore: state.totalEchoScore,
+          highestScore: state.highestScore,
+          highestCombo: state.highestCombo,
+          totalOvercharges: state.totalOvercharges,
+          prestigeCount: state.prestigeCount,
+        };
+      }
+
+      async function exportSaveCode() {
+        const code = encodeSaveCode(buildSavePayload());
+        saveCodeTextareaEl.value = code;
+        toggleImportSavePanel(false);
+        try {
+          await navigator.clipboard.writeText(code);
+          setSaveStatus("Save code copied", "ok", 1600);
+        } catch (error) {
+          setSaveStatus("Save code ready", "ok", 1600);
+        }
+        render();
+      }
+
+      async function copySaveCode() {
+        if (!saveCodeTextareaEl.value.trim()) {
+          await exportSaveCode();
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(saveCodeTextareaEl.value.trim());
+          setSaveStatus("Save code copied", "ok", 1600);
+        } catch (error) {
+          setSaveStatus("Copy failed", "warn", 1600);
+        }
+      }
+
+      function applySaveCode() {
+        const raw = saveCodeTextareaEl.value.trim();
+        if (!raw) {
+          setSaveStatus("Paste a save code", "warn", 1600);
+          return;
+        }
+
+        try {
+          const payload = decodeSaveCode(raw);
+          if (!payload || payload.version !== SAVE_VERSION) {
+            setSaveStatus("Invalid save code", "warn", 1800);
+            return;
+          }
+          window.localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+          setSaveStatus("Save code applied", "ok", 1200);
+          window.setTimeout(() => window.location.reload(), 350);
+        } catch (error) {
+          setSaveStatus("Import failed", "warn", 1800);
+        }
+      }
+
+      clickButton.addEventListener("click", incrementScore);
+      powerUpgradeButton.addEventListener("click", buyPowerUpgrade);
+      autoUpgradeButton.addEventListener("click", buyAutoUpgrade);
+      autoToggleButton.addEventListener("click", toggleAutoEnabled);
+      frequencyUpgradeButton.addEventListener("click", buyFrequencyUpgrade);
+      comboRetentionUpgradeButton.addEventListener("click", buyComboRetentionUpgrade);
+      comboCeilingUpgradeButton.addEventListener("click", buyComboCeilingUpgrade);
+      pressureGainUpgradeButton.addEventListener("click", buyPressureGainUpgrade);
+      aftershockUpgradeButton.addEventListener("click", buyAftershockUpgrade);
+      aftershockToggleButton.addEventListener("click", toggleAftershockEnabled);
+      overdriveUpgradeButton.addEventListener("click", buyOverdriveUpgrade);
+      sidebarToggleButton.addEventListener("click", toggleSidebar);
+      customizationToggleButton.addEventListener("click", toggleCustomizationPanel);
+      saveMenuToggleButton.addEventListener("click", toggleSaveMenu);
+      statsToggleButton.addEventListener("click", toggleStatsPanel);
+      prestigeToggleButton.addEventListener("click", togglePrestigePanel);
+      achievementsToggleButton.addEventListener("click", toggleAchievementsPanel);
+      saveToolsToggleButton.addEventListener("click", toggleSaveToolsPanel);
+      exportSaveButton.addEventListener("click", exportSaveCode);
+      importSaveToggleButton.addEventListener("click", () => toggleImportSavePanel());
+      copySaveCodeButton.addEventListener("click", copySaveCode);
+      applySaveCodeButton.addEventListener("click", applySaveCode);
+      saveDebugToggleButton.addEventListener("click", toggleSaveDebugPanel);
+      resetSaveToggleButton.addEventListener("click", () => toggleResetConfirm());
+      resetSaveConfirmButton.addEventListener("click", resetSave);
+      resetSaveCancelButton.addEventListener("click", () => toggleResetConfirm(true));
+      prestigeButton.addEventListener("click", prestigeReset);
+
+      for (const button of infoButtons) {
+        button.addEventListener("click", () => {
+          const targetId = button.dataset.infoTarget;
+          const infoEl = document.getElementById(targetId);
+          if (!infoEl) return;
+          const nextHidden = !infoEl.hidden;
+          infoEl.hidden = nextHidden;
+          button.setAttribute("aria-expanded", String(!nextHidden));
+        });
+      }
+
+      for (const button of styleButtons) {
+        button.addEventListener("click", () => {
+          if (button.classList.contains("theme-button")) return;
+          const styleId = button.dataset.style;
+          const cost = Number(button.dataset.cost || 0);
+          const unlocked = state.unlockedStyles.includes(styleId);
+
+          if (!unlocked) {
+            if (state.score < cost) {
+              setSaveStatus("Need more score", "warn", 1200);
+              return;
+            }
+            state.score -= cost;
+            state.unlockedStyles.push(styleId);
+            setSaveStatus(`${button.dataset.label} unlocked`, "ok", 1400);
+          }
+
+          state.visualStyle = styleId;
+          render();
+          saveState();
+        });
+      }
+
+      for (const button of themeButtons) {
+        button.addEventListener("click", () => {
+          state.themeId = THEMES[button.dataset.theme] ? button.dataset.theme : "blue";
+          if (!state.themesSeen.includes(state.themeId)) {
+            state.themesSeen.push(state.themeId);
+          }
+          render();
+          saveState();
+        });
+      }
+
+      window.addEventListener("keydown", (event) => {
+        const activeTag = document.activeElement?.tagName;
+        if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
+        if (event.repeat) return;
+        if (event.code === "Space") {
+          event.preventDefault();
+          incrementScore();
+          return;
+        }
+        if (event.code === "ShiftLeft" || event.code === "ShiftRight") {
+          event.preventDefault();
+          activateOverdrive();
+        }
       });
-    }
 
-    function prestigeReset() {
-      if (cookies >= 10000) {
-        prestige += 1;
-        multiplier = 1 + prestige * 0.5;
-        cookies = 0;
-        cps = 0;
-        clickPower = 1;
-        autoClickers = 0;
-        combo = 0;
-        maxCombo = 3;
-        goldenChance = 0.05;
-        critChance = 0.1;
-        purchasedUpgrades = [];
-        updateDisplays();
-        checkAchievements();
-        showNotification("Prestige Reset Complete!");
-      } else {
-        showNotification("Need 10,000 cookies to prestige.");
-      }
-    }
+      setInterval(() => {
+        const now = Date.now();
 
-    function saveGame() {
-      const data = { cookies, cps, clickPower, autoClickers, combo, maxCombo, prestige, multiplier, goldenChance, critChance, achievements, purchasedUpgrades };
-      localStorage.setItem("glowingCookieClickerSave", JSON.stringify(data));
-      showNotification("Game saved.");
-    }
+        if (
+          activeCrackCluster &&
+          !activeCrackCluster.fading &&
+          now - state.lastShatteredIceAt > 2600
+        ) {
+          fadeCrackCluster(activeCrackCluster);
+        }
 
-    function loadGame() {
-      const data = JSON.parse(localStorage.getItem("glowingCookieClickerSave"));
-      if (data) {
-        ({ cookies, cps, clickPower, autoClickers, combo, maxCombo, prestige, multiplier, goldenChance, critChance, achievements, purchasedUpgrades } = data);
-        updateDisplays();
-        renderAchievements();
-        showNotification("Game loaded.");
-      }
-    }
+        if (state.comboCharge > 0) {
+          const idleTime = Math.max(0, now - state.lastClickAt);
+          const decayStrength = Math.max(0.35, 1 - state.comboRetentionLevel * 0.12);
+          const fastDecay = 1 - 0.16 * decayStrength;
+          const slowDecay = 1 - 0.06 * decayStrength;
+          const decayFactor = idleTime > 550 ? fastDecay : slowDecay;
+          state.comboCharge *= decayFactor;
+          if (state.comboCharge < 0.05) state.comboCharge = 0;
+          state.comboMultiplier = getComboMultiplierFromCharge();
+        }
 
-    function exportSave() {
-      const data = btoa(JSON.stringify({ cookies, cps, clickPower, autoClickers, combo, maxCombo, prestige, multiplier, goldenChance, critChance, achievements, purchasedUpgrades }));
-      prompt("Copy your save data:", data);
-    }
+        if (state.pendingEchoes.length > 0) {
+          const remainingEchoes = [];
+          for (const echo of state.pendingEchoes) {
+            if (echo.dueAt <= now) {
+              const echoAmount = normalizeGain(echo.amount);
+              state.score += echoAmount;
+              state.totalEchoScore += echoAmount;
+              recordGain(echoAmount, "echo");
+              updateProgressRecords();
+              spawnGainPopup(echoAmount, "echo");
+              spawnRipple();
+            } else {
+              remainingEchoes.push(echo);
+            }
+          }
+          state.pendingEchoes = remainingEchoes;
+        }
 
-    function importSave() {
-      const data = prompt("Paste your save data:");
-      if (!data) return;
-      try {
-        const parsed = JSON.parse(atob(data));
-        ({ cookies, cps, clickPower, autoClickers, combo, maxCombo, prestige, multiplier, goldenChance, critChance, achievements, purchasedUpgrades } = parsed);
-        updateDisplays();
-        renderAchievements();
-        showNotification("Save imported.");
-      } catch {
-        showNotification("Invalid save data.");
-      }
-    }
+        if (state.autoPower > 0 && state.autoEnabled) {
+          state.autoAccumulator += 100;
+          while (state.autoAccumulator >= state.autoIntervalMs) {
+            state.autoAccumulator -= state.autoIntervalMs;
+            const amount = normalizeGain(state.autoPower * getOverdriveMultiplier(now) * getPrestigeMultiplier());
+            state.score += amount;
+            state.totalAutoScore += amount;
+            recordGain(amount, "auto");
+            updateProgressRecords();
+            if (hasOverdriveUnlocked()) {
+              addPressure(amount * 0.03 * getPressureGainMultiplier());
+            }
+          }
+        }
 
-    function resetGame() {
-      localStorage.removeItem("glowingCookieClickerSave");
-      cookies = 0;
-      cps = 0;
-      clickPower = 1;
-      autoClickers = 0;
-      combo = 0;
-      maxCombo = 3;
-      prestige = 0;
-      multiplier = 1;
-      goldenChance = 0.05;
-      critChance = 0.1;
-      achievements = [];
-      purchasedUpgrades = [];
-      updateDisplays();
-      renderAchievements();
-      showNotification("Game reset.");
-    }
+        render();
+      }, 100);
 
-    function toggleModal(id, visible) {
-      document.getElementById(id).style.display = visible ? "block" : "none";
-    }
+      setInterval(() => {
+        saveState();
+      }, 5000);
 
-    function setCookieColor(theme) {
-      const themes = {
-        classic: "radial-gradient(circle, #ffdd33, #ff9900)",
-        red: "radial-gradient(circle, #ff6666, #aa0000)",
-        blue: "radial-gradient(circle, #66ccff, #0033aa)",
-        rainbow: "conic-gradient(red, orange, yellow, green, blue, indigo, violet, red)"
+      window.addEventListener("beforeunload", () => {
+        saveState();
+      });
+
+      window.render_game_to_text = () =>
+        JSON.stringify({
+          mode: "playing",
+          score: state.score,
+          clickPower: state.clickPower,
+          autoPower: state.autoPower,
+          autoIntervalMs: state.autoIntervalMs,
+          comboMultiplier: state.comboMultiplier,
+          comboCharge: state.comboCharge,
+          pressureCharge: state.pressureCharge,
+          overdriveActive: isOverdriveActive(),
+          overdriveLevel: state.overdriveLevel,
+          highestScore: state.highestScore,
+          highestCombo: state.highestCombo,
+          lifetimeClicks: state.lifetimeClicks,
+          themesSeen: state.themesSeen.length,
+          comboRetentionLevel: state.comboRetentionLevel,
+          comboCeilingLevel: state.comboCeilingLevel,
+          pressureGainLevel: state.pressureGainLevel,
+          aftershockLevel: state.aftershockLevel,
+          powerCost: state.powerCost,
+          autoCost: state.autoCost,
+          frequencyCost: state.frequencyCost,
+          comboRetentionCost: state.comboRetentionCost,
+          comboCeilingCost: state.comboCeilingCost,
+          pressureGainCost: state.pressureGainCost,
+          aftershockCost: state.aftershockCost,
+          overdriveCost: state.overdriveCost,
+          prestigeCount: state.prestigeCount,
+          buttonLabel: clickButton.textContent.trim(),
+          notes: "Click for score, build combo with fast clicks, build overcharge, press either Shift key at 100% to trigger overcharge, and prestige for a permanent earnings bonus.",
+        });
+
+      window.advanceTime = () => {
+        render();
       };
-      cookieButton.style.background = themes[theme];
-    }
 
-    function setBackground(theme) {
-      const backgrounds = {
-        default: "#000",
-        space: "radial-gradient(circle at center, #111 0%, #000 70%)",
-        sunset: "linear-gradient(180deg, #ff9966, #330000)",
-        matrix: "linear-gradient(180deg, #001100, #000)"
-      };
-      document.body.style.background = backgrounds[theme];
-    }
-
-    cookieButton.addEventListener("click", clickCookie);
-    document.getElementById("prestigeButton").addEventListener("click", prestigeReset);
-    document.getElementById("settingsButton").addEventListener("click", () => toggleModal("settingsModal", true));
-    document.getElementById("customizationButton").addEventListener("click", () => toggleModal("customizationModal", true));
-    document.getElementById("showAchievementsButton").addEventListener("click", () => {
-      renderAchievements();
-      toggleModal("achievementsModal", true);
-    });
-    document.getElementById("showAutomationButton").addEventListener("click", () => toggleModal("automationModal", true));
-
-    document.getElementById("saveGameBtn").addEventListener("click", saveGame);
-    document.getElementById("loadGameBtn").addEventListener("click", loadGame);
-    document.getElementById("exportSaveBtn").addEventListener("click", exportSave);
-    document.getElementById("importSaveBtn").addEventListener("click", importSave);
-    document.getElementById("resetGameBtn").addEventListener("click", resetGame);
-    document.getElementById("closeSettingsBtn").addEventListener("click", () => toggleModal("settingsModal", false));
-    document.getElementById("closeCustomizationBtn").addEventListener("click", () => toggleModal("customizationModal", false));
-    document.getElementById("closeAchievementsBtn").addEventListener("click", () => toggleModal("achievementsModal", false));
-    document.getElementById("closeAutomationBtn").addEventListener("click", () => toggleModal("automationModal", false));
-
-    document.querySelectorAll("#cookieColorDropdown button").forEach((button) => {
-      button.addEventListener("click", () => setCookieColor(button.dataset.color));
-    });
-    document.querySelectorAll("#backgroundDropdown button").forEach((button) => {
-      button.addEventListener("click", () => setBackground(button.dataset.bg));
-    });
-
-    setInterval(() => {
-      cookies += (cps * multiplier + autoClickers * 0.5 * multiplier) / 10;
-      combo = Math.max(0, combo - 0.02);
-      updateDisplays();
-      checkAchievements();
-    }, 100);
-
-    loadGame();
-    updateDisplays();
-    renderAchievements();
-  </script>
-</body>
+      maybeWipeOldSave();
+      loadState();
+      syncAnnouncedAchievements();
+      render();
+    </script>
+  </body>
 </html>
