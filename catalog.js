@@ -152,7 +152,7 @@
       slug: "clicker-game",
       title: "Clicker Game",
       status: "playable",
-      publicStatus: "placeholder",
+      publicStatus: "live",
       genre: "Idle",
       platform: "Browser",
       tech: ["Single-file HTML", "Vanilla JavaScript", "Save Export / Import"],

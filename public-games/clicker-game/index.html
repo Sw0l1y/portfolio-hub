@@ -1,0 +1,595 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Glowing Cookie Clicker</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      font-family: Arial, sans-serif;
+      color: #fff;
+    }
+    #mainContainer {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      transition: transform 0.2s linear;
+      position: relative;
+      z-index: 0;
+      margin-right: 50px;
+      margin-left: 50px;
+    }
+    #sidePanel {
+      width: 180px;
+      background: rgba(0, 0, 0, 0.9);
+      box-shadow: 2px 0 8px rgba(0,0,0,0.7);
+      padding: 10px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      overflow-x: visible;
+      position: relative;
+      z-index: 100;
+    }
+    #sidePanel h2 {
+      margin-top: 0;
+      color: #ffcc00;
+      text-shadow: 0 0 8px #ff0;
+      text-align: center;
+      font-size: 1.2em;
+    }
+    .upgrade-button, #settingsButton, #showAchievementsButton, #showAutomationButton, #customizationButton, #prestigeButton {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 8px;
+      background: #111;
+      border: 1px solid #555;
+      color: #fff;
+      cursor: pointer;
+      box-sizing: border-box;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .upgrade-button:hover, #settingsButton:hover, #showAchievementsButton:hover, #showAutomationButton:hover, #customizationButton:hover, #prestigeButton:hover {
+      background: #333;
+    }
+    .upgrade-button:disabled {
+      opacity: 0.5;
+      cursor: default;
+      background: #222;
+      color: #777;
+    }
+    #mainGame {
+      flex: 1;
+      position: relative;
+      overflow: visible;
+    }
+    #cookieButton {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffdd33, #ff9900);
+      box-shadow: 0 0 20px #ff0;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.3s;
+      border: none;
+      z-index: 1;
+      overflow: visible;
+    }
+    #cookieButton:hover { transform: translate(-50%, -50%) scale(1.05); }
+    #cookieCount {
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.5em;
+      text-shadow: 0 0 10px #fff;
+      z-index: 100;
+    }
+    #comboDisplay {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1em;
+      color: #ffcc00;
+      text-shadow: 0 0 10px #ff0;
+      z-index: 100;
+    }
+    #prestigeInfo {
+      position: absolute;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1em;
+      color: #00ffcc;
+      text-shadow: 0 0 10px #0ff;
+      z-index: 100;
+    }
+    #cpsDisplay {
+      position: absolute;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1em;
+      color: #ffcc00;
+      text-shadow: 0 0 10px #fff;
+      z-index: 100;
+    }
+    #autoClickerDisplay {
+      position: absolute;
+      top: 130px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.9em;
+      color: #aaffaa;
+      text-shadow: 0 0 6px #0f0;
+      z-index: 100;
+    }
+    .particle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99;
+      animation: floatUp 1s forwards;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-50px) scale(0); }
+    }
+    #notification {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 1.2em;
+      display: none;
+      z-index: 200;
+      text-shadow: 0 0 8px #fff;
+    }
+    .modal {
+      display: none;
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      max-width: 400px;
+      background: rgba(0,0,0,0.95);
+      border: 2px solid #555;
+      border-radius: 8px;
+      padding: 20px;
+      z-index: 300;
+      box-shadow: 0 0 20px #000;
+    }
+    .modal h3 {
+      margin-top: 0;
+      color: #ffcc00;
+      text-align: center;
+    }
+    .modal button {
+      margin-top: 10px;
+      padding: 8px;
+      width: 100%;
+      background: #111;
+      border: 1px solid #555;
+      color: #fff;
+      cursor: pointer;
+    }
+    .modal button:hover { background: #333; }
+    .dropdown {
+      position: relative;
+      width: 100%;
+      display: block;
+      overflow: visible;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background: rgba(0,0,0,0.95);
+      min-width: 200px;
+      border: 1px solid #555;
+      z-index: 400;
+      padding: 8px;
+      box-sizing: border-box;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .dropdown-content button {
+      width: 100%;
+      margin: 5px 0;
+      padding: 6px;
+      background: #111;
+      border: 1px solid #555;
+      color: #fff;
+      cursor: pointer;
+      box-sizing: border-box;
+      text-align: left;
+    }
+    .dropdown-content button:hover {
+      background: #333;
+    }
+    .dropdown-content button.selected {
+      border-color: gold;
+      color: gold;
+    }
+  </style>
+</head>
+<body>
+  <div id="notification"></div>
+  <div id="mainContainer">
+    <div id="sidePanel">
+      <h2>Upgrades</h2>
+      <button id="upgrade1" class="upgrade-button">Buy A Piece (+1 CPS) - 10 cookies</button>
+      <button id="upgrade2" class="upgrade-button">Sprinkles (+2 CPS) - 50 cookies</button>
+      <button id="upgrade3" class="upgrade-button">Cookie Factory (+5 CPS) - 250 cookies</button>
+      <button id="upgrade4" class="upgrade-button">Double Click Power - 100 cookies</button>
+      <button id="upgrade5" class="upgrade-button">Auto-clicker (+0.5 CPS) - 200 cookies</button>
+      <button id="upgrade6" class="upgrade-button">Combo Boost (+1 max combo) - 300 cookies</button>
+      <button id="upgrade7" class="upgrade-button">Golden Click Chance +5% - 500 cookies</button>
+      <button id="upgrade8" class="upgrade-button">Particle Storm - 700 cookies</button>
+      <button id="upgrade9" class="upgrade-button">Critical Click +10% - 1000 cookies</button>
+      <button id="upgrade10" class="upgrade-button">Cookie Multiplier x1.5 - 2000 cookies</button>
+      <button id="upgrade11" class="upgrade-button">Cookie Empire (+20 CPS) - 5000 cookies</button>
+      <button id="upgrade12" class="upgrade-button">Nuclear Oven (+100 CPS) - 10000 cookies</button>
+      <button id="prestigeButton" class="upgrade-button">Prestige Reset</button>
+      <button id="customizationButton" class="upgrade-button">Customization</button>
+      <button id="showAchievementsButton" class="upgrade-button">Achievements</button>
+      <button id="showAutomationButton" class="upgrade-button">Automation</button>
+      <button id="settingsButton" class="upgrade-button">Settings</button>
+    </div>
+    <div id="mainGame">
+      <div id="cookieCount">Cookies: 0</div>
+      <div id="comboDisplay">Combo: 0 / 3</div>
+      <div id="prestigeInfo">Prestige: 0 (Multiplier x1)</div>
+      <div id="cpsDisplay">Cookies per second: 0</div>
+      <div id="autoClickerDisplay">Auto-clickers: 0</div>
+      <button id="cookieButton"></button>
+    </div>
+  </div>
+
+  <div id="settingsModal" class="modal">
+    <h3>Settings</h3>
+    <button id="saveGameBtn">Save Game</button>
+    <button id="loadGameBtn">Load Game</button>
+    <button id="exportSaveBtn">Export Save</button>
+    <button id="importSaveBtn">Import Save</button>
+    <button id="resetGameBtn">Reset Game</button>
+    <button id="closeSettingsBtn">Close</button>
+  </div>
+
+  <div id="customizationModal" class="modal">
+    <h3>Customization</h3>
+    <div class="dropdown">
+      <button id="cookieColorDropdownBtn" class="upgrade-button">Select Cookie Color</button>
+      <div id="cookieColorDropdown" class="dropdown-content">
+        <button data-color="classic">Classic</button>
+        <button data-color="red">Red</button>
+        <button data-color="blue">Blue</button>
+        <button data-color="rainbow">Rainbow</button>
+      </div>
+    </div>
+    <div class="dropdown">
+      <button id="backgroundDropdownBtn" class="upgrade-button">Select Background</button>
+      <div id="backgroundDropdown" class="dropdown-content">
+        <button data-bg="default">Default</button>
+        <button data-bg="space">Space</button>
+        <button data-bg="sunset">Sunset</button>
+        <button data-bg="matrix">Matrix</button>
+      </div>
+    </div>
+    <button id="closeCustomizationBtn">Close</button>
+  </div>
+
+  <div id="achievementsModal" class="modal">
+    <h3>Achievements</h3>
+    <ul id="achievementsList" style="list-style: none; padding-left: 0;"></ul>
+    <button id="closeAchievementsBtn">Close</button>
+  </div>
+
+  <div id="automationModal" class="modal">
+    <h3>Automation</h3>
+    <p>Automation features coming soon!</p>
+    <button id="closeAutomationBtn">Close</button>
+  </div>
+
+  <script>
+    let cookies = 0;
+    let cps = 0;
+    let clickPower = 1;
+    let autoClickers = 0;
+    let combo = 0;
+    let maxCombo = 3;
+    let prestige = 0;
+    let multiplier = 1;
+    let goldenChance = 0.05;
+    let critChance = 0.1;
+    let achievements = [];
+    let purchasedUpgrades = [];
+
+    const achievementDefinitions = [
+      { key: "firstClick", name: "First Click", check: () => cookies >= 1 },
+      { key: "hundredCookies", name: "Hundred Cookies", check: () => cookies >= 100 },
+      { key: "thousandCookies", name: "Thousand Cookies", check: () => cookies >= 1000 },
+      { key: "firstPrestige", name: "First Prestige", check: () => prestige >= 1 }
+    ];
+
+    const cookieCount = document.getElementById("cookieCount");
+    const comboDisplay = document.getElementById("comboDisplay");
+    const prestigeInfo = document.getElementById("prestigeInfo");
+    const cpsDisplay = document.getElementById("cpsDisplay");
+    const autoClickerDisplay = document.getElementById("autoClickerDisplay");
+    const cookieButton = document.getElementById("cookieButton");
+    const notification = document.getElementById("notification");
+
+    const upgradeButtons = [
+      { id: "upgrade1", cost: 10, action: () => cps += 1 },
+      { id: "upgrade2", cost: 50, action: () => cps += 2 },
+      { id: "upgrade3", cost: 250, action: () => cps += 5 },
+      { id: "upgrade4", cost: 100, action: () => clickPower *= 2 },
+      { id: "upgrade5", cost: 200, action: () => autoClickers += 1 },
+      { id: "upgrade6", cost: 300, action: () => maxCombo += 1 },
+      { id: "upgrade7", cost: 500, action: () => goldenChance += 0.05 },
+      { id: "upgrade8", cost: 700, action: () => triggerParticleStorm() },
+      { id: "upgrade9", cost: 1000, action: () => critChance += 0.1 },
+      { id: "upgrade10", cost: 2000, action: () => multiplier *= 1.5 },
+      { id: "upgrade11", cost: 5000, action: () => cps += 20 },
+      { id: "upgrade12", cost: 10000, action: () => cps += 100 }
+    ];
+
+    upgradeButtons.forEach((upgrade, index) => {
+      const button = document.getElementById(upgrade.id);
+      button.addEventListener("click", () => buyUpgrade(index));
+    });
+
+    function showNotification(text) {
+      notification.textContent = text;
+      notification.style.display = "block";
+      clearTimeout(showNotification.timeout);
+      showNotification.timeout = setTimeout(() => {
+        notification.style.display = "none";
+      }, 2000);
+    }
+
+    function updateDisplays() {
+      cookieCount.textContent = "Cookies: " + Math.floor(cookies);
+      comboDisplay.textContent = "Combo: " + combo + " / " + maxCombo;
+      prestigeInfo.textContent = "Prestige: " + prestige + " (Multiplier x" + multiplier.toFixed(2) + ")";
+      cpsDisplay.textContent = "Cookies per second: " + (cps * multiplier + autoClickers * 0.5 * multiplier).toFixed(1);
+      autoClickerDisplay.textContent = "Auto-clickers: " + autoClickers;
+
+      upgradeButtons.forEach((upgrade) => {
+        const button = document.getElementById(upgrade.id);
+        button.disabled = cookies < upgrade.cost;
+      });
+    }
+
+    function spawnParticle(x, y, color = "#fff") {
+      const particle = document.createElement("div");
+      particle.className = "particle";
+      particle.style.left = x + "px";
+      particle.style.top = y + "px";
+      particle.style.background = color;
+      document.body.appendChild(particle);
+      setTimeout(() => particle.remove(), 1000);
+    }
+
+    function triggerParticleStorm() {
+      for (let i = 0; i < 30; i++) {
+        spawnParticle(
+          Math.random() * window.innerWidth,
+          Math.random() * window.innerHeight,
+          ["#ff0", "#0ff", "#f0f", "#fff"][Math.floor(Math.random() * 4)]
+        );
+      }
+      showNotification("Particle Storm!");
+    }
+
+    function clickCookie(event) {
+      let gained = clickPower * multiplier;
+      combo = Math.min(combo + 1, maxCombo);
+      gained *= 1 + combo * 0.1;
+
+      if (Math.random() < goldenChance) {
+        gained *= 5;
+        showNotification("Golden Click!");
+      }
+      if (Math.random() < critChance) {
+        gained *= 2;
+        showNotification("Critical Click!");
+      }
+
+      cookies += gained;
+      updateDisplays();
+      spawnParticle(event.clientX, event.clientY, "#ffcc00");
+      checkAchievements();
+    }
+
+    function buyUpgrade(index) {
+      const upgrade = upgradeButtons[index];
+      if (cookies >= upgrade.cost) {
+        cookies -= upgrade.cost;
+        upgrade.action();
+        purchasedUpgrades.push(upgrade.id);
+        updateDisplays();
+        showNotification("Upgrade purchased!");
+      }
+    }
+
+    function checkAchievements() {
+      achievementDefinitions.forEach((achievement) => {
+        if (!achievements.includes(achievement.key) && achievement.check()) {
+          achievements.push(achievement.key);
+          showNotification("Achievement unlocked: " + achievement.name);
+          renderAchievements();
+        }
+      });
+    }
+
+    function renderAchievements() {
+      const list = document.getElementById("achievementsList");
+      list.innerHTML = "";
+      achievementDefinitions.forEach((achievement) => {
+        const item = document.createElement("li");
+        item.textContent = achievements.includes(achievement.key)
+          ? "✓ " + achievement.name
+          : "○ " + achievement.name;
+        list.appendChild(item);
+      });
+    }
+
+    function prestigeReset() {
+      if (cookies >= 10000) {
+        prestige += 1;
+        multiplier = 1 + prestige * 0.5;
+        cookies = 0;
+        cps = 0;
+        clickPower = 1;
+        autoClickers = 0;
+        combo = 0;
+        maxCombo = 3;
+        goldenChance = 0.05;
+        critChance = 0.1;
+        purchasedUpgrades = [];
+        updateDisplays();
+        checkAchievements();
+        showNotification("Prestige Reset Complete!");
+      } else {
+        showNotification("Need 10,000 cookies to prestige.");
+      }
+    }
+
+    function saveGame() {
+      const data = { cookies, cps, clickPower, autoClickers, combo, maxCombo, prestige, multiplier, goldenChance, critChance, achievements, purchasedUpgrades };
+      localStorage.setItem("glowingCookieClickerSave", JSON.stringify(data));
+      showNotification("Game saved.");
+    }
+
+    function loadGame() {
+      const data = JSON.parse(localStorage.getItem("glowingCookieClickerSave"));
+      if (data) {
+        ({ cookies, cps, clickPower, autoClickers, combo, maxCombo, prestige, multiplier, goldenChance, critChance, achievements, purchasedUpgrades } = data);
+        updateDisplays();
+        renderAchievements();
+        showNotification("Game loaded.");
+      }
+    }
+
+    function exportSave() {
+      const data = btoa(JSON.stringify({ cookies, cps, clickPower, autoClickers, combo, maxCombo, prestige, multiplier, goldenChance, critChance, achievements, purchasedUpgrades }));
+      prompt("Copy your save data:", data);
+    }
+
+    function importSave() {
+      const data = prompt("Paste your save data:");
+      if (!data) return;
+      try {
+        const parsed = JSON.parse(atob(data));
+        ({ cookies, cps, clickPower, autoClickers, combo, maxCombo, prestige, multiplier, goldenChance, critChance, achievements, purchasedUpgrades } = parsed);
+        updateDisplays();
+        renderAchievements();
+        showNotification("Save imported.");
+      } catch {
+        showNotification("Invalid save data.");
+      }
+    }
+
+    function resetGame() {
+      localStorage.removeItem("glowingCookieClickerSave");
+      cookies = 0;
+      cps = 0;
+      clickPower = 1;
+      autoClickers = 0;
+      combo = 0;
+      maxCombo = 3;
+      prestige = 0;
+      multiplier = 1;
+      goldenChance = 0.05;
+      critChance = 0.1;
+      achievements = [];
+      purchasedUpgrades = [];
+      updateDisplays();
+      renderAchievements();
+      showNotification("Game reset.");
+    }
+
+    function toggleModal(id, visible) {
+      document.getElementById(id).style.display = visible ? "block" : "none";
+    }
+
+    function setCookieColor(theme) {
+      const themes = {
+        classic: "radial-gradient(circle, #ffdd33, #ff9900)",
+        red: "radial-gradient(circle, #ff6666, #aa0000)",
+        blue: "radial-gradient(circle, #66ccff, #0033aa)",
+        rainbow: "conic-gradient(red, orange, yellow, green, blue, indigo, violet, red)"
+      };
+      cookieButton.style.background = themes[theme];
+    }
+
+    function setBackground(theme) {
+      const backgrounds = {
+        default: "#000",
+        space: "radial-gradient(circle at center, #111 0%, #000 70%)",
+        sunset: "linear-gradient(180deg, #ff9966, #330000)",
+        matrix: "linear-gradient(180deg, #001100, #000)"
+      };
+      document.body.style.background = backgrounds[theme];
+    }
+
+    cookieButton.addEventListener("click", clickCookie);
+    document.getElementById("prestigeButton").addEventListener("click", prestigeReset);
+    document.getElementById("settingsButton").addEventListener("click", () => toggleModal("settingsModal", true));
+    document.getElementById("customizationButton").addEventListener("click", () => toggleModal("customizationModal", true));
+    document.getElementById("showAchievementsButton").addEventListener("click", () => {
+      renderAchievements();
+      toggleModal("achievementsModal", true);
+    });
+    document.getElementById("showAutomationButton").addEventListener("click", () => toggleModal("automationModal", true));
+
+    document.getElementById("saveGameBtn").addEventListener("click", saveGame);
+    document.getElementById("loadGameBtn").addEventListener("click", loadGame);
+    document.getElementById("exportSaveBtn").addEventListener("click", exportSave);
+    document.getElementById("importSaveBtn").addEventListener("click", importSave);
+    document.getElementById("resetGameBtn").addEventListener("click", resetGame);
+    document.getElementById("closeSettingsBtn").addEventListener("click", () => toggleModal("settingsModal", false));
+    document.getElementById("closeCustomizationBtn").addEventListener("click", () => toggleModal("customizationModal", false));
+    document.getElementById("closeAchievementsBtn").addEventListener("click", () => toggleModal("achievementsModal", false));
+    document.getElementById("closeAutomationBtn").addEventListener("click", () => toggleModal("automationModal", false));
+
+    document.querySelectorAll("#cookieColorDropdown button").forEach((button) => {
+      button.addEventListener("click", () => setCookieColor(button.dataset.color));
+    });
+    document.querySelectorAll("#backgroundDropdown button").forEach((button) => {
+      button.addEventListener("click", () => setBackground(button.dataset.bg));
+    });
+
+    setInterval(() => {
+      cookies += (cps * multiplier + autoClickers * 0.5 * multiplier) / 10;
+      combo = Math.max(0, combo - 0.02);
+      updateDisplays();
+      checkAchievements();
+    }, 100);
+
+    loadGame();
+    updateDisplays();
+    renderAchievements();
+  </script>
+</body>
+</html>
