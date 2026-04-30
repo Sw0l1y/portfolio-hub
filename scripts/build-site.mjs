@@ -21,6 +21,10 @@ const EXTERNAL_GAME_SOURCES = {
     sourceDir: "orbital-mechanics-sim",
     buildDir: "dist",
   },
+  "dungeon-surge": {
+    sourceDir: "dungeon-surge",
+    buildDir: "dist",
+  },
   "momentum-trial": {
     sourceDir: "momentum-trial",
     entryFile: "game/Game.html",
