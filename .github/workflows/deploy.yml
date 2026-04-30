@@ -12,6 +12,13 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v5
 
+      - name: Check out dash source
+        uses: actions/checkout@v5
+        with:
+          repository: Sw0l1y/dash
+          token: ${{ secrets.CONTENT_REPO_TOKEN }}
+          path: external-games/dash
+
       - name: Check out clicker-game source
         uses: actions/checkout@v5
         with:

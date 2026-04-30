@@ -13,6 +13,10 @@ const PUBLIC_GAMES_ROOT = path.join(REPO_ROOT, "public-games");
 const EXTERNAL_GAMES_ROOT = path.join(REPO_ROOT, "external-games");
 const ROOT_FILES = ["index.html", "app.js", "catalog.js", "styles.css"];
 const EXTERNAL_GAME_SOURCES = {
+  "dash": {
+    sourceDir: "dash",
+    entryFile: "index.html",
+  },
   "clicker-game": {
     sourceDir: "clicker-game",
     entryFile: "Clicker.html",

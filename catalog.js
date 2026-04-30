@@ -102,7 +102,7 @@
       slug: "dash",
       title: "Dash",
       status: "playable",
-      publicStatus: "placeholder",
+      publicStatus: "live",
       genre: "Action",
       platform: "Browser",
       tech: ["Single-file HTML", "Canvas", "Vanilla JavaScript"],
@@ -118,9 +118,9 @@
       },
       featured: false,
       sortOrder: 2,
+      repoUrl: "https://github.com/Sw0l1y/dash",
       actions: [
-        { label: "Play", href: "/Nathan games that he made/dash/index.html", kind: "primary" },
-        { label: "Files", href: "/Nathan games that he made/dash/", kind: "secondary" },
+        { label: "Play", href: "/games/dash/", kind: "primary" },
       ],
     },
     {
