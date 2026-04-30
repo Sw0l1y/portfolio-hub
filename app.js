@@ -1,6 +1,16 @@
 (() => {
   /** @type {typeof window.PORTFOLIO_CATALOG} */
-  const projects = [...(window.PORTFOLIO_CATALOG || [])].sort((a, b) => a.sortOrder - b.sortOrder);
+  function cardGroup(project) {
+    if (project.status === "abandoned") return 3;
+    if (project.publicStatus === "live" && project.genre === "Editor") return 1;
+    if (project.publicStatus === "live") return 0;
+    return 2;
+  }
+
+  const projects = [...(window.PORTFOLIO_CATALOG || [])].sort((a, b) => {
+    const groupDiff = cardGroup(a) - cardGroup(b);
+    return groupDiff !== 0 ? groupDiff : a.sortOrder - b.sortOrder;
+  });
 
   if (!projects.length) {
     throw new Error("Portfolio catalog is empty.");
