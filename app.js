@@ -257,7 +257,7 @@
 
         if (isAbandoned) {
           return `
-            <article class="project-card project-card--abandoned ${project.id === selectedProject.id ? "is-selected" : ""}" role="listitem">
+            <article class="project-card project-card--abandoned ${state.drawerOpen && project.id === selectedProject.id ? "is-selected" : ""}" role="listitem">
               <div class="project-card-header">
                 <button class="card-select" type="button" data-project-open="${escapeHtml(project.id)}">
                   <div class="project-cover project-cover--abandoned" style="background:${projectCoverStyle(project)}"></div>
@@ -280,7 +280,7 @@
         const primaryAction = publicActions.find((action) => action.kind === "primary") || null;
 
         return `
-          <article class="project-card ${project.id === selectedProject.id ? "is-selected" : ""}" role="listitem">
+          <article class="project-card ${state.drawerOpen && project.id === selectedProject.id ? "is-selected" : ""}" role="listitem">
             <div class="project-card-header">
               <button class="card-select" type="button" data-project-open="${escapeHtml(project.id)}">
                 <div class="project-cover" style="background:${projectCoverStyle(project)}"></div>
@@ -444,6 +444,7 @@
     state.drawerOpen = false;
     drawerShell.hidden = true;
     document.body.classList.remove("drawer-open");
+    renderProjects();
   }
 
   searchInput.addEventListener("input", (event) => {
