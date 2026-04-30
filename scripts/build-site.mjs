@@ -53,6 +53,10 @@ async function main() {
     const externalSource = getExternalSource(project.slug);
     const routeIndex = path.join(routeRoot, "index.html");
 
+    if (project.status === "abandoned") {
+      continue;
+    }
+
     if (project.publicStatus === "live") {
       if (await directoryHasEntries(sourceRouteRoot)) {
         await copyDirectory(sourceRouteRoot, routeRoot);

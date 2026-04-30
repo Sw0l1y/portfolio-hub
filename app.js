@@ -253,6 +253,29 @@
 
     grid.innerHTML = visibleProjects
       .map((project) => {
+        const isAbandoned = project.status === "abandoned";
+
+        if (isAbandoned) {
+          return `
+            <article class="project-card project-card--abandoned ${project.id === selectedProject.id ? "is-selected" : ""}" role="listitem">
+              <div class="project-card-header">
+                <button class="card-select" type="button" data-project-open="${escapeHtml(project.id)}">
+                  <div class="project-cover project-cover--abandoned" style="background:${projectCoverStyle(project)}"></div>
+                  <div class="card-meta">
+                    <span class="status-pill" data-status="${project.status}">${statusLabel(project.status)}</span>
+                    <span class="meta-pill">${escapeHtml(project.genre)}</span>
+                  </div>
+                  <h3 class="project-card-title">${escapeHtml(project.title)}</h3>
+                </button>
+              </div>
+              <div class="shelved-bar">
+                <span class="shelved-label">&#x2715;&ensp;No longer maintained</span>
+                <button class="button button-ghost shelved-details" type="button" data-project-open="${escapeHtml(project.id)}">Details</button>
+              </div>
+            </article>
+          `;
+        }
+
         const publicActions = getPublicActions(project);
         const primaryAction = publicActions.find((action) => action.kind === "primary") || null;
 
@@ -288,24 +311,33 @@
 
   function renderDrawer() {
     const project = getSelectedProject();
-    const publicActions = getPublicActions(project);
+    const isAbandoned = project.status === "abandoned";
 
     setTheme(project);
 
-    drawer.innerHTML = `
-      <div class="drawer-header">
-        <div>
-          <div class="eyebrow">Project Details</div>
-          <h3 id="drawer-title">${escapeHtml(project.title)}</h3>
+    const drawerCoverStyle = isAbandoned
+      ? `background:${projectCoverStyle(project)};filter:grayscale(0.75) brightness(0.6);`
+      : `background:${projectCoverStyle(project)}`;
+
+    const drawerBody = isAbandoned
+      ? `
+        <div class="drawer-meta">
+          <span class="status-pill" data-status="abandoned">${statusLabel(project.status)}</span>
+          <span class="meta-pill">${escapeHtml(project.genre)}</span>
+          <span class="meta-pill">${escapeHtml(project.platform)}</span>
         </div>
-        <button class="drawer-close" id="close-drawer" type="button" aria-label="Close project details">
-          ×
-        </button>
-      </div>
-
-      <div class="drawer-cover" style="background:${projectCoverStyle(project)}"></div>
-
-      <div class="drawer-body">
+        <div class="shelved-notice">
+          <p>This project has been shelved and is no longer in active development. The source exists but won't receive updates.</p>
+        </div>
+        <div class="drawer-section">
+          <h4>Tech</h4>
+          <div class="stack-list">
+            ${project.tech.map((item) => `<span class="stack-chip">${escapeHtml(item)}</span>`).join("")}
+          </div>
+        </div>
+        ${project.repoUrl ? `<div class="drawer-section"><div class="drawer-actions"><a class="button button-ghost" href="${encodeHref(project.repoUrl)}" target="_blank" rel="noreferrer">GitHub</a></div></div>` : ""}
+      `
+      : `
         <div class="drawer-meta">
           <span class="status-pill" data-status="${project.status}">${statusLabel(project.status)}</span>
           <span class="meta-pill">${escapeHtml(project.genre)}</span>
@@ -336,13 +368,30 @@
 
         <div class="drawer-section">
           <h4>Actions</h4>
-          <div class="drawer-actions">${renderActionRow(publicActions)}</div>
+          <div class="drawer-actions">${renderActionRow(getPublicActions(project))}</div>
         </div>
 
         <div class="drawer-section">
           <h4>Route</h4>
           <p class="drawer-summary">${escapeHtml(getPublicRoute(project))} — ${escapeHtml(getPublicStatusSummary(project))}</p>
         </div>
+      `;
+
+    drawer.innerHTML = `
+      <div class="drawer-header">
+        <div>
+          <div class="eyebrow">Project Details</div>
+          <h3 id="drawer-title">${escapeHtml(project.title)}</h3>
+        </div>
+        <button class="drawer-close" id="close-drawer" type="button" aria-label="Close project details">
+          ×
+        </button>
+      </div>
+
+      <div class="drawer-cover" style="${drawerCoverStyle}"></div>
+
+      <div class="drawer-body">
+        ${drawerBody}
       </div>
     `;
 
