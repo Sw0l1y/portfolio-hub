@@ -53,6 +53,12 @@
     ].join(', ');
   }
 
+  function cardCoverStyle(p) {
+    const grad = coverGradient(p);
+    if (p.cover) return `background: url('${p.cover}') center/cover no-repeat, ${grad}`;
+    return `background: ${grad}`;
+  }
+
   function getPlayUrl(p) {
     if (p.publicStatus !== 'live') return null;
     if (p.publicPath) return p.publicPath;
@@ -139,16 +145,14 @@
 
   function cardHtml(p, idx) {
     const num = String(idx + 1).padStart(2, '0');
-    const dateStamp = `${p.year || '—'}${p.q ? '.' + p.q : ''}`;
     const cls = p.kind === 'DEPRECATED' ? 'card card--deprecated' : 'card';
     return `
       <div class="${cls}" data-nav-detail="${esc(p.id)}">
-        <div class="card-cover" style="background:${coverGradient(p)}">
-          <div class="card-cover-fig">№ ${num} · ${p.year || '—'}</div>
+        <div class="card-cover" style="${cardCoverStyle(p)}">
           <div class="crops"><span></span></div>
           <div class="card-overlay">
             <div>
-              <div class="card-overlay-meta">№ ${num} · ${dateStamp} · ${p.kind}</div>
+              <div class="card-overlay-meta">${p.kind}</div>
               <div class="card-overlay-title">${esc(p.title)}</div>
               <div class="card-overlay-tagline">${esc(p.shortSummary)}</div>
             </div>
@@ -160,7 +164,7 @@
         </div>
         <div class="card-label">
           <span>${num} · ${esc(p.title.toLowerCase())}</span>
-          <span>${dateStamp}</span>
+          <span>${p.kind}</span>
         </div>
       </div>`;
   }
@@ -223,7 +227,7 @@
             </div>
 
             <div class="hero-plate" data-nav-detail="${esc(latest.id)}">
-              <div class="hero-cover" style="background:${coverGradient(latest)}">
+              <div class="hero-cover" style="${cardCoverStyle(latest)}">
                 <div class="hero-cover-fig">FIG. 01 — REEL</div>
                 <div class="crops"><span></span></div>
                 <div class="hero-cover-action">
@@ -318,14 +322,14 @@
             <div class="embed-plate" id="embed-plate">
               ${playUrl ? `
                 <div class="embed-placeholder">
-                  <div class="embed-placeholder-cover" style="background:${coverGradient(p)}">
+                  <div class="embed-placeholder-cover" style="${cardCoverStyle(p)}">
                     <div class="crops"><span></span></div>
                   </div>
                   <button class="btn btn-filled embed-load-btn" data-embed-load="${esc(playUrl)}">▶ LOAD BUILD</button>
                 </div>
               ` : `
                 <div class="embed-placeholder">
-                  <div class="embed-placeholder-cover" style="background:${coverGradient(p)};opacity:0.45">
+                  <div class="embed-placeholder-cover" style="${cardCoverStyle(p)};opacity:0.45">
                     <div class="crops"><span></span></div>
                   </div>
                   <div class="embed-load-btn" style="pointer-events:none;opacity:0.5;font-size:11px;letter-spacing:0.18em;text-transform:uppercase">NOT AVAILABLE</div>
@@ -383,8 +387,7 @@
             <div class="related-grid">
               ${related.map(rp => `
                 <div class="card" data-nav-detail="${esc(rp.id)}">
-                  <div class="card-cover card-cover--sm" style="background:${coverGradient(rp)}">
-                    <div class="card-cover-fig">${rp.year || ''}${rp.q ? '.' + rp.q : ''}</div>
+                  <div class="card-cover card-cover--sm" style="${cardCoverStyle(rp)}">
                     <div class="crops"><span></span></div>
                     <div class="card-overlay">
                       <div>
@@ -603,7 +606,7 @@
       if (plate && p && playUrl) {
         plate.innerHTML = `
           <div class="embed-placeholder">
-            <div class="embed-placeholder-cover" style="background:${coverGradient(p)}">
+            <div class="embed-placeholder-cover" style="${cardCoverStyle(p)}">
               <div class="crops"><span></span></div>
             </div>
             <button class="btn btn-filled embed-load-btn" data-embed-load="${esc(playUrl)}">▶ LOAD BUILD</button>

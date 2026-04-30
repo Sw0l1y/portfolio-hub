@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#141e28"/>
+      <stop offset="100%" stop-color="#060c14"/>
+    </radialGradient>
+    <linearGradient id="lane" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6adaff" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#6adaff" stop-opacity="0.25"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="400" fill="url(#bg)"/>
+
+  <!-- sky gradient -->
+  <rect x="0" y="0" width="600" height="200" fill="#0a1520" opacity="0.5"/>
+
+  <!-- horizon glow -->
+  <ellipse cx="300" cy="195" rx="300" ry="20" fill="#6adaff" opacity="0.06"/>
+
+  <!-- three lane dividers (converging to vanishing point at 300, 195) -->
+  <!-- left lane edges -->
+  <line x1="0" y1="400" x2="300" y2="195" stroke="#6adaff" stroke-width="1.5" opacity="0.5"/>
+  <line x1="200" y1="400" x2="300" y2="195" stroke="#6adaff" stroke-width="1" opacity="0.35"/>
+  <!-- center lane edges -->
+  <line x1="400" y1="400" x2="300" y2="195" stroke="#6adaff" stroke-width="1" opacity="0.35"/>
+  <!-- right lane edge -->
+  <line x1="600" y1="400" x2="300" y2="195" stroke="#6adaff" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- lane fills -->
+  <polygon points="0,400 200,400 300,195" fill="url(#lane)" opacity="0.3"/>
+  <polygon points="200,400 400,400 300,195" fill="url(#lane)" opacity="0.4"/>
+  <polygon points="400,400 600,400 300,195" fill="url(#lane)" opacity="0.3"/>
+
+  <!-- speed lines (road markings) -->
+  <g stroke="#6adaff" stroke-width="1" opacity="0.2">
+    <!-- center lane dashes -->
+    <line x1="300" y1="340" x2="300" y2="316"/><line x1="300" y1="308" x2="300" y2="288"/>
+    <line x1="300" y1="280" x2="300" y2="262"/><line x1="300" y1="255" x2="300" y2="242"/>
+    <line x1="300" y1="237" x2="300" y2="225"/>
+  </g>
+
+  <!-- obstacles (perspective boxes) -->
+  <!-- far obstacles -->
+  <rect x="270" y="230" width="20" height="14" fill="#ffe07b" opacity="0.5"/>
+  <rect x="264" y="222" width="20" height="8" fill="#ffe07b" opacity="0.3"/>
+  <!-- mid obstacles left lane -->
+  <rect x="145" y="290" width="36" height="28" fill="#6adaff" opacity="0.35"/>
+  <rect x="139" y="276" width="36" height="14" fill="#6adaff" opacity="0.2"/>
+  <!-- mid obstacles right lane -->
+  <rect x="410" y="295" width="40" height="28" fill="#6adaff" opacity="0.3"/>
+  <!-- near obstacle center -->
+  <rect x="250" y="350" width="60" height="44" fill="#ffe07b" opacity="0.45"/>
+  <rect x="244" y="336" width="60" height="14" fill="#ffe07b" opacity="0.3"/>
+
+  <!-- player character (center lane, near) -->
+  <rect x="284" y="320" width="28" height="44" rx="2" fill="#6adaff" opacity="0.8"/>
+  <circle cx="298" cy="310" r="12" fill="#6adaff" opacity="0.8"/>
+  <!-- motion blur -->
+  <rect x="284" y="318" width="28" height="10" fill="#6adaff" opacity="0.2"/>
+
+  <!-- buildings/scenery sides -->
+  <rect x="0" y="120" width="60" height="260" fill="#0a1830" stroke="#6adaff" stroke-width="0.5" opacity="0.4"/>
+  <rect x="60" y="150" width="40" height="230" fill="#0c1e38" stroke="#6adaff" stroke-width="0.3" opacity="0.3"/>
+  <rect x="540" y="110" width="60" height="270" fill="#0a1830" stroke="#6adaff" stroke-width="0.5" opacity="0.4"/>
+  <rect x="500" y="155" width="40" height="225" fill="#0c1e38" stroke="#6adaff" stroke-width="0.3" opacity="0.3"/>
+
+  <!-- window lights -->
+  <g fill="#ffe07b" opacity="0.3">
+    <rect x="10" y="130" width="8" height="6"/><rect x="22" y="130" width="8" height="6"/>
+    <rect x="10" y="145" width="8" height="6"/><rect x="22" y="155" width="8" height="6"/>
+    <rect x="548" y="125" width="8" height="6"/><rect x="560" y="135" width="8" height="6"/>
+    <rect x="548" y="148" width="8" height="6"/>
+  </g>
+
+  <!-- speed/distance HUD -->
+  <text x="20" y="40" font-family="monospace" font-size="11" fill="#6adaff" opacity="0.7" letter-spacing="1">DIST  2.4 KM</text>
+  <text x="20" y="58" font-family="monospace" font-size="9" fill="#ffe07b" opacity="0.6" letter-spacing="1">SCORE  48200</text>
+
+  <text x="20" y="390" font-family="monospace" font-size="9" fill="#6adaff" opacity="0.35" letter-spacing="1">CANVAS · 3D RUNNER DRAFT</text>
+</svg>

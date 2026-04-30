@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#0d1e2d"/>
+      <stop offset="100%" stop-color="#030810"/>
+    </radialGradient>
+  </defs>
+  <rect width="600" height="400" fill="url(#bg)"/>
+
+  <!-- toolbar (left) -->
+  <rect x="12" y="40" width="44" height="320" rx="3" fill="#081828" stroke="#73e5f6" stroke-width="1" opacity="0.7"/>
+  <text x="34" y="62" font-family="monospace" font-size="8" fill="#73e5f6" text-anchor="middle" opacity="0.6" letter-spacing="0.5">TOOL</text>
+  <rect x="18" y="68" width="32" height="28" rx="2" fill="#73e5f6" opacity="0.9"/>
+  <text x="34" y="87" font-family="monospace" font-size="9" fill="#081828" text-anchor="middle" font-weight="bold">1</text>
+  <rect x="18" y="100" width="32" height="28" rx="2" fill="#73e5f6" opacity="0.2"/>
+  <text x="34" y="119" font-family="monospace" font-size="9" fill="#73e5f6" text-anchor="middle" opacity="0.7">2</text>
+  <rect x="18" y="132" width="32" height="28" rx="2" fill="#73e5f6" opacity="0.15"/>
+  <text x="34" y="151" font-family="monospace" font-size="9" fill="#73e5f6" text-anchor="middle" opacity="0.6">3</text>
+  <rect x="18" y="164" width="32" height="28" rx="2" fill="#73e5f6" opacity="0.12"/>
+  <text x="34" y="183" font-family="monospace" font-size="9" fill="#73e5f6" text-anchor="middle" opacity="0.5">4</text>
+  <rect x="18" y="196" width="32" height="28" rx="2" fill="#ffe693" opacity="0.15"/>
+  <text x="34" y="215" font-family="monospace" font-size="9" fill="#ffe693" text-anchor="middle" opacity="0.6">5</text>
+
+  <!-- title bar -->
+  <rect x="62" y="12" width="530" height="24" rx="2" fill="#081828" stroke="#73e5f6" stroke-width="0.8" opacity="0.6"/>
+  <text x="76" y="28" font-family="monospace" font-size="9" fill="#73e5f6" opacity="0.7" letter-spacing="1">level_02.level · MOMENTUM TRIAL EDITOR</text>
+  <rect x="568" y="16" width="14" height="14" rx="1" fill="#73e5f6" opacity="0.2"/>
+
+  <!-- tile grid canvas -->
+  <!-- ground tiles (gray) -->
+  <g fill="#1a3040" stroke="#73e5f6" stroke-width="0.3" opacity="0.6">
+    <rect x="62" y="270" width="32" height="32"/><rect x="94" y="270" width="32" height="32"/><rect x="126" y="270" width="32" height="32"/>
+    <rect x="158" y="270" width="32" height="32"/><rect x="190" y="270" width="32" height="32"/><rect x="222" y="270" width="32" height="32"/>
+    <rect x="254" y="270" width="32" height="32"/><rect x="286" y="270" width="32" height="32"/><rect x="318" y="270" width="32" height="32"/>
+    <rect x="350" y="270" width="32" height="32"/><rect x="382" y="270" width="32" height="32"/><rect x="414" y="270" width="32" height="32"/>
+    <rect x="446" y="270" width="32" height="32"/><rect x="478" y="270" width="32" height="32"/><rect x="510" y="270" width="32" height="32"/>
+  </g>
+
+  <!-- platform tiles (cyan) -->
+  <g fill="#1a3a42" stroke="#73e5f6" stroke-width="0.5" opacity="0.8">
+    <rect x="126" y="206" width="32" height="32"/><rect x="158" y="206" width="32" height="32"/><rect x="190" y="206" width="32" height="32"/>
+    <rect x="286" y="174" width="32" height="32"/><rect x="318" y="174" width="32" height="32"/>
+    <rect x="414" y="142" width="32" height="32"/><rect x="446" y="142" width="32" height="32"/><rect x="478" y="142" width="32" height="32"/>
+  </g>
+
+  <!-- hazard tiles (orange) -->
+  <g fill="#3a2010" stroke="#ffe693" stroke-width="0.5" opacity="0.7">
+    <rect x="222" y="238" width="32" height="32"/><rect x="254" y="238" width="32" height="32"/>
+  </g>
+
+  <!-- spawn point (accent) -->
+  <rect x="94" y="238" width="32" height="32" fill="#0d2d3a" stroke="#73e5f6" stroke-width="1.5" opacity="0.9"/>
+  <text x="110" y="259" font-family="monospace" font-size="11" fill="#73e5f6" text-anchor="middle" opacity="0.9">S</text>
+
+  <!-- cursor selection -->
+  <rect x="286" y="174" width="64" height="32" fill="none" stroke="#73e5f6" stroke-width="2" stroke-dasharray="4 2" opacity="0.9"/>
+
+  <!-- empty grid area -->
+  <g stroke="#73e5f6" stroke-width="0.2" opacity="0.06">
+    <line x1="62" y1="40" x2="62" y2="360"/><line x1="94" y1="40" x2="94" y2="360"/>
+    <line x1="126" y1="40" x2="126" y2="360"/><line x1="158" y1="40" x2="158" y2="360"/>
+    <line x1="190" y1="40" x2="190" y2="360"/><line x1="222" y1="40" x2="222" y2="360"/>
+    <line x1="254" y1="40" x2="254" y2="360"/><line x1="286" y1="40" x2="286" y2="360"/>
+    <line x1="318" y1="40" x2="318" y2="360"/><line x1="350" y1="40" x2="350" y2="360"/>
+    <line x1="382" y1="40" x2="382" y2="360"/><line x1="414" y1="40" x2="414" y2="360"/>
+    <line x1="446" y1="40" x2="446" y2="360"/><line x1="478" y1="40" x2="478" y2="360"/>
+    <line x1="510" y1="40" x2="510" y2="360"/>
+    <line x1="62" y1="40" x2="592" y2="40"/><line x1="62" y1="72" x2="592" y2="72"/>
+    <line x1="62" y1="104" x2="592" y2="104"/><line x1="62" y1="136" x2="592" y2="136"/>
+    <line x1="62" y1="168" x2="592" y2="168"/><line x1="62" y1="200" x2="592" y2="200"/>
+    <line x1="62" y1="232" x2="592" y2="232"/><line x1="62" y1="264" x2="592" y2="264"/>
+    <line x1="62" y1="296" x2="592" y2="296"/><line x1="62" y1="328" x2="592" y2="328"/>
+    <line x1="62" y1="360" x2="592" y2="360"/>
+  </g>
+
+  <!-- export button -->
+  <rect x="480" y="356" width="100" height="24" rx="2" fill="#73e5f6" opacity="0.9"/>
+  <text x="530" y="372" font-family="monospace" font-size="9" fill="#030810" text-anchor="middle" font-weight="bold" letter-spacing="1">EXPORT .LEVEL</text>
+
+  <text x="20" y="394" font-family="monospace" font-size="9" fill="#73e5f6" opacity="0.35" letter-spacing="1">DRAG AND DROP · LEVEL EXPORT · BROWSER</text>
+</svg>

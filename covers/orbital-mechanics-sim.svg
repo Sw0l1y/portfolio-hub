@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="55%" r="75%">
+      <stop offset="0%" stop-color="#0e1825"/>
+      <stop offset="100%" stop-color="#030810"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="600" height="400" fill="url(#bg)"/>
+
+  <!-- star field -->
+  <g fill="white" opacity="0.5">
+    <circle cx="80" cy="40" r="1"/><circle cx="150" cy="80" r="1.5"/><circle cx="520" cy="30" r="1"/>
+    <circle cx="480" cy="70" r="1"/><circle cx="560" cy="120" r="1.5"/><circle cx="40" cy="150" r="1"/>
+    <circle cx="570" cy="300" r="1"/><circle cx="30" cy="320" r="1.5"/><circle cx="555" cy="360" r="1"/>
+    <circle cx="110" cy="370" r="1"/><circle cx="200" cy="30" r="1"/><circle cx="350" cy="20" r="1.5"/>
+  </g>
+
+  <!-- sun (focus point) -->
+  <circle cx="240" cy="200" r="24" fill="#ff916d" opacity="0.95" filter="url(#glow)"/>
+  <circle cx="240" cy="200" r="24" fill="#ff916d" opacity="0.85"/>
+  <circle cx="240" cy="200" r="18" fill="#ffb88a" opacity="0.6"/>
+
+  <!-- large orbit (outer planet) -->
+  <ellipse cx="240" cy="200" rx="220" ry="140" fill="none" stroke="#ff916d" stroke-width="1" opacity="0.2"/>
+  <!-- planet on outer orbit -->
+  <circle cx="460" cy="200" r="14" fill="#7be0dd" opacity="0.85"/>
+  <circle cx="460" cy="200" r="10" fill="#9ae8e6" opacity="0.6"/>
+
+  <!-- medium orbit -->
+  <ellipse cx="240" cy="200" rx="140" ry="88" fill="none" stroke="#ff916d" stroke-width="0.8" opacity="0.3"/>
+  <!-- planet on medium orbit -->
+  <circle cx="240" cy="112" r="10" fill="#ff916d" opacity="0.8"/>
+  <circle cx="240" cy="112" r="7" fill="#ffb88a" opacity="0.6"/>
+
+  <!-- small orbit (moon-ish) -->
+  <ellipse cx="240" cy="200" rx="65" ry="42" fill="none" stroke="#ff916d" stroke-width="0.6" opacity="0.4"/>
+  <circle cx="305" cy="200" r="6" fill="#e8ddc0" opacity="0.75"/>
+
+  <!-- velocity vectors -->
+  <line x1="460" y1="200" x2="460" y2="155" stroke="#ff916d" stroke-width="1" stroke-dasharray="3 2" opacity="0.5"/>
+  <polygon points="460,152 456,162 464,162" fill="#ff916d" opacity="0.5"/>
+  <line x1="240" y1="112" x2="286" y2="112" stroke="#ff916d" stroke-width="1" stroke-dasharray="3 2" opacity="0.5"/>
+  <polygon points="289,112 279,108 279,116" fill="#ff916d" opacity="0.5"/>
+
+  <!-- gravitational field lines -->
+  <circle cx="240" cy="200" r="60" fill="none" stroke="#ff916d" stroke-width="0.4" stroke-dasharray="2 6" opacity="0.2"/>
+  <circle cx="240" cy="200" r="100" fill="none" stroke="#ff916d" stroke-width="0.3" stroke-dasharray="2 8" opacity="0.15"/>
+  <circle cx="240" cy="200" r="175" fill="none" stroke="#ff916d" stroke-width="0.2" stroke-dasharray="2 10" opacity="0.1"/>
+
+  <!-- data readout -->
+  <text x="490" y="280" font-family="monospace" font-size="9" fill="#ff916d" opacity="0.7" text-anchor="end" letter-spacing="1">PERIOD  3.14y</text>
+  <text x="490" y="295" font-family="monospace" font-size="9" fill="#ff916d" opacity="0.7" text-anchor="end" letter-spacing="1">VEL     24.2 km/s</text>
+  <text x="490" y="310" font-family="monospace" font-size="9" fill="#7be0dd" opacity="0.7" text-anchor="end" letter-spacing="1">BODIES  3</text>
+
+  <text x="20" y="380" font-family="monospace" font-size="9" fill="#ff916d" opacity="0.35" letter-spacing="1">TYPESCRIPT · VITE · SIMULATION</text>
+</svg>

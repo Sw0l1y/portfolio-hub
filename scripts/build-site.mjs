@@ -104,6 +104,11 @@ async function copyRootFiles() {
   for (const filename of ROOT_FILES) {
     await fs.copyFile(path.join(REPO_ROOT, filename), path.join(DIST_ROOT, filename));
   }
+  const coversSource = path.join(REPO_ROOT, 'covers');
+  const coversDest = path.join(DIST_ROOT, 'covers');
+  if (await directoryHasEntries(coversSource)) {
+    await copyDirectory(coversSource, coversDest);
+  }
 }
 
 async function loadPortfolioCatalog() {

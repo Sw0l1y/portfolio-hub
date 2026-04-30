@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="75%">
+      <stop offset="0%" stop-color="#111e28"/>
+      <stop offset="100%" stop-color="#04090f"/>
+    </radialGradient>
+  </defs>
+  <rect width="600" height="400" fill="url(#bg)"/>
+
+  <!-- 3D perspective floor grid -->
+  <!-- vertical lines converging to vanishing point (300, 100) -->
+  <g stroke="#7ce6d0" stroke-width="0.5" opacity="0.2">
+    <line x1="0" y1="400" x2="300" y2="100"/><line x1="60" y1="400" x2="300" y2="100"/>
+    <line x1="120" y1="400" x2="300" y2="100"/><line x1="180" y1="400" x2="300" y2="100"/>
+    <line x1="240" y1="400" x2="300" y2="100"/><line x1="300" y1="400" x2="300" y2="100"/>
+    <line x1="360" y1="400" x2="300" y2="100"/><line x1="420" y1="400" x2="300" y2="100"/>
+    <line x1="480" y1="400" x2="300" y2="100"/><line x1="540" y1="400" x2="300" y2="100"/>
+    <line x1="600" y1="400" x2="300" y2="100"/>
+  </g>
+  <!-- horizontal lines -->
+  <g stroke="#7ce6d0" stroke-width="0.4" opacity="0.15">
+    <line x1="0" y1="150" x2="600" y2="150"/><line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="250" x2="600" y2="250"/><line x1="0" y1="300" x2="600" y2="300"/>
+    <line x1="0" y1="350" x2="600" y2="350"/>
+  </g>
+
+  <!-- floating platforms -->
+  <!-- far platform -->
+  <rect x="235" y="148" width="130" height="16" rx="2" fill="#0f2a28" stroke="#7ce6d0" stroke-width="1" opacity="0.7"/>
+  <rect x="235" y="164" width="130" height="5" fill="#072018" stroke="#7ce6d0" stroke-width="0.5" opacity="0.4"/>
+
+  <!-- mid-left platform -->
+  <rect x="90" y="220" width="110" height="16" rx="2" fill="#0f2a28" stroke="#7ce6d0" stroke-width="1" opacity="0.65"/>
+  <rect x="90" y="236" width="110" height="5" fill="#072018" stroke="#7ce6d0" stroke-width="0.5" opacity="0.35"/>
+
+  <!-- mid-right platform -->
+  <rect x="360" y="210" width="130" height="16" rx="2" fill="#0f2a28" stroke="#7ce6d0" stroke-width="1" opacity="0.65"/>
+  <rect x="360" y="226" width="130" height="5" fill="#072018" stroke="#7ce6d0" stroke-width="0.5" opacity="0.35"/>
+
+  <!-- near-center platform (main) -->
+  <rect x="200" y="300" width="200" height="18" rx="2" fill="#122e2c" stroke="#7ce6d0" stroke-width="1.5" opacity="0.8"/>
+  <rect x="200" y="318" width="200" height="6" fill="#0a201e" stroke="#7ce6d0" stroke-width="0.5" opacity="0.5"/>
+
+  <!-- player character (on main platform) -->
+  <rect x="288" y="276" width="16" height="24" rx="2" fill="#7ce6d0" opacity="0.8"/>
+  <circle cx="296" cy="269" r="9" fill="#7ce6d0" opacity="0.8"/>
+  <!-- player shadow -->
+  <ellipse cx="296" cy="303" rx="10" ry="3" fill="#7ce6d0" opacity="0.2"/>
+
+  <!-- movement arrow -->
+  <line x1="296" y1="285" x2="360" y2="218" stroke="#7ce6d0" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.55"/>
+  <polygon points="362,215 354,222 360,228" fill="#7ce6d0" opacity="0.55"/>
+
+  <!-- camera indicator (top-right) -->
+  <rect x="490" y="55" width="80" height="55" rx="3" fill="none" stroke="#cbd9e8" stroke-width="1" opacity="0.4"/>
+  <polygon points="490,68 470,58 470,100 490,90" fill="none" stroke="#cbd9e8" stroke-width="1" opacity="0.35"/>
+  <text x="530" y="87" font-family="monospace" font-size="8" fill="#cbd9e8" text-anchor="middle" opacity="0.5" letter-spacing="0.5">CAM</text>
+
+  <!-- HUD overlay -->
+  <text x="20" y="35" font-family="monospace" font-size="10" fill="#7ce6d0" opacity="0.65" letter-spacing="1">POS  124.3 · 8.2 · -44.1</text>
+  <text x="20" y="52" font-family="monospace" font-size="9" fill="#7ce6d0" opacity="0.5" letter-spacing="1">VEL  6.4 m/s ↗</text>
+
+  <!-- axis indicator (bottom left) -->
+  <g opacity="0.6">
+    <line x1="40" y1="345" x2="70" y2="325" stroke="#ff6060" stroke-width="1.5"/><text x="73" y="323" font-family="monospace" font-size="8" fill="#ff6060">X</text>
+    <line x1="40" y1="345" x2="40" y2="312" stroke="#7ce6d0" stroke-width="1.5"/><text x="36" y="308" font-family="monospace" font-size="8" fill="#7ce6d0">Y</text>
+    <line x1="40" y1="345" x2="14" y2="330" stroke="#a0a0ff" stroke-width="1.5"/><text x="6" y="328" font-family="monospace" font-size="8" fill="#a0a0ff">Z</text>
+  </g>
+
+  <text x="20" y="390" font-family="monospace" font-size="9" fill="#7ce6d0" opacity="0.35" letter-spacing="1">CANVAS · FREE MOVEMENT · HUD OVERLAY</text>
+</svg>

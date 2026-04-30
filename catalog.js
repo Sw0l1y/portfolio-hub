@@ -68,6 +68,7 @@
       sortOrder: 0,
       year: 2026,
       q: "Q1",
+      cover: "./covers/godot-physics-sandbox.svg",
       publicPath: "https://play.sw0l1ylab.com",
       repoUrl: "https://github.com/Sw0l1y/godot-physics-sandbox",
       actions: [
@@ -98,6 +99,7 @@
       sortOrder: 1,
       year: 2025,
       q: "Q4",
+      cover: "./covers/momentum-trial.svg",
       repoUrl: "https://github.com/Sw0l1y/momentum-trial",
       actions: [
         { label: "Play", href: "/games/momentum-trial/", kind: "primary" },
@@ -126,6 +128,7 @@
       sortOrder: 2,
       year: 2025,
       q: "Q3",
+      cover: "./covers/dash.svg",
       repoUrl: "https://github.com/Sw0l1y/dash",
       actions: [
         { label: "Play", href: "/games/dash/", kind: "primary" },
@@ -154,6 +157,7 @@
       sortOrder: 3,
       year: 2025,
       q: "Q3",
+      cover: "./covers/dungeon-surge.svg",
       repoUrl: "https://github.com/Sw0l1y/dungeon-surge",
       actions: [
         { label: "Play", href: "/games/dungeon-surge/", kind: "primary" },
@@ -182,6 +186,7 @@
       sortOrder: 4,
       year: 2024,
       q: "Q4",
+      cover: "./covers/clicker-game.svg",
       publicPath: "/games/clicker-game/",
       actions: [
         { label: "Play", href: "/Nathan games that he made/clicker game/Clicker.html", kind: "primary" },
@@ -212,6 +217,7 @@
       sortOrder: 5,
       year: 2025,
       q: "Q2",
+      cover: "./covers/orbital-mechanics-sim.svg",
       actions: [
         { label: "Play", href: "/games/orbital-mechanics-sim/", kind: "primary" },
       ],
@@ -239,6 +245,7 @@
       sortOrder: 6,
       year: 2025,
       q: "Q4",
+      cover: "./covers/momentum-trial-editor.svg",
       repoUrl: "https://github.com/Sw0l1y/momentum-trial",
       actions: [
         { label: "Open Tool", href: "/games/momentum-trial-editor/", kind: "primary" },
@@ -267,6 +274,7 @@
       sortOrder: 7,
       year: 2024,
       q: "Q2",
+      cover: "./covers/subway-surfer-3d-draft.svg",
       actions: [
         { label: "Play", href: "/Nathan games that he made/subway surfer/index.html", kind: "primary" },
         { label: "Files", href: "/Nathan games that he made/subway surfer/", kind: "secondary" },
@@ -295,6 +303,7 @@
       sortOrder: 8,
       year: 2024,
       q: "Q1",
+      cover: "./covers/traversal-lab-3d.svg",
       actions: [
         { label: "Play", href: "/Nathan games that he made/free movement sandbox/index.html", kind: "primary" },
         { label: "Files", href: "/Nathan games that he made/free movement sandbox/", kind: "secondary" },
