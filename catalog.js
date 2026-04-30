@@ -44,6 +44,34 @@
   /** @type {Project[]} */
   const projects = [
     {
+      id: "godot-physics-sandbox",
+      slug: "godot-physics-sandbox",
+      title: "Physics Sandbox",
+      status: "playable",
+      publicStatus: "live",
+      genre: "Sandbox",
+      platform: "Browser · Multiplayer",
+      tech: ["Godot 4", "GDScript", "WebRTC", "WebGL", "Multiplayer"],
+      shortSummary: "A multiplayer 3D physics sandbox with prop spawning, grapple hooks, and live sessions over WebRTC.",
+      detailSummary:
+        "Physics Sandbox is the most fully-featured project in this set. It runs in the browser via a Godot 4 web export and supports live multiplayer sessions over WebRTC. Features include physics grabbing, a grapple tool, prop spawning, and a quality preset system tuned for browser performance.",
+      controls: ["WASD + mouse look", "Physics grab and throw", "Grapple hook on right click", "Prop spawn from sidebar", "Multiplayer join from session UI"],
+      visualTheme: {
+        accent: "#a8ee72",
+        accentAlt: "#ffde6e",
+        glow: "rgba(168, 238, 114, 0.28)",
+        base: "#0a1208",
+      },
+      featured: true,
+      sortOrder: 0,
+      publicPath: "https://play.sw0l1ylab.com",
+      repoUrl: "https://github.com/Sw0l1y/godot-physics-sandbox",
+      actions: [
+        { label: "Play", href: "https://play.sw0l1ylab.com", kind: "primary" },
+        { label: "GitHub", href: "https://github.com/Sw0l1y/godot-physics-sandbox", kind: "secondary" },
+      ],
+    },
+    {
       id: "momentum-trial",
       slug: "momentum-trial",
       title: "Momentum Trial",
