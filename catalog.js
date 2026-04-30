@@ -1,6 +1,6 @@
 (() => {
   /**
-   * @typedef {"playable" | "prototype" | "wip"} ProjectStatus
+   * @typedef {"playable" | "prototype" | "wip" | "abandoned"} ProjectStatus
    * @typedef {"live" | "placeholder" | "local_only"} PublicStatus
    * @typedef {"primary" | "secondary" | "disabled"} ActionKind
    *
@@ -127,7 +127,7 @@
       id: "subway-surfer-draft",
       slug: "subway-surfer-3d-draft",
       title: "Subway Surfer 3D Draft",
-      status: "playable",
+      status: "abandoned",
       publicStatus: "placeholder",
       genre: "Runner",
       platform: "Browser",
@@ -153,7 +153,7 @@
       id: "traversal-lab-3d",
       slug: "traversal-lab-3d",
       title: "Traversal Lab 3D",
-      status: "playable",
+      status: "abandoned",
       publicStatus: "placeholder",
       genre: "Traversal",
       platform: "Browser",

@@ -312,6 +312,11 @@ h2 {
   color: #ffb8ad;
 }
 
+.status-pill[data-status="abandoned"] {
+  border-color: rgba(160, 160, 180, 0.2);
+  color: #9a9aaa;
+}
+
 .meta-pill[data-public-status="live"] {
   border-color: rgba(108, 229, 213, 0.24);
   color: #abfff2;
