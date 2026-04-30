@@ -76,7 +76,7 @@
       slug: "momentum-trial",
       title: "Momentum Trial",
       status: "playable",
-      publicStatus: "placeholder",
+      publicStatus: "live",
       genre: "Platformer",
       platform: "Browser",
       tech: ["Single-file HTML", "Canvas", "JSON Level Loader", "Local Save Data"],
@@ -92,10 +92,9 @@
       },
       featured: true,
       sortOrder: 1,
+      repoUrl: "https://github.com/Sw0l1y/momentum-trial",
       actions: [
-        { label: "Play", href: "/Nathan games that he made/momentum-trial/Game.html", kind: "primary" },
-        { label: "Dev Notes", href: "/Nathan games that he made/momentum-trial/progress.md", kind: "secondary" },
-        { label: "Files", href: "/Nathan games that he made/momentum-trial/", kind: "secondary" },
+        { label: "Play", href: "/games/momentum-trial/", kind: "primary" },
       ],
     },
     {
@@ -209,7 +208,7 @@
       slug: "momentum-trial-editor",
       title: "Momentum Trial Editor",
       status: "playable",
-      publicStatus: "placeholder",
+      publicStatus: "live",
       genre: "Editor",
       platform: "Browser Tool",
       tech: ["Single-file HTML", "Drag and Drop Editor", ".level Export", "Level Import"],
@@ -225,10 +224,9 @@
       },
       featured: false,
       sortOrder: 6,
+      repoUrl: "https://github.com/Sw0l1y/momentum-trial",
       actions: [
-        { label: "Open Tool", href: "/Nathan games that he made/momentum-trial-editor/Level Editor.html", kind: "primary" },
-        { label: "Dev Notes", href: "/Nathan games that he made/momentum-trial-editor/progress.md", kind: "secondary" },
-        { label: "Files", href: "/Nathan games that he made/momentum-trial-editor/", kind: "secondary" },
+        { label: "Open Tool", href: "/games/momentum-trial-editor/", kind: "primary" },
       ],
     },
     {

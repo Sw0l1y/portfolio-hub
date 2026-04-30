@@ -21,6 +21,14 @@ const EXTERNAL_GAME_SOURCES = {
     sourceDir: "orbital-mechanics-sim",
     buildDir: "dist",
   },
+  "momentum-trial": {
+    sourceDir: "momentum-trial",
+    entryFile: "game/Game.html",
+  },
+  "momentum-trial-editor": {
+    sourceDir: "momentum-trial",
+    entryFile: "editor/Level Editor.html",
+  },
 };
 
 async function main() {

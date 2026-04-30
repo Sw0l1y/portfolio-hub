@@ -19,6 +19,13 @@ jobs:
           token: ${{ secrets.CONTENT_REPO_TOKEN }}
           path: external-games/clicker-game
 
+      - name: Check out momentum-trial source
+        uses: actions/checkout@v5
+        with:
+          repository: Sw0l1y/momentum-trial
+          token: ${{ secrets.CONTENT_REPO_TOKEN }}
+          path: external-games/momentum-trial
+
       - name: Check out orbital-mechanics-sim source
         uses: actions/checkout@v5
         with:
