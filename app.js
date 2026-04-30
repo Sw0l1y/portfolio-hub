@@ -88,6 +88,9 @@
   }
 
   function getPublicStatusSummary(project) {
+    if (project.status === "abandoned") {
+      return "This project is no longer in active development.";
+    }
     switch (project.publicStatus) {
       case "live":
         return "Live on the public site now.";
@@ -107,6 +110,10 @@
 
     if (project.publicStatus === "local_only") {
       return "Local Build";
+    }
+
+    if (project.status === "abandoned") {
+      return "Shelved";
     }
 
     return "Coming Soon";
