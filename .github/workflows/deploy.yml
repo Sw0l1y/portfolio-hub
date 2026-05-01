@@ -27,6 +27,13 @@ jobs:
           token: ${{ secrets.CONTENT_REPO_TOKEN }}
           path: external-games/clicker-game
 
+      - name: Check out coop-dungeon source
+        uses: actions/checkout@v5
+        with:
+          repository: Sw0l1y/coop-dungeon
+          token: ${{ secrets.CONTENT_REPO_TOKEN }}
+          path: external-games/coop-dungeon
+
       - name: Check out dungeon-surge source
         uses: actions/checkout@v5
         with:
@@ -55,6 +62,10 @@ jobs:
 
       - name: Build dungeon-surge
         working-directory: external-games/dungeon-surge
+        run: npm install && npm run build
+
+      - name: Build coop-dungeon
+        working-directory: external-games/coop-dungeon
         run: npm install && npm run build
 
       - name: Build orbital-mechanics-sim
