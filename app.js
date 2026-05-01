@@ -125,7 +125,7 @@
     const onWorks = page !== 'info';
     return `
       <header class="topbar">
-        <span>SWOL ／ PUBLIC ARCHIVE</span>
+        <span>SW0L1Y ／ PUBLIC ARCHIVE</span>
         <span class="topbar-status">OPERATOR: SW0L1Y · STATUS: ACTIVE</span>
         <nav class="topbar-nav">
           <span class="nav-link ${onWorks ? 'is-active' : ''}" data-nav="works">WORKS</span>
@@ -138,7 +138,7 @@
     return `
       <footer class="footer-bar">
         <span>EOF — SECTION ${String(section).padStart(3, '0')}</span>
-        <span>SWOL · PUBLIC ARCHIVE · ${new Date().getFullYear()}</span>
+        <span>SW0L1Y · PUBLIC ARCHIVE · ${new Date().getFullYear()}</span>
         <span class="footer-top" data-scroll-top>↑ TOP</span>
       </footer>`;
   }
@@ -430,7 +430,7 @@
     }
 
     const idRows = [
-      ['HANDLE', 'SWOL'],
+      ['HANDLE', 'Sw0l1y'],
       ['DESIGNATION', 'OPERATOR / DEV'],
       ['DOMAIN', 'sw0l1ylab.com'],
       ['GITHUB', '@sw0l1y'],
