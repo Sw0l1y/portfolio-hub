@@ -187,11 +187,12 @@
       year: 2024,
       q: "Q4",
       cover: "./covers/clicker-game.svg",
+      repoUrl: "https://github.com/Sw0l1y/clicker-game",
       publicPath: "/games/clicker-game/",
       actions: [
-        { label: "Play", href: "/Nathan games that he made/clicker game/Clicker.html", kind: "primary" },
-        { label: "Dev Notes", href: "/Nathan games that he made/clicker game/progress.md", kind: "secondary" },
-        { label: "Files", href: "/Nathan games that he made/clicker game/", kind: "secondary" },
+        { label: "Play", href: "/games/clicker-game/", kind: "primary" },
+        { label: "Dev Notes", href: "https://github.com/Sw0l1y/clicker-game/blob/main/progress.md", kind: "secondary" },
+        { label: "Files", href: "https://github.com/Sw0l1y/clicker-game", kind: "secondary" },
       ],
     },
     {
