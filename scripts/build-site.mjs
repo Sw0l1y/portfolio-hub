@@ -29,6 +29,10 @@ const EXTERNAL_GAME_SOURCES = {
     sourceDir: "dungeon-surge",
     buildDir: "dist",
   },
+  "dungeon-v2": {
+    sourceDir: "dungeon-v2",
+    buildDir: "dist",
+  },
 "momentum-trial": {
     sourceDir: "momentum-trial",
     entryFile: "game/Game.html",

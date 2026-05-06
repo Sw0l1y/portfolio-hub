@@ -48,10 +48,23 @@ jobs:
           token: ${{ secrets.CONTENT_REPO_TOKEN }}
           path: external-games/orbital-mechanics-sim
 
+      - name: Check out dungeon-v2 source
+        uses: actions/checkout@v5
+        with:
+          repository: Sw0l1y/dungeon-v2
+          token: ${{ secrets.CONTENT_REPO_TOKEN }}
+          path: external-games/dungeon-v2
+
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
           node-version: "22"
+
+      - name: Prepare dungeon-v2 for deploy
+        run: |
+          mkdir -p external-games/dungeon-v2/dist
+          cp external-games/dungeon-v2/index.html external-games/dungeon-v2/dist/
+          cp -r external-games/dungeon-v2/src external-games/dungeon-v2/dist/
 
       - name: Build dungeon-surge
         working-directory: external-games/dungeon-surge
