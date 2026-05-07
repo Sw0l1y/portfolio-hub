@@ -192,6 +192,7 @@
       sortOrder: 4,
       year: 2026,
       q: "Q2",
+      cover: "./covers/dungeon-v2.svg",
       repoUrl: "https://github.com/Sw0l1y/dungeon-v2",
       actions: [
         { label: "Play", href: "/games/dungeon-v2/", kind: "primary" },

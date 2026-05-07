@@ -1,0 +1,223 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <filter id="bloom" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softblur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5"/>
+    </filter>
+
+    <!-- Floor tile pattern -->
+    <pattern id="floor" x="0" y="0" width="21" height="21" patternUnits="userSpaceOnUse">
+      <rect width="21" height="21" fill="#1e2e44"/>
+      <rect width="21" height="21" fill="none" stroke="rgba(91,195,255,0.055)" stroke-width="0.5"/>
+    </pattern>
+
+    <!-- Background -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#07111c"/>
+      <stop offset="55%" stop-color="#0b1730"/>
+      <stop offset="100%" stop-color="#08111f"/>
+    </linearGradient>
+
+    <!-- Player auras -->
+    <radialGradient id="p1aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8cf3ff" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#8cf3ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="p2aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff8c42" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#ff8c42" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Boss glow bleeding in from right -->
+    <radialGradient id="bossbleed" cx="90%" cy="52%" r="55%">
+      <stop offset="0%" stop-color="#cc1111" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#cc1111" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="400" fill="url(#bg)"/>
+
+  <!-- Floor tiles (full canvas) -->
+  <rect width="600" height="400" fill="url(#floor)"/>
+
+  <!-- ── WALLS ── -->
+  <!-- Border -->
+  <rect x="0"   y="0"   width="600" height="21" fill="#1a2340"/>
+  <rect x="0"   y="379" width="600" height="21" fill="#1a2340"/>
+  <rect x="0"   y="0"   width="21"  height="400" fill="#1a2340"/>
+  <rect x="579" y="0"   width="21"  height="400" fill="#1a2340"/>
+
+  <!-- Border wall edge lines -->
+  <rect x="0"   y="0"   width="600" height="21" fill="none" stroke="rgba(91,195,255,0.09)" stroke-width="0.5"/>
+  <rect x="0"   y="379" width="600" height="21" fill="none" stroke="rgba(91,195,255,0.09)" stroke-width="0.5"/>
+  <rect x="0"   y="0"   width="21"  height="400" fill="none" stroke="rgba(91,195,255,0.09)" stroke-width="0.5"/>
+  <rect x="579" y="0"   width="21"  height="400" fill="none" stroke="rgba(91,195,255,0.09)" stroke-width="0.5"/>
+
+  <!-- Interior walls — top-left cluster -->
+  <rect x="63"  y="42"  width="42" height="21" fill="#1a2340" stroke="rgba(91,195,255,0.08)" stroke-width="0.5"/>
+  <rect x="63"  y="42"  width="21" height="42" fill="#1a2340" stroke="rgba(91,195,255,0.08)" stroke-width="0.5"/>
+
+  <!-- Top-center corridor pillars -->
+  <rect x="231" y="63"  width="21" height="63" fill="#1a2340" stroke="rgba(91,195,255,0.08)" stroke-width="0.5"/>
+  <rect x="252" y="63"  width="42" height="21" fill="#1a2340" stroke="rgba(91,195,255,0.08)" stroke-width="0.5"/>
+
+  <!-- Top-right cluster -->
+  <rect x="462" y="42"  width="42" height="21" fill="#1a2340" stroke="rgba(91,195,255,0.08)" stroke-width="0.5"/>
+  <rect x="483" y="42"  width="21" height="42" fill="#1a2340" stroke="rgba(91,195,255,0.08)" stroke-width="0.5"/>
+
+  <!-- Left-center L-wall -->
+  <rect x="147" y="168" width="21" height="63" fill="#1a2340" stroke="rgba(91,195,255,0.08)" stroke-width="0.5"/>
+  <rect x="147" y="189" width="42" height="21" fill="#1a2340" stroke="rgba(91,195,255,0.08)" stroke-width="0.5"/>
+
+  <!-- Center block -->
+  <rect x="315" y="168" width="42" height="21" fill="#1a2340" stroke="rgba(91,195,255,0.08)" stroke-width="0.5"/>
+  <rect x="336" y="168" width="21" height="42" fill="#1a2340" stroke="rgba(91,195,255,0.08)" stroke-width="0.5"/>
+
+  <!-- Bottom-left cluster -->
+  <rect x="63"  y="294" width="42" height="21" fill="#1a2340" stroke="rgba(91,195,255,0.08)" stroke-width="0.5"/>
+  <rect x="63"  y="273" width="21" height="42" fill="#1a2340" stroke="rgba(91,195,255,0.08)" stroke-width="0.5"/>
+
+  <!-- Bottom-right cluster -->
+  <rect x="462" y="273" width="42" height="21" fill="#1a2340" stroke="rgba(91,195,255,0.08)" stroke-width="0.5"/>
+  <rect x="483" y="273" width="21" height="42" fill="#1a2340" stroke="rgba(91,195,255,0.08)" stroke-width="0.5"/>
+
+  <!-- ── BOSS AMBIENCE ── -->
+  <rect width="600" height="400" fill="url(#bossbleed)" opacity="1"/>
+
+  <!-- ── ENEMIES ── -->
+
+  <!-- Basic enemy (slate-blue) at (168, 148) -->
+  <circle cx="168" cy="148" r="10" fill="#4d6e99" opacity="0.88"/>
+  <circle cx="168" cy="148" r="16" fill="none" stroke="#4d6e99" stroke-width="1" opacity="0.32"/>
+  <circle cx="178" cy="141" r="3.5" fill="rgba(0,0,0,0.5)"/>
+
+  <!-- Sprinter (yellow #ffe033) at (358, 284) — P1 is targeting this -->
+  <circle cx="358" cy="284" r="10" fill="#ffe033" opacity="0.92" filter="url(#glow)"/>
+  <circle cx="358" cy="284" r="10" fill="#ffe033" opacity="0.88"/>
+  <circle cx="358" cy="284" r="16" fill="none" stroke="#ffe033" stroke-width="1" opacity="0.38"/>
+  <circle cx="350" cy="277" r="3.5" fill="rgba(0,0,0,0.5)"/>
+
+  <!-- Ranger (orange #ff8c00) at (434, 144) — P2 targeting this -->
+  <circle cx="434" cy="144" r="10" fill="#ff8c00" opacity="0.88"/>
+  <circle cx="434" cy="144" r="16" fill="none" stroke="#ff8c00" stroke-width="1" opacity="0.32"/>
+  <circle cx="424" cy="150" r="3.5" fill="rgba(0,0,0,0.5)"/>
+
+  <!-- Ranger projectile arcing toward players -->
+  <circle cx="392" cy="174" r="4.5" fill="#ff8c00" opacity="0.82" filter="url(#glow)"/>
+  <circle cx="376" cy="181" r="3"   fill="#ff8c00" opacity="0.42"/>
+  <circle cx="362" cy="188" r="2"   fill="#ff8c00" opacity="0.22"/>
+
+  <!-- Basic enemy (bottom area) at (112, 282) -->
+  <circle cx="112" cy="282" r="9"  fill="#4d6e99" opacity="0.72"/>
+  <circle cx="112" cy="282" r="14" fill="none" stroke="#4d6e99" stroke-width="1" opacity="0.26"/>
+
+  <!-- ── BOSS (partially visible, right edge) ── -->
+  <!-- Outer glow -->
+  <circle cx="566" cy="208" r="70" fill="none" stroke="#cc2244" stroke-width="10" opacity="0.14" filter="url(#softblur)"/>
+  <!-- Body -->
+  <circle cx="566" cy="208" r="38" fill="#6b0018" opacity="0.95" filter="url(#bloom)"/>
+  <circle cx="566" cy="208" r="38" fill="#6b0018"/>
+  <!-- Pulse ring -->
+  <circle cx="566" cy="208" r="52" fill="none" stroke="#cc2244" stroke-width="3" opacity="0.55" filter="url(#glow)"/>
+  <!-- Inner ring -->
+  <circle cx="566" cy="208" r="22" fill="none" stroke="#ff2244" stroke-width="1.5" opacity="0.7"/>
+  <!-- Spokes -->
+  <g stroke="#ff224466" stroke-width="1.5">
+    <line x1="566" y1="208" x2="584" y2="191"/>
+    <line x1="566" y1="208" x2="584" y2="225"/>
+    <line x1="566" y1="208" x2="548" y2="191"/>
+    <line x1="566" y1="208" x2="548" y2="225"/>
+    <line x1="566" y1="208" x2="566" y2="186"/>
+    <line x1="566" y1="208" x2="566" y2="230"/>
+  </g>
+  <!-- Eye -->
+  <circle cx="566" cy="208" r="7"   fill="#ffbbbb" opacity="0.9"/>
+  <circle cx="566" cy="208" r="3"   fill="#330000"/>
+  <!-- Boss HP bar -->
+  <rect x="518" y="162" width="96" height="9" rx="2" fill="rgba(0,0,0,0.7)"/>
+  <rect x="520" y="164" width="76" height="6" rx="1" fill="#e03030"/>
+  <line x1="576" y1="163" x2="576" y2="171" stroke="rgba(255,255,255,0.45)" stroke-width="1"/>
+  <line x1="553" y1="163" x2="553" y2="171" stroke="rgba(255,255,255,0.45)" stroke-width="1"/>
+  <text x="566" y="158" font-family="monospace" font-size="8" fill="#ff8888" text-anchor="middle" letter-spacing="0.5">BOSS · PHASE 1</text>
+
+  <!-- ── PLAYERS ── -->
+
+  <!-- P1 aura -->
+  <circle cx="228" cy="226" r="44" fill="url(#p1aura)"/>
+  <!-- P2 aura -->
+  <circle cx="266" cy="208" r="38" fill="url(#p2aura)"/>
+
+  <!-- P1 crosshair over Sprinter (358, 284) — cyan -->
+  <circle cx="358" cy="284" r="22" fill="none" stroke="#8cf3ff" stroke-width="1.5" opacity="0.82" filter="url(#glow)"/>
+  <circle cx="358" cy="284" r="22" fill="none" stroke="#8cf3ff" stroke-width="1.5" opacity="0.78"/>
+  <line x1="336" y1="284" x2="325" y2="284" stroke="#8cf3ff" stroke-width="1.5" opacity="0.78"/>
+  <line x1="380" y1="284" x2="391" y2="284" stroke="#8cf3ff" stroke-width="1.5" opacity="0.78"/>
+  <line x1="358" y1="262" x2="358" y2="251" stroke="#8cf3ff" stroke-width="1.5" opacity="0.78"/>
+  <line x1="358" y1="306" x2="358" y2="317" stroke="#8cf3ff" stroke-width="1.5" opacity="0.78"/>
+
+  <!-- P1 arrow toward Sprinter -->
+  <line x1="241" y1="237" x2="334" y2="276" stroke="#8cf3ff" stroke-width="2" opacity="0.72" stroke-linecap="round"/>
+  <polygon points="336,277 326,271 330,281" fill="#8cf3ff" opacity="0.72"/>
+
+  <!-- P1 body -->
+  <circle cx="228" cy="226" r="12" fill="#8cf3ff" filter="url(#glow)"/>
+  <circle cx="228" cy="226" r="12" fill="#8cf3ff"/>
+  <!-- P1 facing dot -->
+  <circle cx="240" cy="234" r="4" fill="rgba(0,0,0,0.55)"/>
+  <!-- P1 HP bar -->
+  <rect x="213" y="206" width="30" height="4" rx="1" fill="rgba(0,0,0,0.5)"/>
+  <rect x="213" y="206" width="29" height="4" rx="1" fill="#4cff72"/>
+  <!-- P1 name tag -->
+  <rect x="204" y="192" width="48" height="13" rx="3" fill="rgba(0,0,0,0.58)"/>
+  <text x="228" y="202" font-family="monospace" font-size="9" fill="#8cf3ff" text-anchor="middle">PLAYER 1</text>
+
+  <!-- P2 crosshair over Ranger (434, 144) — orange -->
+  <circle cx="434" cy="144" r="22" fill="none" stroke="#ff8c42" stroke-width="1.5" opacity="0.78" filter="url(#glow)"/>
+  <circle cx="434" cy="144" r="22" fill="none" stroke="#ff8c42" stroke-width="1.5" opacity="0.74"/>
+  <line x1="412" y1="144" x2="401" y2="144" stroke="#ff8c42" stroke-width="1.5" opacity="0.74"/>
+  <line x1="456" y1="144" x2="467" y2="144" stroke="#ff8c42" stroke-width="1.5" opacity="0.74"/>
+  <line x1="434" y1="122" x2="434" y2="111" stroke="#ff8c42" stroke-width="1.5" opacity="0.74"/>
+  <line x1="434" y1="166" x2="434" y2="177" stroke="#ff8c42" stroke-width="1.5" opacity="0.74"/>
+
+  <!-- P2 dash trail (rogue) -->
+  <ellipse cx="284" cy="202" rx="18" ry="5" fill="#ff8c42" opacity="0.14" transform="rotate(-38 284 202)"/>
+  <ellipse cx="294" cy="197" rx="12" ry="4" fill="#ff8c42" opacity="0.22" transform="rotate(-38 294 197)"/>
+
+  <!-- P2 body -->
+  <circle cx="266" cy="208" r="12" fill="#ff8c42" filter="url(#glow)"/>
+  <circle cx="266" cy="208" r="12" fill="#ff8c42"/>
+  <!-- P2 facing dot (toward Ranger) -->
+  <circle cx="277" cy="201" r="4" fill="rgba(0,0,0,0.55)"/>
+  <!-- P2 HP bar -->
+  <rect x="251" y="188" width="30" height="4" rx="1" fill="rgba(0,0,0,0.5)"/>
+  <rect x="251" y="188" width="20" height="4" rx="1" fill="#ffd24c"/>
+  <!-- P2 name tag -->
+  <rect x="242" y="174" width="48" height="13" rx="3" fill="rgba(0,0,0,0.58)"/>
+  <text x="266" y="184" font-family="monospace" font-size="9" fill="#ff8c42" text-anchor="middle">PLAYER 2</text>
+
+  <!-- ── HUD ── -->
+  <!-- Level name (top-left, inside border) -->
+  <text x="34" y="17" font-family="monospace" font-size="9"  fill="rgba(255,255,255,0.32)" letter-spacing="0.8">LEVEL 1</text>
+
+  <!-- Wave status (bottom-center) -->
+  <text x="300" y="390" font-family="monospace" font-size="10" fill="rgba(255,112,112,0.82)" text-anchor="middle" letter-spacing="0.8">WAVE 3  ·  4 ENEMIES LEFT</text>
+
+  <!-- Tech label (bottom-right) -->
+  <text x="573" y="390" font-family="monospace" font-size="9" fill="rgba(91,195,255,0.28)" text-anchor="end" letter-spacing="0.5">CO-OP · WAVE-BASED · A* AI</text>
+
+  <!-- Ambient particles -->
+  <circle cx="90"  cy="126" r="1.5" fill="#8cf3ff" opacity="0.18"/>
+  <circle cx="514" cy="338" r="1.5" fill="#8cf3ff" opacity="0.14"/>
+  <circle cx="192" cy="344" r="1"   fill="#8cf3ff" opacity="0.18"/>
+  <circle cx="496" cy="86"  r="1.5" fill="#8cf3ff" opacity="0.14"/>
+  <circle cx="52"  cy="244" r="1"   fill="#8cf3ff" opacity="0.16"/>
+  <circle cx="544" cy="312" r="1"   fill="#8cf3ff" opacity="0.16"/>
+</svg>
