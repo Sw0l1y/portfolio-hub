@@ -172,86 +172,20 @@
   // ── Works page ───────────────────────────────────────────────────────────
 
   function worksHtml() {
-    const latest = getLatest();
     const filtered = getFiltered();
     const allYears = projects.map(p => p.year).filter(Boolean);
     const minYear = allYears.length ? Math.min(...allYears) : 2024;
     const maxYear = allYears.length ? Math.max(...allYears) : 2026;
-    const activeCount = projects.filter(p => p.kind !== 'DEPRECATED').length;
-    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
 
     return `
       ${topbarHtml()}
       <div class="page">
-        <section class="banner">
-          <div class="side-rail side-rail--left">
-            ${['A','B','C','D','E','F','G'].map(l => `<span>${l}</span>`).join('')}
-          </div>
-          <div class="side-rail side-rail--right">
-            ${['01','02','03','04','05','06','07'].map(l => `<span>${l}</span>`).join('')}
-          </div>
-
-          <div class="banner-body">
-            <div class="banner-left">
-              <div>
-                <div class="doc-label">DOCUMENT 001 · CLASSIFICATION: PUBLIC · LAST REVISION ${today}</div>
-                <h1 class="banner-title">PROJECT<br>ARCHIVE.</h1>
-                <p class="banner-desc">COMPLETE INDEX OF SHIPPED WORKS — INTERACTIVE BUILDS, TOOLS, AND TECHNICAL EXPERIMENTS. ALL ENTRIES PLAYABLE IN-BROWSER. NO INSTALL REQUIRED.</p>
-              </div>
-
-              <div class="spec-strip">
-                <div class="spec-cell">
-                  <div class="spec-cell-header"><span>RECORDS</span></div>
-                  <div class="spec-val">${activeCount}</div>
-                </div>
-                <div class="spec-cell">
-                  <div class="spec-cell-header"><span>SPAN</span></div>
-                  <div class="spec-val">${minYear}—${String(maxYear).slice(2)}</div>
-                </div>
-                <div class="spec-cell">
-                  <div class="spec-cell-header"><span>UPTIME</span><span><span class="live-dot"></span>LIVE</span></div>
-                  <div class="spec-val spec-val--mono" id="uptime-val">${formatUptime()}</div>
-                </div>
-                <div class="spec-cell spec-cell--link" data-nav-detail="${esc(latest.id)}">
-                  <div class="spec-cell-header"><span>LATEST</span><span><span class="live-dot"></span>LIVE</span></div>
-                  <div class="spec-val spec-val--sm">${esc(latest.title)}</div>
-                </div>
-              </div>
-
-              <div class="banner-actions">
-                <div class="btn-group">
-                  <button class="btn btn-filled" data-scroll-index>↓ ENTER ARCHIVE</button>
-                  <button class="btn" data-nav="info">↗ INFO</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="hero-plate" data-nav-detail="${esc(latest.id)}">
-              <div class="hero-cover" style="${cardCoverStyle(latest)}">
-                <div class="hero-cover-fig">FIG. 01 — REEL</div>
-                <div class="crops"><span></span></div>
-                <div class="hero-cover-action">
-                  <span class="live-dot"></span>${esc(latest.title)} · OPEN RECORD →
-                </div>
-                <div class="hero-cover-dim">1920 × 1080 · LOOP</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="banner-footer">
-            <span>↓ PROCEED TO INDEX</span>
-            <span>SECTION 002 / 004</span>
-            <span>EOF — BANNER</span>
-          </div>
-        </section>
-
         <section class="index-section" id="section-index">
           <div class="index-header">
             <div>
-              <div class="doc-label">SECTION 002 — INDEX</div>
-              <div class="index-title">ALL RECORDS</div>
+              <div class="index-title">Projects</div>
               <div class="index-meta" id="index-meta">
-                ${filtered.length} ENTRIES · INDEXED ${minYear}—${maxYear} · SORT ↓ NEWEST
+                ${filtered.length} ENTRIES · ${minYear}—${maxYear}
               </div>
             </div>
             <div class="filter-row">
@@ -268,7 +202,7 @@
           </div>
         </section>
 
-        ${footerHtml(2)}
+        ${footerHtml(1)}
       </div>`;
   }
 
@@ -495,7 +429,6 @@
 
     if (state.page === 'works') {
       app.innerHTML = worksHtml();
-      startUptimeTicker();
       setupGridHover();
     } else if (state.page === 'detail') {
       app.innerHTML = detailHtml(state.detailId);
