@@ -65,6 +65,8 @@ jobs:
           mkdir -p external-games/dungeon-v2/dist
           cp external-games/dungeon-v2/index.html external-games/dungeon-v2/dist/
           cp -r external-games/dungeon-v2/src external-games/dungeon-v2/dist/
+          VERSION=$(node -e "const fs=require('fs');const m=fs.readFileSync('external-games/dungeon-v2/src/Game.js','utf8').match(/VERSION\s*=\s*'([^']+)'/);console.log(m[1])")
+          node scripts/cache-bust-modules.mjs external-games/dungeon-v2/dist/src $VERSION
 
       - name: Build dungeon-surge
         working-directory: external-games/dungeon-surge
