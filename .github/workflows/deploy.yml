@@ -81,6 +81,11 @@ jobs:
       - name: Build static site
         run: npm run build
 
+      - name: Stage dungeon map editor
+        run: |
+          mkdir -p dist/d-editor
+          cp external-games/dungeon-v2/editor/index.html dist/d-editor/index.html
+
       - name: Install SSH key
         env:
           VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
