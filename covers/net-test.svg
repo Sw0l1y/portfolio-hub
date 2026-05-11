@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#0d2518"/>
+      <stop offset="100%" stop-color="#030e07"/>
+    </radialGradient>
+    <radialGradient id="glow1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4eff91" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#4eff91" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="600" height="400" fill="url(#bg)"/>
+  <circle cx="300" cy="200" r="140" fill="url(#glow1)"/>
+
+  <!-- grid lines -->
+  <g stroke="#4eff91" stroke-width="0.3" opacity="0.07">
+    <line x1="0" y1="50"  x2="600" y2="50"/>
+    <line x1="0" y1="100" x2="600" y2="100"/>
+    <line x1="0" y1="150" x2="600" y2="150"/>
+    <line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="250" x2="600" y2="250"/>
+    <line x1="0" y1="300" x2="600" y2="300"/>
+    <line x1="0" y1="350" x2="600" y2="350"/>
+    <line x1="60"  y1="0" x2="60"  y2="400"/>
+    <line x1="120" y1="0" x2="120" y2="400"/>
+    <line x1="180" y1="0" x2="180" y2="400"/>
+    <line x1="240" y1="0" x2="240" y2="400"/>
+    <line x1="300" y1="0" x2="300" y2="400"/>
+    <line x1="360" y1="0" x2="360" y2="400"/>
+    <line x1="420" y1="0" x2="420" y2="400"/>
+    <line x1="480" y1="0" x2="480" y2="400"/>
+    <line x1="540" y1="0" x2="540" y2="400"/>
+  </g>
+
+  <!-- connection lines (topology) -->
+  <g stroke="#4eff91" stroke-width="1.2" opacity="0.35" stroke-dasharray="5 4">
+    <line x1="300" y1="200" x2="160" y2="130"/>
+    <line x1="300" y1="200" x2="440" y2="130"/>
+    <line x1="300" y1="200" x2="160" y2="280"/>
+    <line x1="300" y1="200" x2="440" y2="280"/>
+    <line x1="300" y1="200" x2="300" y2="96"/>
+    <line x1="300" y1="200" x2="300" y2="310"/>
+    <line x1="160" y1="130" x2="440" y2="130"/>
+    <line x1="160" y1="280" x2="440" y2="280"/>
+  </g>
+
+  <!-- ping ripple rings around center -->
+  <circle cx="300" cy="200" r="28" fill="none" stroke="#4eff91" stroke-width="1.4" opacity="0.6"/>
+  <circle cx="300" cy="200" r="52" fill="none" stroke="#4eff91" stroke-width="0.9" opacity="0.3"/>
+  <circle cx="300" cy="200" r="78" fill="none" stroke="#4eff91" stroke-width="0.5" opacity="0.15"/>
+
+  <!-- center node (VPS) -->
+  <circle cx="300" cy="200" r="16" fill="#0d2518" stroke="#4eff91" stroke-width="2" opacity="0.95"/>
+  <text x="300" y="204" font-family="monospace" font-size="8" fill="#4eff91" text-anchor="middle" font-weight="bold" letter-spacing="0.5">VPS</text>
+
+  <!-- outer nodes -->
+  <circle cx="160" cy="130" r="9" fill="#0d2518" stroke="#4eff91" stroke-width="1.4" opacity="0.85"/>
+  <circle cx="440" cy="130" r="9" fill="#0d2518" stroke="#4eff91" stroke-width="1.4" opacity="0.85"/>
+  <circle cx="160" cy="280" r="9" fill="#0d2518" stroke="#4eff91" stroke-width="1.4" opacity="0.7"/>
+  <circle cx="440" cy="280" r="9" fill="#0d2518" stroke="#4eff91" stroke-width="1.4" opacity="0.7"/>
+  <circle cx="300" cy="96"  r="9" fill="#0d2518" stroke="#ffde6e" stroke-width="1.4" opacity="0.8"/>
+  <circle cx="300" cy="310" r="9" fill="#0d2518" stroke="#4eff91" stroke-width="1.4" opacity="0.65"/>
+
+  <!-- node labels -->
+  <text x="144" y="116" font-family="monospace" font-size="7" fill="#4eff91" opacity="0.6">WS</text>
+  <text x="446" y="116" font-family="monospace" font-size="7" fill="#4eff91" opacity="0.6">SIG</text>
+  <text x="286" y="88"  font-family="monospace" font-size="7" fill="#ffde6e" opacity="0.7">HTTP</text>
+
+  <!-- status bar at top -->
+  <rect x="12" y="12" width="576" height="22" rx="2" fill="#0a1e0e" stroke="#1a4028" stroke-width="0.8" opacity="0.8"/>
+  <circle cx="26" cy="23" r="4" fill="#4eff91" opacity="0.9"/>
+  <text x="36" y="27" font-family="monospace" font-size="8" fill="#4eff91" opacity="0.7" letter-spacing="0.8">play.sw0l1ylab.com · /signal · /healthz · LIVE</text>
+
+  <!-- pass/fail indicator rows -->
+  <rect x="12" y="342" width="576" height="46" rx="2" fill="#0a1e0e" stroke="#1a4028" stroke-width="0.8" opacity="0.6"/>
+  <rect x="22"  y="352" width="70" height="14" rx="1" fill="#4eff91" opacity="0.18"/>
+  <text x="57"  y="363" font-family="monospace" font-size="7" fill="#4eff91" text-anchor="middle" opacity="0.9">PASS</text>
+  <rect x="100" y="352" width="70" height="14" rx="1" fill="#4eff91" opacity="0.18"/>
+  <text x="135" y="363" font-family="monospace" font-size="7" fill="#4eff91" text-anchor="middle" opacity="0.9">PASS</text>
+  <rect x="178" y="352" width="70" height="14" rx="1" fill="#4eff91" opacity="0.18"/>
+  <text x="213" y="363" font-family="monospace" font-size="7" fill="#4eff91" text-anchor="middle" opacity="0.9">PASS</text>
+  <rect x="256" y="352" width="70" height="14" rx="1" fill="#ff5a5a" opacity="0.18"/>
+  <text x="291" y="363" font-family="monospace" font-size="7" fill="#ff5a5a" text-anchor="middle" opacity="0.9">FAIL</text>
+  <text x="22" y="382" font-family="monospace" font-size="7" fill="#4eff91" opacity="0.35" letter-spacing="0.8">HTTP · WS CONNECT · SIGNAL PROTO · FALLBACK</text>
+</svg>

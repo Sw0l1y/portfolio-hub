@@ -6,7 +6,7 @@
 
   function getKind(p) {
     if (p.status === 'abandoned') return 'DEPRECATED';
-    if (p.genre === 'Editor') return 'TOOLS';
+    if (p.genre === 'Editor' || p.genre === 'Tool') return 'TOOLS';
     return 'GAMES';
   }
 

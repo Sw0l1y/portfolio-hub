@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VPS Network Test · sw0l1ylab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #071a0e;
+      --surface: #0d2518;
+      --border:  #1a4028;
+      --accent:  #4eff91;
+      --accent2: #ffde6e;
+      --text:    #c8e8d0;
+      --dim:     #4a7a5a;
+      --fail:    #ff5a5a;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem 3rem;
+    }
+
+    .shell {
+      max-width: 740px;
+      margin: 0 auto;
+    }
+
+    /* ── header ── */
+    .header { margin-bottom: 2.5rem; }
+
+    .label {
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      opacity: 0.55;
+    }
+
+    h1 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0.3rem 0 0.5rem;
+      letter-spacing: 0.03em;
+    }
+
+    .subtitle {
+      font-size: 0.68rem;
+      color: var(--dim);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── test rows ── */
+    .tests {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 1.4rem;
+    }
+
+    .test {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.75rem;
+      padding: 0.9rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .test:last-child { border-bottom: none; }
+    .test.running  { background: rgba(78,255,145,0.04); }
+    .test.pass     { background: rgba(78,255,145,0.06); }
+    .test.fail     { background: rgba(255,90,90,0.06); }
+
+    .test-name {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.04em;
+      margin-bottom: 0.2rem;
+    }
+
+    .test-url {
+      font-size: 0.62rem;
+      color: var(--dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .test-detail {
+      font-size: 0.62rem;
+      color: var(--dim);
+      margin-top: 0.18rem;
+      min-height: 0.85rem;
+    }
+    .test.pass .test-detail { color: var(--accent); opacity: 0.85; }
+    .test.fail .test-detail { color: var(--fail);   opacity: 0.85; }
+
+    .test-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.25rem;
+      white-space: nowrap;
+    }
+
+    .status {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 0.15rem 0.55rem;
+      border-radius: 2px;
+    }
+    .status.pending { color: var(--dim);    border: 1px solid var(--border); }
+    .status.running { color: var(--accent2); border: 1px solid var(--accent2); animation: blink 0.75s ease-in-out infinite; }
+    .status.pass    { color: var(--accent); border: 1px solid var(--accent); }
+    .status.fail    { color: var(--fail);   border: 1px solid var(--fail); }
+
+    .timing {
+      font-size: 0.62rem;
+      color: var(--dim);
+    }
+    .test.pass .timing { color: var(--accent); opacity: 0.65; }
+    .test.fail .timing { color: var(--fail);   opacity: 0.65; }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.35; }
+    }
+
+    /* ── controls ── */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    button {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 0.6rem 1.5rem;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    button:hover:not(:disabled) { opacity: 0.82; }
+    button:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      background: var(--dim);
+    }
+
+    #back-btn {
+      background: transparent;
+      color: var(--dim);
+      border: 1px solid var(--border);
+      padding: 0.6rem 1rem;
+    }
+    #back-btn:hover:not(:disabled) { color: var(--text); border-color: var(--dim); opacity: 1; }
+
+    .summary {
+      font-size: 0.68rem;
+      color: var(--dim);
+      letter-spacing: 0.06em;
+    }
+    .summary.all-pass { color: var(--accent); }
+    .summary.has-fail  { color: var(--fail);  }
+
+    /* ── log ── */
+    .log-header {
+      font-size: 0.62rem;
+      color: var(--dim);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+
+    .log {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.8rem 1rem;
+      font-size: 0.62rem;
+      line-height: 1.75;
+      color: var(--dim);
+      max-height: 210px;
+      overflow-y: auto;
+      min-height: 64px;
+    }
+    .log .ts  { opacity: 0.4; margin-right: 0.6rem; }
+    .log .ok  { color: var(--accent); }
+    .log .err { color: var(--fail); }
+    .log .inf { color: var(--text); }
+
+    /* ── footer ── */
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.58rem;
+      color: var(--dim);
+      opacity: 0.4;
+      letter-spacing: 0.07em;
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="header">
+    <div class="label">TOOL · DIAGNOSTICS</div>
+    <h1>VPS Network Test</h1>
+    <div class="subtitle">TARGET · play.sw0l1ylab.com · 143.198.148.19 · SIGNALING SERVER</div>
+  </div>
+
+  <div class="tests" id="tests">
+
+    <div class="test" id="t-http">
+      <div>
+        <div class="test-name">HTTP Health Check</div>
+        <div class="test-url">https://play.sw0l1ylab.com/healthz</div>
+        <div class="test-detail" id="d-http">—</div>
+      </div>
+      <div class="test-right">
+        <div class="status pending" id="s-http">PENDING</div>
+        <div class="timing"        id="m-http"></div>
+      </div>
+    </div>
+
+    <div class="test" id="t-ws">
+      <div>
+        <div class="test-name">WebSocket Connect</div>
+        <div class="test-url">wss://play.sw0l1ylab.com/signal</div>
+        <div class="test-detail" id="d-ws">—</div>
+      </div>
+      <div class="test-right">
+        <div class="status pending" id="s-ws">PENDING</div>
+        <div class="timing"        id="m-ws"></div>
+      </div>
+    </div>
+
+    <div class="test" id="t-proto">
+      <div>
+        <div class="test-name">Signal Protocol Round-Trip</div>
+        <div class="test-url">hello → error (expected) · confirms server is processing</div>
+        <div class="test-detail" id="d-proto">—</div>
+      </div>
+      <div class="test-right">
+        <div class="status pending" id="s-proto">PENDING</div>
+        <div class="timing"        id="m-proto"></div>
+      </div>
+    </div>
+
+    <div class="test" id="t-fallback">
+      <div>
+        <div class="test-name">Fallback URL</div>
+        <div class="test-url">wss://play.143.198.148.19.sslip.io/signal</div>
+        <div class="test-detail" id="d-fallback">—</div>
+      </div>
+      <div class="test-right">
+        <div class="status pending" id="s-fallback">PENDING</div>
+        <div class="timing"        id="m-fallback"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <button id="run-btn">RUN TESTS</button>
+    <button id="back-btn" onclick="history.back()">← BACK</button>
+    <div class="summary" id="summary"></div>
+  </div>
+
+  <div class="log-header">// EVENT LOG</div>
+  <div class="log" id="log"><span style="opacity:0.35">no events yet — click RUN TESTS to start</span></div>
+
+  <div class="footer">VPS NETWORK TEST · sw0l1ylab.com · DIAGNOSTICS v1.0</div>
+
+</div>
+<script>
+  const LOG     = document.getElementById('log');
+  const RUN_BTN = document.getElementById('run-btn');
+  const SUMMARY = document.getElementById('summary');
+
+  function ts() {
+    const d = new Date();
+    return [d.getHours(), d.getMinutes(), d.getSeconds()]
+      .map(n => String(n).padStart(2, '0')).join(':') +
+      '.' + String(d.getMilliseconds()).padStart(3, '0');
+  }
+
+  function addLog(msg, type = 'inf') {
+    if (LOG.querySelector('span')) LOG.innerHTML = '';
+    const el = document.createElement('div');
+    el.innerHTML = `<span class="ts">${ts()}</span><span class="${type}">${msg}</span>`;
+    LOG.appendChild(el);
+    LOG.scrollTop = LOG.scrollHeight;
+  }
+
+  const STATUS_LABELS = { pending: 'PENDING', running: '...', pass: 'PASS', fail: 'FAIL' };
+
+  function setRow(id, state, detail, timing) {
+    const row = document.getElementById('t-' + id);
+    const s   = document.getElementById('s-' + id);
+    const d   = document.getElementById('d-' + id);
+    const m   = document.getElementById('m-' + id);
+    row.className      = 'test ' + state;
+    s.className        = 'status ' + state;
+    s.textContent      = STATUS_LABELS[state] ?? state.toUpperCase();
+    if (detail !== undefined) d.textContent = detail;
+    if (timing !== undefined) m.textContent = timing;
+  }
+
+  function reset() {
+    ['http', 'ws', 'proto', 'fallback'].forEach(id => setRow(id, 'pending', '—', ''));
+    SUMMARY.textContent = '';
+    SUMMARY.className   = 'summary';
+    LOG.innerHTML       = '';
+  }
+
+  /* ── test 1: HTTP health ── */
+  async function testHttp() {
+    setRow('http', 'running', 'Connecting…', '');
+    addLog('→ GET https://play.sw0l1ylab.com/healthz');
+    const t0 = performance.now();
+
+    try {
+      let body = null;
+      let status = null;
+
+      try {
+        const res = await fetch('https://play.sw0l1ylab.com/healthz', {
+          signal: AbortSignal.timeout(8000),
+        });
+        status = res.status;
+        body   = await res.text();
+      } catch (corsErr) {
+        // CORS blocked — retry opaque to at least confirm reachability
+        await fetch('https://play.sw0l1ylab.com/healthz', {
+          mode:   'no-cors',
+          signal: AbortSignal.timeout(8000),
+        });
+      }
+
+      const ms = Math.round(performance.now() - t0);
+
+      if (body !== null) {
+        const clean = body.trim();
+        if (status === 200 && clean === 'ok') {
+          setRow('http', 'pass', `HTTP ${status} · "${clean}"`, `${ms}ms`);
+          addLog(`← HTTP ${status} "${clean}" (${ms}ms)`, 'ok');
+        } else {
+          setRow('http', 'fail', `HTTP ${status} · unexpected body`, `${ms}ms`);
+          addLog(`← HTTP ${status} unexpected: "${clean}"`, 'err');
+          return false;
+        }
+      } else {
+        setRow('http', 'pass', `Reachable · CORS headers not set (body unreadable)`, `${ms}ms`);
+        addLog(`← opaque response — server reachable (${ms}ms)`, 'ok');
+      }
+      return true;
+    } catch (err) {
+      const ms = Math.round(performance.now() - t0);
+      setRow('http', 'fail', err.message || 'Network error', `${ms}ms`);
+      addLog(`✗ HTTP: ${err.message}`, 'err');
+      return false;
+    }
+  }
+
+  /* ── shared WS connect helper ── */
+  function wsConnect(url, id, label) {
+    return new Promise(resolve => {
+      setRow(id, 'running', 'Opening WebSocket…', '');
+      addLog(`→ WS ${url}`);
+      const t0 = performance.now();
+      let ws, done = false;
+
+      const finish = (ok, detail, ms) => {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        if (ws && ws.readyState < 2) ws.close();
+        setRow(id, ok ? 'pass' : 'fail', detail, `${ms}ms`);
+        addLog(`${ok ? '←' : '✗'} ${label}: ${detail} (${ms}ms)`, ok ? 'ok' : 'err');
+        resolve(ok);
+      };
+
+      const timer = setTimeout(() => {
+        finish(false, 'Connection timeout', Math.round(performance.now() - t0));
+      }, 10000);
+
+      try {
+        ws = new WebSocket(url);
+        ws.addEventListener('open',  () => finish(true,  'WebSocket open',  Math.round(performance.now() - t0)));
+        ws.addEventListener('error', () => finish(false, 'WebSocket error', Math.round(performance.now() - t0)));
+      } catch (err) {
+        finish(false, err.message || 'Error', Math.round(performance.now() - t0));
+      }
+    });
+  }
+
+  /* ── test 3: signal protocol round-trip ── */
+  function testProto() {
+    return new Promise(resolve => {
+      setRow('proto', 'running', 'Connecting…', '');
+      addLog('→ Signal protocol wss://play.sw0l1ylab.com/signal');
+      const t0 = performance.now();
+      let ws, done = false, opened = false;
+
+      const finish = (ok, detail, ms) => {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        if (ws && ws.readyState < 2) ws.close();
+        setRow('proto', ok ? 'pass' : 'fail', detail, `${ms}ms`);
+        addLog(`${ok ? '←' : '✗'} Proto: ${detail} (${ms}ms)`, ok ? 'ok' : 'err');
+        resolve(ok);
+      };
+
+      const timer = setTimeout(() => {
+        const phase = opened ? 'waiting for response' : 'connecting';
+        finish(false, `Timeout (${phase})`, Math.round(performance.now() - t0));
+      }, 10000);
+
+      try {
+        ws = new WebSocket('wss://play.sw0l1ylab.com/signal');
+
+        ws.addEventListener('open', () => {
+          opened = true;
+          const tOpen = Math.round(performance.now() - t0);
+          setRow('proto', 'running', `WS open (${tOpen}ms) · sending hello…`, '');
+          addLog(`← WS open (${tOpen}ms) · sending hello`);
+          ws.send(JSON.stringify({ type: 'hello', room: '__nettest__', role: 'client' }));
+        });
+
+        ws.addEventListener('message', ev => {
+          const ms = Math.round(performance.now() - t0);
+          let msg;
+          try { msg = JSON.parse(ev.data); } catch { msg = { raw: ev.data }; }
+
+          if (msg?.type === 'error' && String(msg.message).includes('No host')) {
+            finish(true, `Round-trip OK · "${msg.message}"`, ms);
+          } else if (msg?.type === 'welcome') {
+            finish(true, `Welcome (room had a host) · peer_id=${msg.peer_id}`, ms);
+          } else {
+            finish(false, `Unexpected response: ${JSON.stringify(msg)}`, ms);
+          }
+        });
+
+        ws.addEventListener('error', () => {
+          finish(false, 'WebSocket error', Math.round(performance.now() - t0));
+        });
+      } catch (err) {
+        finish(false, err.message || 'Error', Math.round(performance.now() - t0));
+      }
+    });
+  }
+
+  /* ── run all ── */
+  async function runAll() {
+    RUN_BTN.disabled = true;
+    reset();
+    addLog('=== Starting network tests ===', 'inf');
+
+    const r1 = await testHttp();
+    const r2 = await wsConnect('wss://play.sw0l1ylab.com/signal',          'ws',       'WS connect');
+    const r3 = await testProto();
+    const r4 = await wsConnect('wss://play.143.198.148.19.sslip.io/signal', 'fallback', 'Fallback');
+
+    const passed = [r1, r2, r3, r4].filter(Boolean).length;
+
+    if (passed === 4) {
+      SUMMARY.textContent = 'ALL TESTS PASSED (4 / 4)';
+      SUMMARY.className   = 'summary all-pass';
+      addLog('=== All tests passed ===', 'ok');
+    } else if (passed === 0) {
+      SUMMARY.textContent = 'ALL TESTS FAILED (0 / 4)';
+      SUMMARY.className   = 'summary has-fail';
+      addLog('=== All tests failed ===', 'err');
+    } else {
+      SUMMARY.textContent = `${passed} / 4 passed`;
+      SUMMARY.className   = 'summary has-fail';
+      addLog(`=== ${passed} / 4 tests passed ===`, 'inf');
+    }
+
+    RUN_BTN.disabled = false;
+  }
+
+  RUN_BTN.addEventListener('click', runAll);
+</script>
+</body>
+</html>
