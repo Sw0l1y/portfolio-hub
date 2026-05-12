@@ -113,17 +113,24 @@ jobs:
           PORT="${VPS_PORT:-22}"
           rsync -az --delete -e "ssh -p $PORT" ./dist/ "${VPS_USER}@${VPS_HOST}:/root/godot-physics-sandbox/deploy/webrtc/portfolio-build/"
 
-      - name: Reload Caddy config on VPS
+      - name: Check out VPS config repo
+        uses: actions/checkout@v5
+        with:
+          repository: Sw0l1y/godot-physics-sandbox
+          token: ${{ secrets.CONTENT_REPO_TOKEN }}
+          path: vps-config
+
+      - name: Sync Caddyfile and reload
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
           VPS_PORT: ${{ secrets.VPS_PORT }}
         run: |
           PORT="${VPS_PORT:-22}"
-          ssh -p "$PORT" "${VPS_USER}@${VPS_HOST}" '
-            git -C /root/godot-physics-sandbox pull --ff-only &&
-            docker compose -f /root/godot-physics-sandbox/deploy/webrtc/docker-compose.yml exec caddy caddy reload --config /etc/caddy/Caddyfile
-          '
+          rsync -az -e "ssh -p $PORT" vps-config/deploy/webrtc/Caddyfile \
+            "${VPS_USER}@${VPS_HOST}:/root/godot-physics-sandbox/deploy/webrtc/Caddyfile"
+          ssh -p "$PORT" "${VPS_USER}@${VPS_HOST}" \
+            'docker compose -f /root/godot-physics-sandbox/deploy/webrtc/docker-compose.yml exec caddy caddy reload --config /etc/caddy/Caddyfile'
 
       - name: Verify remote directory
         env:
