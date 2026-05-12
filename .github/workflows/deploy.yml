@@ -113,6 +113,18 @@ jobs:
           PORT="${VPS_PORT:-22}"
           rsync -az --delete -e "ssh -p $PORT" ./dist/ "${VPS_USER}@${VPS_HOST}:/root/godot-physics-sandbox/deploy/webrtc/portfolio-build/"
 
+      - name: Reload Caddy config on VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+        run: |
+          PORT="${VPS_PORT:-22}"
+          ssh -p "$PORT" "${VPS_USER}@${VPS_HOST}" '
+            git -C /root/godot-physics-sandbox pull --ff-only &&
+            docker compose -f /root/godot-physics-sandbox/deploy/webrtc/docker-compose.yml exec caddy caddy reload --config /etc/caddy/Caddyfile
+          '
+
       - name: Verify remote directory
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
