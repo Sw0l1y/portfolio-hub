@@ -199,7 +199,7 @@
           <h1 class="home-title" style="color:${accent}">${esc(latest.title)}.</h1>
           <p class="home-tagline">${esc(latest.shortSummary)}</p>
           <div class="home-actions">
-            ${playUrl ? `<a class="btn btn-filled" href="${esc(playUrl)}" target="_blank" rel="noreferrer">▶ PLAY</a>` : ''}
+            ${playUrl ? `<button class="btn btn-filled" data-play-url="${esc(playUrl)}">▶ PLAY</button>` : ''}
             <button class="btn" data-nav-detail="${esc(latest.id)}">→ VIEW RECORD</button>
           </div>
         </div>
@@ -565,6 +565,12 @@
     const filterBtn = e.target.closest('[data-filter]');
     if (filterBtn) { applyFilter(filterBtn.dataset.filter); return; }
 
+    const playBtn = e.target.closest('[data-play-url]');
+    if (playBtn) { openGameOverlay(playBtn.dataset.playUrl); return; }
+
+    const closeOverlay = e.target.closest('[data-close-overlay]');
+    if (closeOverlay) { closeGameOverlay(); return; }
+
     const embedBtn = e.target.closest('[data-embed-load]');
     if (embedBtn) {
       const url = embedBtn.dataset.embedLoad;
@@ -656,6 +662,26 @@
         }
       }
     }
+  }
+
+  // ── Game overlay ─────────────────────────────────────────────────────────
+
+  let overlayKeyHandler = null;
+
+  function openGameOverlay(url) {
+    const el = document.createElement('div');
+    el.id = 'game-overlay';
+    el.innerHTML = `
+      <iframe src="${esc(url)}" allowfullscreen allow="fullscreen"></iframe>
+      <button class="overlay-close" data-close-overlay title="Close (Esc)">✕</button>`;
+    document.body.appendChild(el);
+    overlayKeyHandler = (e) => { if (e.key === 'Escape') closeGameOverlay(); };
+    document.addEventListener('keydown', overlayKeyHandler);
+  }
+
+  function closeGameOverlay() {
+    document.getElementById('game-overlay')?.remove();
+    if (overlayKeyHandler) { document.removeEventListener('keydown', overlayKeyHandler); overlayKeyHandler = null; }
   }
 
   // ── Init ─────────────────────────────────────────────────────────────────

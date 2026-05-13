@@ -782,6 +782,42 @@ kbd {
   padding: 16px 0;
 }
 
+/* ── Game overlay ───────────────────────────────────────────────────────── */
+#game-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+}
+
+#game-overlay iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.overlay-close {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 10000;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 11, 22, 0.82);
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  border-radius: 8px;
+  color: #e7e3da;
+  font-size: 15px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+.overlay-close:hover { opacity: 1; }
+
 /* ── Home page ──────────────────────────────────────────────────────────── */
 .home-hero {
   padding: 64px 56px 56px;
