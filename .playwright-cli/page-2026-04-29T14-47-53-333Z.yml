@@ -1,0 +1,173 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: Project Index
+        - heading "Games" [level=1] [ref=e7]
+        - paragraph [ref=e8]: Playable experiments, prototypes, and tools in one compact grid.
+      - generic "Catalog summary" [ref=e9]:
+        - generic [ref=e10]:
+          - strong [ref=e11]: "8"
+          - text: tracked
+        - generic [ref=e12]:
+          - strong [ref=e13]: "1"
+          - text: live
+        - generic [ref=e14]:
+          - strong [ref=e15]: "6"
+          - text: queued
+        - generic [ref=e16]:
+          - strong [ref=e17]: "1"
+          - text: local-only
+    - generic [ref=e18]:
+      - heading "Curated launch board" [level=2] [ref=e19]
+      - paragraph [ref=e20]: 8 visible of 8 tracked
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - generic [ref=e23]: Search title or summary
+        - searchbox "Search title or summary" [ref=e24]
+      - generic [ref=e25]:
+        - generic [ref=e26]: Status
+        - generic [ref=e27]:
+          - button "playable" [ref=e28] [cursor=pointer]
+          - button "prototype" [ref=e29] [cursor=pointer]
+          - button "wip" [ref=e30] [cursor=pointer]
+      - generic [ref=e31]:
+        - generic [ref=e32]: Genre
+        - generic [ref=e33]:
+          - button "Action" [ref=e34] [cursor=pointer]
+          - button "Editor" [ref=e35] [cursor=pointer]
+          - button "Idle" [ref=e36] [cursor=pointer]
+          - button "Platformer" [ref=e37] [cursor=pointer]
+          - button "Runner" [ref=e38] [cursor=pointer]
+          - button "Simulation" [ref=e39] [cursor=pointer]
+          - button "Survivor" [ref=e40] [cursor=pointer]
+          - button "Traversal" [ref=e41] [cursor=pointer]
+      - generic [ref=e42]:
+        - generic [ref=e43]: Platform
+        - generic [ref=e44]:
+          - button "Browser" [ref=e45] [cursor=pointer]
+          - button "Browser Tool" [ref=e46] [cursor=pointer]
+          - button "Build Preview" [ref=e47] [cursor=pointer]
+          - button "Build Required" [ref=e48] [cursor=pointer]
+      - button "Reset Filters" [ref=e50] [cursor=pointer]
+    - list [ref=e51]:
+      - listitem [ref=e52]:
+        - generic [ref=e53]:
+          - button "Playable Platformer Browser Coming Soon Momentum Trial" [ref=e54] [cursor=pointer]:
+            - generic [ref=e56]:
+              - generic [ref=e57]: Playable
+              - generic [ref=e58]: Platformer
+              - generic [ref=e59]: Browser
+              - generic [ref=e60]: Coming Soon
+            - heading "Momentum Trial" [level=3] [ref=e61]
+          - paragraph [ref=e62]: A browser-first movement trial built around speed tech, checkpoints, and authored levels.
+        - generic [ref=e63]:
+          - link "Coming Soon" [ref=e64] [cursor=pointer]:
+            - /url: /games/momentum-trial/
+          - button "Details" [ref=e65] [cursor=pointer]
+        - generic [ref=e66]: Single-file HTML • Canvas
+      - listitem [ref=e67]:
+        - generic [ref=e68]:
+          - button "Playable Action Browser Coming Soon Dash" [ref=e69] [cursor=pointer]:
+            - generic [ref=e71]:
+              - generic [ref=e72]: Playable
+              - generic [ref=e73]: Action
+              - generic [ref=e74]: Browser
+              - generic [ref=e75]: Coming Soon
+            - heading "Dash" [level=3] [ref=e76]
+          - paragraph [ref=e77]: Top-down combat built around dash bursts, slash timing, and escalating arena rounds.
+        - generic [ref=e78]:
+          - link "Coming Soon" [ref=e79] [cursor=pointer]:
+            - /url: /games/dash/
+          - button "Details" [ref=e80] [cursor=pointer]
+        - generic [ref=e81]: Single-file HTML • Canvas
+      - listitem [ref=e82]:
+        - generic [ref=e83]:
+          - button "Playable Runner Browser Coming Soon Subway Surfer 3D Draft" [ref=e84] [cursor=pointer]:
+            - generic [ref=e86]:
+              - generic [ref=e87]: Playable
+              - generic [ref=e88]: Runner
+              - generic [ref=e89]: Browser
+              - generic [ref=e90]: Coming Soon
+            - heading "Subway Surfer 3D Draft" [level=3] [ref=e91]
+          - paragraph [ref=e92]: A 3D runner draft with dodge lanes, HUD overlays, and rough arcade energy.
+        - generic [ref=e93]:
+          - link "Coming Soon" [ref=e94] [cursor=pointer]:
+            - /url: /games/subway-surfer-3d-draft/
+          - button "Details" [ref=e95] [cursor=pointer]
+        - generic [ref=e96]: Single-file HTML • Canvas
+      - listitem [ref=e97]:
+        - generic [ref=e98]:
+          - button "Playable Traversal Browser Coming Soon Traversal Lab 3D" [ref=e99] [cursor=pointer]:
+            - generic [ref=e101]:
+              - generic [ref=e102]: Playable
+              - generic [ref=e103]: Traversal
+              - generic [ref=e104]: Browser
+              - generic [ref=e105]: Coming Soon
+            - heading "Traversal Lab 3D" [level=3] [ref=e106]
+          - paragraph [ref=e107]: A free-movement sandbox built to explore spatial traversal, camera feel, and readable HUD design.
+        - generic [ref=e108]:
+          - link "Coming Soon" [ref=e109] [cursor=pointer]:
+            - /url: /games/traversal-lab-3d/
+          - button "Details" [ref=e110] [cursor=pointer]
+        - generic [ref=e111]: Single-file HTML • Canvas
+      - listitem [ref=e112]:
+        - generic [ref=e113]:
+          - button "Playable Idle Browser Hosted Clicker Game" [ref=e114] [cursor=pointer]:
+            - generic [ref=e116]:
+              - generic [ref=e117]: Playable
+              - generic [ref=e118]: Idle
+              - generic [ref=e119]: Browser
+              - generic [ref=e120]: Hosted
+            - heading "Clicker Game" [level=3] [ref=e121]
+          - paragraph [ref=e122]: An effects-heavy incremental game with prestige systems, upgrade loops, and big visual bursts.
+        - generic [ref=e123]:
+          - link "Play" [ref=e124] [cursor=pointer]:
+            - /url: /games/clicker-game/
+          - button "Details" [ref=e125] [cursor=pointer]
+        - generic [ref=e126]: Single-file HTML • Vanilla JavaScript
+      - listitem [ref=e127]:
+        - generic [ref=e128]:
+          - button "Playable Editor Browser Tool Coming Soon Momentum Trial Editor" [ref=e129] [cursor=pointer]:
+            - generic [ref=e131]:
+              - generic [ref=e132]: Playable
+              - generic [ref=e133]: Editor
+              - generic [ref=e134]: Browser Tool
+              - generic [ref=e135]: Coming Soon
+            - heading "Momentum Trial Editor" [level=3] [ref=e136]
+          - paragraph [ref=e137]: A companion editor for building and exporting levels into the Momentum Trial runtime.
+        - generic [ref=e138]:
+          - link "Coming Soon" [ref=e139] [cursor=pointer]:
+            - /url: /games/momentum-trial-editor/
+          - button "Details" [ref=e140] [cursor=pointer]
+        - generic [ref=e141]: Single-file HTML • Drag and Drop Editor
+      - listitem [ref=e142]:
+        - generic [ref=e143]:
+          - button "Prototype Simulation Build Preview Coming Soon Orbital Mechanics Sim" [ref=e144] [cursor=pointer]:
+            - generic [ref=e146]:
+              - generic [ref=e147]: Prototype
+              - generic [ref=e148]: Simulation
+              - generic [ref=e149]: Build Preview
+              - generic [ref=e150]: Coming Soon
+            - heading "Orbital Mechanics Sim" [level=3] [ref=e151]
+          - paragraph [ref=e152]: A newer simulation track with TypeScript structure and a bundled browser build.
+        - generic [ref=e153]:
+          - link "Coming Soon" [ref=e154] [cursor=pointer]:
+            - /url: /games/orbital-mechanics-sim/
+          - button "Details" [ref=e155] [cursor=pointer]
+        - generic [ref=e156]: TypeScript • Vite
+      - listitem [ref=e157]:
+        - generic [ref=e158]:
+          - button "WIP Survivor Build Required Local Only Dungeon Surge" [ref=e159] [cursor=pointer]:
+            - generic [ref=e161]:
+              - generic [ref=e162]: WIP
+              - generic [ref=e163]: Survivor
+              - generic [ref=e164]: Build Required
+              - generic [ref=e165]: Local Only
+            - heading "Dungeon Surge" [level=3] [ref=e166]
+          - paragraph [ref=e167]: A work-in-progress survival arena project with heavier systems and a React/Vite runtime.
+        - generic [ref=e168]:
+          - link "Local Build" [ref=e169] [cursor=pointer]:
+            - /url: /games/dungeon-surge/
+          - button "Details" [ref=e170] [cursor=pointer]
+        - generic [ref=e171]: React • Vite
