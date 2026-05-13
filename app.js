@@ -23,7 +23,7 @@
   // ── State ────────────────────────────────────────────────────────────────
 
   const state = {
-    page: 'home',
+    page: 'works',
     detailId: null,
     filter: 'ALL',
     gitFeed: null,
@@ -136,7 +136,6 @@
         <span>SW0L1Y ／ PUBLIC ARCHIVE</span>
         <span class="topbar-status">OPERATOR: SW0L1Y · STATUS: ACTIVE</span>
         <nav class="topbar-nav">
-          <span class="nav-link ${page === 'home' ? 'is-active' : ''}" data-nav="home">HOME</span>
           <span class="nav-link ${page === 'works' || page === 'detail' ? 'is-active' : ''}" data-nav="works">WORKS</span>
           <span class="nav-link ${page === 'info' ? 'is-active' : ''}" data-nav="info">INFO</span>
         </nav>
@@ -178,14 +177,20 @@
       </div>`;
   }
 
-  // ── Home page ────────────────────────────────────────────────────────────
+  // ── Works page ───────────────────────────────────────────────────────────
 
-  function homeHtml() {
+  function worksHtml() {
+    const filtered = getFiltered();
+    const allYears = projects.map(p => p.year).filter(Boolean);
+    const minYear = allYears.length ? Math.min(...allYears) : 2024;
+    const maxYear = allYears.length ? Math.max(...allYears) : 2026;
+
     const latest = (state.latestProjectId && projects.find(p => p.id === state.latestProjectId))
       || projects.find(p => p.id === 'dungeon-v2')
       || getLatest();
     const playUrl = getPlayUrl(latest);
     const { accent, glow, base } = latest.visualTheme;
+
     return `
       ${topbarHtml()}
       <div class="page">
@@ -210,21 +215,6 @@
           </div>
         </div>
 
-        ${footerHtml(0)}
-      </div>`;
-  }
-
-  // ── Works page ───────────────────────────────────────────────────────────
-
-  function worksHtml() {
-    const filtered = getFiltered();
-    const allYears = projects.map(p => p.year).filter(Boolean);
-    const minYear = allYears.length ? Math.min(...allYears) : 2024;
-    const maxYear = allYears.length ? Math.max(...allYears) : 2026;
-
-    return `
-      ${topbarHtml()}
-      <div class="page">
         <section class="index-section" id="section-index">
           <div class="index-header">
             <div>
@@ -473,13 +463,11 @@
       detailKeyHandler = null;
     }
 
-    if (state.page === 'home') {
-      app.innerHTML = homeHtml();
-      startUpdateTicker();
-      if (state.gitFeed === null && !state.gitLoading) fetchGitFeed();
-    } else if (state.page === 'works') {
+    if (state.page === 'works') {
       app.innerHTML = worksHtml();
       setupGridHover();
+      startUpdateTicker();
+      if (state.gitFeed === null && !state.gitLoading) fetchGitFeed();
     } else if (state.page === 'detail') {
       app.innerHTML = detailHtml(state.detailId);
       attachDetailKeyboard();
@@ -647,7 +635,7 @@
       state.gitFeed = [];
     } finally {
       state.gitLoading = false;
-      if (state.page === 'home') {
+      if (state.page === 'works') {
         render();
         return;
       }
