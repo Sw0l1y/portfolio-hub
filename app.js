@@ -75,13 +75,9 @@
     return `${d}d ${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '00')}s`;
   }
 
-  function formatTimeSince(from) {
-    const ms = Math.max(0, Date.now() - from.getTime());
-    const d = Math.floor(ms / 86400000);
-    const h = Math.floor((ms % 86400000) / 3600000);
-    const m = Math.floor((ms % 3600000) / 60000);
-    const s = Math.floor((ms % 60000) / 1000);
-    return `${d}d ${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+  function formatHoursAgo(from) {
+    const h = Math.floor(Math.max(0, Date.now() - from.getTime()) / 3600000);
+    return `${h} hour${h !== 1 ? 's' : ''} ago`;
   }
 
   function getLatest() {
@@ -200,12 +196,8 @@
 
         <div class="home-stats">
           <div class="home-stat">
-            <div class="doc-label">ARCHIVE UPTIME</div>
-            <div class="home-stat-val" id="uptime-val">${formatUptime()}</div>
-          </div>
-          <div class="home-stat">
             <div class="doc-label">LAST UPDATE</div>
-            <div class="home-stat-val" id="home-update-val">${formatTimeSince(LAST_UPDATE_DATE)}</div>
+            <div class="home-stat-val" id="home-update-val">${formatHoursAgo(LAST_UPDATE_DATE)}</div>
           </div>
           <div class="home-stat">
             <div class="doc-label">TOTAL ENTRIES</div>
@@ -477,7 +469,6 @@
 
     if (state.page === 'home') {
       app.innerHTML = homeHtml();
-      startUptimeTicker();
       startUpdateTicker();
     } else if (state.page === 'works') {
       app.innerHTML = worksHtml();
@@ -504,9 +495,9 @@
   function startUpdateTicker() {
     const id = setInterval(() => {
       const el = document.getElementById('home-update-val');
-      if (el) { el.textContent = formatTimeSince(LAST_UPDATE_DATE); }
+      if (el) { el.textContent = formatHoursAgo(LAST_UPDATE_DATE); }
       else { clearInterval(id); }
-    }, 1000);
+    }, 60000);
   }
 
   function setupGridHover() {
