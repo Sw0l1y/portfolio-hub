@@ -781,3 +781,61 @@ kbd {
   text-transform: uppercase;
   padding: 16px 0;
 }
+
+/* ── Home page ──────────────────────────────────────────────────────────── */
+.home-hero {
+  padding: 64px 0 56px;
+  border-bottom: 1px solid var(--line);
+}
+
+.home-title {
+  font-size: clamp(42px, 7vw, 72px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin: 12px 0 20px;
+  text-transform: uppercase;
+}
+
+.home-tagline {
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  max-width: 520px;
+  line-height: 1.6;
+  margin: 0 0 32px;
+}
+
+.home-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.home-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--line);
+}
+
+.home-stat {
+  padding: 32px 0;
+  border-right: 1px solid var(--line);
+}
+
+.home-stat:last-child { border-right: none; }
+
+.home-stat-val {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-top: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 600px) {
+  .home-stats { grid-template-columns: 1fr; }
+  .home-stat  { border-right: none; border-bottom: 1px solid var(--line); padding: 24px 0; }
+  .home-stat:last-child { border-bottom: none; }
+}

@@ -1,5 +1,6 @@
 (() => {
   const LAUNCH_DATE = new Date('2024-01-15T00:00:00Z');
+  const LAST_UPDATE_DATE = new Date('2026-05-13T00:00:00Z');
   const GITHUB_USER = 'Sw0l1y';
 
   // ── Catalog augmentation ─────────────────────────────────────────────────
@@ -23,7 +24,7 @@
   // ── State ────────────────────────────────────────────────────────────────
 
   const state = {
-    page: 'works',
+    page: 'home',
     detailId: null,
     filter: 'ALL',
     gitFeed: null,
@@ -67,6 +68,15 @@
 
   function formatUptime() {
     const ms = Math.max(0, Date.now() - LAUNCH_DATE.getTime());
+    const d = Math.floor(ms / 86400000);
+    const h = Math.floor((ms % 86400000) / 3600000);
+    const m = Math.floor((ms % 3600000) / 60000);
+    const s = Math.floor((ms % 60000) / 1000);
+    return `${d}d ${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '00')}s`;
+  }
+
+  function formatTimeSince(from) {
+    const ms = Math.max(0, Date.now() - from.getTime());
     const d = Math.floor(ms / 86400000);
     const h = Math.floor((ms % 86400000) / 3600000);
     const m = Math.floor((ms % 3600000) / 60000);
@@ -122,13 +132,13 @@
 
   function topbarHtml() {
     const { page } = state;
-    const onWorks = page !== 'info';
     return `
       <header class="topbar">
         <span>SW0L1Y ／ PUBLIC ARCHIVE</span>
         <span class="topbar-status">OPERATOR: SW0L1Y · STATUS: ACTIVE</span>
         <nav class="topbar-nav">
-          <span class="nav-link ${onWorks ? 'is-active' : ''}" data-nav="works">WORKS</span>
+          <span class="nav-link ${page === 'home' ? 'is-active' : ''}" data-nav="home">HOME</span>
+          <span class="nav-link ${page === 'works' || page === 'detail' ? 'is-active' : ''}" data-nav="works">WORKS</span>
           <span class="nav-link ${page === 'info' ? 'is-active' : ''}" data-nav="info">INFO</span>
         </nav>
       </header>`;
@@ -166,6 +176,44 @@
           <span>${num} · ${esc(p.title.toLowerCase())}</span>
           <span>${p.kind}</span>
         </div>
+      </div>`;
+  }
+
+  // ── Home page ────────────────────────────────────────────────────────────
+
+  function homeHtml() {
+    const latest = projects.find(p => p.id === 'dungeon-v2') || getLatest();
+    const playUrl = getPlayUrl(latest);
+    const { accent, glow, base } = latest.visualTheme;
+    return `
+      ${topbarHtml()}
+      <div class="page">
+        <div class="home-hero" style="background: radial-gradient(circle at 20% 40%, ${glow}, transparent 48%), linear-gradient(160deg, ${base} 0%, transparent 100%)">
+          <div class="doc-label">LATEST RECORD · ${esc(latest.year || '—')}${latest.q ? ' · ' + latest.q : ''} · v0.14.0</div>
+          <h1 class="home-title" style="color:${accent}">${esc(latest.title)}.</h1>
+          <p class="home-tagline">${esc(latest.shortSummary)}</p>
+          <div class="home-actions">
+            ${playUrl ? `<a class="btn btn-filled" href="${esc(playUrl)}" target="_blank" rel="noreferrer">▶ PLAY</a>` : ''}
+            <button class="btn" data-nav-detail="${esc(latest.id)}">→ VIEW RECORD</button>
+          </div>
+        </div>
+
+        <div class="home-stats">
+          <div class="home-stat">
+            <div class="doc-label">ARCHIVE UPTIME</div>
+            <div class="home-stat-val" id="uptime-val">${formatUptime()}</div>
+          </div>
+          <div class="home-stat">
+            <div class="doc-label">LAST UPDATE</div>
+            <div class="home-stat-val" id="home-update-val">${formatTimeSince(LAST_UPDATE_DATE)}</div>
+          </div>
+          <div class="home-stat">
+            <div class="doc-label">TOTAL ENTRIES</div>
+            <div class="home-stat-val">${projects.filter(p => p.kind !== 'DEPRECATED').length} PROJECTS</div>
+          </div>
+        </div>
+
+        ${footerHtml(0)}
       </div>`;
   }
 
@@ -427,7 +475,11 @@
       detailKeyHandler = null;
     }
 
-    if (state.page === 'works') {
+    if (state.page === 'home') {
+      app.innerHTML = homeHtml();
+      startUptimeTicker();
+      startUpdateTicker();
+    } else if (state.page === 'works') {
       app.innerHTML = worksHtml();
       setupGridHover();
     } else if (state.page === 'detail') {
@@ -446,6 +498,14 @@
       const el = document.getElementById('uptime-val');
       if (el) { el.textContent = formatUptime(); }
       else { clearInterval(uptimeInterval); uptimeInterval = null; }
+    }, 1000);
+  }
+
+  function startUpdateTicker() {
+    const id = setInterval(() => {
+      const el = document.getElementById('home-update-val');
+      if (el) { el.textContent = formatTimeSince(LAST_UPDATE_DATE); }
+      else { clearInterval(id); }
     }, 1000);
   }
 
