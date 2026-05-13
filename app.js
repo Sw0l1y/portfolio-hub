@@ -1,6 +1,5 @@
 (() => {
   const LAUNCH_DATE = new Date('2024-01-15T00:00:00Z');
-  const LAST_UPDATE_DATE = new Date('2026-05-13T00:00:00Z');
   const GITHUB_USER = 'Sw0l1y';
 
   // ── Catalog augmentation ─────────────────────────────────────────────────
@@ -29,9 +28,12 @@
     filter: 'ALL',
     gitFeed: null,
     gitLoading: false,
+    latestTimestamp: null,
+    latestProjectId: null,
   };
 
   let uptimeInterval = null;
+  let updateInterval = null;
   let detailKeyHandler = null;
 
   // ── Helpers ──────────────────────────────────────────────────────────────
@@ -76,6 +78,7 @@
   }
 
   function formatHoursAgo(from) {
+    if (!from) return '—';
     const h = Math.floor(Math.max(0, Date.now() - from.getTime()) / 3600000);
     return `${h} hour${h !== 1 ? 's' : ''} ago`;
   }
@@ -178,14 +181,16 @@
   // ── Home page ────────────────────────────────────────────────────────────
 
   function homeHtml() {
-    const latest = projects.find(p => p.id === 'dungeon-v2') || getLatest();
+    const latest = (state.latestProjectId && projects.find(p => p.id === state.latestProjectId))
+      || projects.find(p => p.id === 'dungeon-v2')
+      || getLatest();
     const playUrl = getPlayUrl(latest);
     const { accent, glow, base } = latest.visualTheme;
     return `
       ${topbarHtml()}
       <div class="page">
         <div class="home-hero" style="background: radial-gradient(circle at 20% 40%, ${glow}, transparent 48%), linear-gradient(160deg, ${base} 0%, transparent 100%)">
-          <div class="doc-label">LATEST RECORD · ${esc(latest.year || '—')}${latest.q ? ' · ' + latest.q : ''} · v0.14.0</div>
+          <div class="doc-label">LATEST RECORD · ${esc(latest.year || '—')}${latest.q ? ' · ' + latest.q : ''}</div>
           <h1 class="home-title" style="color:${accent}">${esc(latest.title)}.</h1>
           <p class="home-tagline">${esc(latest.shortSummary)}</p>
           <div class="home-actions">
@@ -197,7 +202,7 @@
         <div class="home-stats">
           <div class="home-stat">
             <div class="doc-label">LAST UPDATE</div>
-            <div class="home-stat-val" id="home-update-val">${formatHoursAgo(LAST_UPDATE_DATE)}</div>
+            <div class="home-stat-val" id="home-update-val">${state.gitLoading ? '…' : formatHoursAgo(state.latestTimestamp)}</div>
           </div>
           <div class="home-stat">
             <div class="doc-label">TOTAL ENTRIES</div>
@@ -462,6 +467,7 @@
     if (!app) return;
 
     if (uptimeInterval) { clearInterval(uptimeInterval); uptimeInterval = null; }
+    if (updateInterval)  { clearInterval(updateInterval);  updateInterval  = null; }
     if (detailKeyHandler) {
       document.removeEventListener('keydown', detailKeyHandler);
       detailKeyHandler = null;
@@ -470,6 +476,7 @@
     if (state.page === 'home') {
       app.innerHTML = homeHtml();
       startUpdateTicker();
+      if (state.gitFeed === null && !state.gitLoading) fetchGitFeed();
     } else if (state.page === 'works') {
       app.innerHTML = worksHtml();
       setupGridHover();
@@ -493,10 +500,11 @@
   }
 
   function startUpdateTicker() {
-    const id = setInterval(() => {
+    if (updateInterval) clearInterval(updateInterval);
+    updateInterval = setInterval(() => {
       const el = document.getElementById('home-update-val');
-      if (el) { el.textContent = formatHoursAgo(LAST_UPDATE_DATE); }
-      else { clearInterval(id); }
+      if (el) { el.textContent = formatHoursAgo(state.latestTimestamp); }
+      else { clearInterval(updateInterval); updateInterval = null; }
     }, 60000);
   }
 
@@ -628,10 +636,21 @@
         kind: eventKind(ev),
         msg: eventMsg(ev),
       }));
+
+      // Derive latest push timestamp and project from events
+      const slugToId = new Map(projects.map(p => [p.slug, p.id]));
+      const pushes = data.filter(ev => ev.type === 'PushEvent');
+      if (pushes.length) state.latestTimestamp = new Date(pushes[0].created_at);
+      const projectPush = pushes.find(ev => slugToId.has(ev.repo.name.replace(`${GITHUB_USER}/`, '')));
+      if (projectPush) state.latestProjectId = slugToId.get(projectPush.repo.name.replace(`${GITHUB_USER}/`, ''));
     } catch {
       state.gitFeed = [];
     } finally {
       state.gitLoading = false;
+      if (state.page === 'home') {
+        render();
+        return;
+      }
       if (state.page === 'info') {
         const feedEl = document.querySelector('.git-feed');
         if (feedEl) {
