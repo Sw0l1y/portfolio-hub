@@ -1,4 +1,4 @@
-export const VERSION = '1.0.0';
+export const VERSION = '1.0.1';
 
 import { LEVELS }                                    from './levels.js';
 import { Ball, Platform, Anchor, Portal, Hazard, Particle, dist } from './world.js';
@@ -100,6 +100,12 @@ export class Game {
         const a = this.anchors[this._nearestAnchorId];
         const len = dist(this.ball.x, this.ball.y, a.x, a.y);
         this.tether = { anchor: a, anchorIdx: this._nearestAnchorId, length: len };
+        // Impulse toward anchor so the ball lifts off and starts swinging
+        if (len > 0) {
+          const str = 4;
+          this.ball.vx += ((a.x - this.ball.x) / len) * str;
+          this.ball.vy += ((a.y - this.ball.y) / len) * str;
+        }
         this._emitAttach(a);
       }
     }
