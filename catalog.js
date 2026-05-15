@@ -46,6 +46,36 @@
   /** @type {Project[]} */
   const projects = [
     {
+      id: "tether",
+      slug: "tether",
+      title: "Tether",
+      status: "playable",
+      publicStatus: "live",
+      genre: "Puzzle Platformer",
+      platform: "Browser",
+      tech: ["Vanilla JavaScript", "ES Modules", "Canvas", "Physics Engine"],
+      shortSummary: "A physics puzzle platformer where you shoot a tether to anchor points, swing as a pendulum, and release at the right moment to reach the exit portal.",
+      detailSummary:
+        "Tether is built around one core mechanic: shoot a rope to any anchor, let gravity pull you into a pendulum swing, and release at the right moment to fly toward the exit. Five levels teach the mechanic progressively — from a single anchor over a gap to chained multi-swing routes around spike hazards. The neon aesthetic gives every interaction strong visual feedback: a color-shifting tether line (cyan when slack, magenta when taut), particle bursts on attach and release, a glowing orb with a motion trail, and a pulsing exit portal.",
+      controls: ["Click a glowing anchor to tether", "Ball swings on pendulum physics", "Click again anywhere to release"],
+      visualTheme: {
+        accent: "#00e5ff",
+        accentAlt: "#c080ff",
+        glow: "rgba(0, 229, 255, 0.28)",
+        base: "#06060e",
+      },
+      featured: true,
+      sortOrder: 0,
+      year: 2026,
+      q: "Q2",
+      cover: "./covers/tether.svg",
+      repoUrl: "https://github.com/Sw0l1y/tether",
+      actions: [
+        { label: "Play", href: "/games/tether/", kind: "primary" },
+        { label: "GitHub", href: "https://github.com/Sw0l1y/tether", kind: "secondary" },
+      ],
+    },
+    {
       id: "godot-physics-sandbox",
       slug: "godot-physics-sandbox",
       title: "Physics Sandbox",

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tether</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        min-height: 100%;
+      }
+      body {
+        display: grid;
+        place-items: center;
+        background: #050508;
+        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      }
+      .shell {
+        position: relative;
+        width: min(100vw, 1120px);
+        padding: 18px;
+      }
+      canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 9;
+        border: 1px solid rgba(100, 220, 255, 0.15);
+        border-radius: 14px;
+        box-shadow:
+          0 24px 84px rgba(0, 0, 0, 0.8),
+          0 0 60px rgba(80, 200, 255, 0.06);
+        background: #06060e;
+        cursor: crosshair;
+      }
+      #fs-btn {
+        position: absolute;
+        bottom: 26px;
+        right: 26px;
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 7px;
+        color: rgba(255,255,255,0.5);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+        transition: background 0.15s, color 0.15s;
+      }
+      #fs-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <canvas id="c"></canvas>
+      <button id="fs-btn" title="Fullscreen">⛶</button>
+    </div>
+    <script type="module" src="src/main.js?v=1.0.0"></script>
+    <script>
+      document.getElementById('fs-btn').addEventListener('click', () => {
+        const el = document.querySelector('.shell');
+        if (!document.fullscreenElement) el.requestFullscreen();
+        else document.exitFullscreen();
+      });
+    </script>
+  </body>
+</html>
