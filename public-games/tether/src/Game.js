@@ -1,11 +1,11 @@
-export const VERSION = '2.0.0';
+export const VERSION = '2.1.0';
 
 import { LEVELS }                                        from './levels.js';
-import { Ball, Platform, Slingshot, Portal, Hazard, Particle, dist } from './world.js';
+import { Ball, Platform, Portal, Hazard, Particle, dist } from './world.js';
 import { Renderer }                                      from './renderer.js';
 import { Input }                                         from './input.js';
 
-const MAX_PULL = 110;
+const MAX_PULL = 120;
 const POWER    = 0.21;
 
 const S = { MENU: 0, PLAYING: 1, WIN: 2, DEATH: 3 };
@@ -24,8 +24,8 @@ export class Game {
     this.levelIndex = 0;
     this.particles  = [];
     this.dragging   = false;
-    this.dragX      = 0;
-    this.dragY      = 0;
+    this.dragOriginX = 0;
+    this.dragOriginY = 0;
     this.showHint   = true;
     this.hintTimer  = 0;
 
@@ -35,18 +35,15 @@ export class Game {
   // ── Level setup ────────────────────────────────────────────────────────────
 
   _buildLevel(idx) {
-    const d          = LEVELS[idx];
-    this.slingshot   = new Slingshot(d.slingshot.x, d.slingshot.y);
-    this.ball        = new Ball(d.slingshot.x, d.slingshot.y);
-    this.platforms   = d.platforms.map(p => new Platform(p.x, p.y, p.w, p.h));
-    this.portal      = new Portal(d.portal.x, d.portal.y);
-    this.hazards     = (d.hazards || []).map(h => new Hazard(h.x, h.y, h.w, h.h));
-    this.particles   = [];
-    this.dragging    = false;
-    this.showHint    = true;
-    this.hintTimer   = 0;
-    this.retryTimer  = 0;
-    this.showRetry   = false;
+    const d        = LEVELS[idx];
+    this.ball      = new Ball(d.ball.x, d.ball.y);
+    this.platforms = d.platforms.map(p => new Platform(p.x, p.y, p.w, p.h));
+    this.portal    = new Portal(d.portal.x, d.portal.y);
+    this.hazards   = (d.hazards || []).map(h => new Hazard(h.x, h.y, h.w, h.h));
+    this.particles = [];
+    this.dragging  = false;
+    this.showHint  = true;
+    this.hintTimer = 0;
   }
 
   // ── Update ─────────────────────────────────────────────────────────────────
@@ -83,56 +80,55 @@ export class Game {
     this.hintTimer += dt;
     if (this.hintTimer > 240) this.showHint = false;
 
-    const sl  = this.slingshot;
-    const mp  = inp.mousePos;
+    const mp   = inp.mousePos;
     const ball = this.ball;
 
-    // ── Aiming (ball not launched) ─────────────────────────────────────────
-    if (!ball.launched) {
-      if (inp.justDown()) {
-        const dToBall = dist(mp.x, mp.y, ball.x, ball.y);
-        if (dToBall < 40) {
-          this.dragging = true;
-        }
+    // always update physics (even while dragging, ball is pinned by overwrite below)
+    ball.update(dt, this.platforms);
+
+    // particles
+    for (const p of this.particles) p.update(dt);
+    this.particles = this.particles.filter(p => p.alive);
+    if (ball.justBounced) this._emitBounce();
+
+    // ── Grab / drag ────────────────────────────────────────────────────────
+    if (inp.justDown()) {
+      const dToBall = dist(mp.x, mp.y, ball.x, ball.y);
+      if (dToBall < 40) {
+        this.dragging    = true;
+        this.dragOriginX = ball.x;
+        this.dragOriginY = ball.y;
+        ball.grab();
       }
+    }
 
-      if (this.dragging) {
-        // clamp drag to max pull circle around slingshot center
-        const dx = mp.x - sl.x;
-        const dy = mp.y - sl.y;
-        const d  = Math.sqrt(dx * dx + dy * dy);
-        if (d <= MAX_PULL) {
-          this.dragX = mp.x;
-          this.dragY = mp.y;
-        } else {
-          this.dragX = sl.x + (dx / d) * MAX_PULL;
-          this.dragY = sl.y + (dy / d) * MAX_PULL;
-        }
-        ball.x = this.dragX;
-        ball.y = this.dragY;
+    if (this.dragging) {
+      // clamp drag to MAX_PULL radius around the origin
+      const dx = mp.x - this.dragOriginX;
+      const dy = mp.y - this.dragOriginY;
+      const d  = Math.sqrt(dx * dx + dy * dy);
+      if (d <= MAX_PULL) {
+        ball.x = mp.x; ball.y = mp.y;
+      } else {
+        ball.x = this.dragOriginX + (dx / d) * MAX_PULL;
+        ball.y = this.dragOriginY + (dy / d) * MAX_PULL;
       }
+    }
 
-      if (inp.justUp() && this.dragging) {
-        // launch!
-        const dx = sl.x - ball.x;
-        const dy = sl.y - ball.y;
-        if (Math.sqrt(dx*dx + dy*dy) > 8) {
-          ball.launch(dx * POWER, dy * POWER);
-          this._emitLaunch();
-        }
-        this.dragging = false;
+    if (inp.justUp() && this.dragging) {
+      const dx = this.dragOriginX - ball.x;
+      const dy = this.dragOriginY - ball.y;
+      if (Math.sqrt(dx*dx + dy*dy) > 8) {
+        ball.launch(dx * POWER, dy * POWER);
+        this._emitLaunch();
+      } else {
+        ball.release();
       }
+      this.dragging = false;
+    }
 
-    // ── Ball in flight ──────────────────────────────────────────────────────
-    } else {
-      ball.update(dt, this.platforms);
-
-      // particles
-      for (const p of this.particles) p.update(dt);
-      this.particles = this.particles.filter(p => p.alive);
-      if (ball.justBounced) this._emitBounce();
-
-      // win check
+    // ── Win / death checks ─────────────────────────────────────────────────
+    if (!this.dragging) {
       if (dist(ball.x, ball.y, this.portal.x, this.portal.y) < this.portal.r + ball.r) {
         this._emitWin();
         this.state = S.WIN;
@@ -140,7 +136,6 @@ export class Game {
         return;
       }
 
-      // hazard check
       for (const h of this.hazards) {
         if (ball.x + ball.r > h.x && ball.x - ball.r < h.x + h.w &&
             ball.y + ball.r > h.y && ball.y - ball.r < h.y + h.h) {
@@ -150,22 +145,10 @@ export class Game {
         }
       }
 
-      // fell off screen
       if (ball.y > this.H + 80 || ball.x < -80 || ball.x > this.W + 80) {
         this.state = S.DEATH;
         inp.endFrame();
         return;
-      }
-
-      // ball came to rest on wrong platform → show retry hint
-      if (ball.restTimer > 90) {
-        this.showRetry = true;
-        if (inp.justDown()) {
-          this._buildLevel(this.levelIndex);
-          this.state = S.PLAYING;
-          inp.endFrame();
-          return;
-        }
       }
     }
 
@@ -178,7 +161,6 @@ export class Game {
   draw() {
     const r    = this.renderer;
     const ball = this.ball;
-    const sl   = this.slingshot;
 
     r.clear();
 
@@ -188,17 +170,19 @@ export class Game {
     r.drawHazards(this.hazards);
     r.drawPortal(this.portal);
 
-    // trajectory preview while dragging
-    if (this.dragging && (Math.abs(ball.x - sl.x) > 8 || Math.abs(ball.y - sl.y) > 8)) {
-      r.drawTrajectory(sl, ball.x, ball.y, this.platforms);
+    if (this.dragging) {
+      const dx = this.dragOriginX - ball.x;
+      const dy = this.dragOriginY - ball.y;
+      if (Math.sqrt(dx*dx + dy*dy) > 8) {
+        r.drawTrajectory(this.dragOriginX, this.dragOriginY, ball.x, ball.y, this.platforms);
+        r.drawPullLine(this.dragOriginX, this.dragOriginY, ball.x, ball.y);
+      }
     }
 
-    r.drawSlingshot(sl, ball.x, ball.y, this.dragging);
     r.drawParticles(this.particles);
     r.drawBall(ball);
     r.drawHUD(this.levelIndex + 1, LEVELS.length, LEVELS[this.levelIndex].hint, this.showHint);
 
-    if (this.showRetry) r.drawRetryHint();
     if (this.state === S.WIN)   r.drawWin(this.levelIndex + 1, LEVELS.length);
     if (this.state === S.DEATH) r.drawDeath();
   }

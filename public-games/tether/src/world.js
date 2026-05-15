@@ -15,14 +15,23 @@ export class Ball {
     this.justBounced = false;
     this.onGround = false;
     this.speed = 0;
-    this.launched = false;
-    this.restTimer = 0;  // frames spent nearly still after launch
+    this.grabbed = false;
+  }
+
+  grab() {
+    this.grabbed = true;
+    this.vx = 0; this.vy = 0;
+    this.trail = [];
+  }
+
+  release() {
+    this.grabbed = false;
   }
 
   update(dt, platforms) {
     this.justBounced = false;
 
-    if (!this.launched) return;
+    if (this.grabbed) return;
 
     this.vy += 0.50 * dt;
 
@@ -42,19 +51,13 @@ export class Ball {
 
     this.speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
 
-    if (this.launched && this.onGround && this.speed < 0.8) {
-      this.restTimer += dt;
-    } else {
-      this.restTimer = 0;
-    }
   }
 
   launch(vx, vy) {
+    this.grabbed = false;
     this.vx = vx;
     this.vy = vy;
-    this.launched = true;
     this.trail = [];
-    this.restTimer = 0;
   }
 
   _collidePlatform(p) {
@@ -86,15 +89,6 @@ export class Ball {
 
 export class Platform {
   constructor(x, y, w, h) { this.x = x; this.y = y; this.w = w; this.h = h; }
-}
-
-export class Slingshot {
-  constructor(x, y) {
-    this.x = x; this.y = y;
-    // prong tips relative to center
-    this.leftTip  = { x: x - 24, y: y - 38 };
-    this.rightTip = { x: x + 24, y: y - 38 };
-  }
 }
 
 export class Portal {

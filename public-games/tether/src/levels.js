@@ -5,7 +5,7 @@ export const LEVELS = [
   {
     title: 'LAUNCH PAD',
     hint: 'Drag the ball back and release',
-    slingshot: { x: 200, y: 450 },
+    ball: { x: 200, y: 450 },
     platforms: [
       { x: 0,   y: 450, w: 170, h: 180 },  // left base
       { x: 0,   y: 548, w: 1120, h: 82 },  // floor
@@ -19,7 +19,7 @@ export const LEVELS = [
   {
     title: 'OVER THE WALL',
     hint: 'Arc over the wall',
-    slingshot: { x: 200, y: 450 },
+    ball: { x: 200, y: 450 },
     platforms: [
       { x: 0,   y: 450, w: 170, h: 180 },  // left base
       { x: 0,   y: 548, w: 1120, h: 82 },  // floor
@@ -34,7 +34,7 @@ export const LEVELS = [
   {
     title: 'THE NOTCH',
     hint: 'Thread the gap',
-    slingshot: { x: 200, y: 450 },
+    ball: { x: 200, y: 450 },
     platforms: [
       { x: 0,    y: 450, w: 170, h: 180 },  // left base
       { x: 0,    y: 548, w: 1120, h: 82 },  // floor
@@ -50,7 +50,7 @@ export const LEVELS = [
   {
     title: 'THE ISLAND',
     hint: 'Land on the island — spikes below',
-    slingshot: { x: 200, y: 470 },
+    ball: { x: 200, y: 470 },
     platforms: [
       { x: 0,   y: 470, w: 170, h: 160 },  // left base
       { x: 0,   y: 558, w: 1120, h: 72 },  // floor
@@ -67,7 +67,7 @@ export const LEVELS = [
   {
     title: 'GAUNTLET',
     hint: 'Three walls stand between you and freedom',
-    slingshot: { x: 160, y: 468 },
+    ball: { x: 160, y: 468 },
     platforms: [
       { x: 0,   y: 468, w: 130, h: 162 },  // left base
       { x: 0,   y: 548, w: 1120, h: 82 },  // floor

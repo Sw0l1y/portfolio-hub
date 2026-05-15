@@ -105,88 +105,34 @@ export class Renderer {
     this.noGlow();
   }
 
-  // ── Slingshot structure ────────────────────────────────────────────────────
+  // ── Pull line ──────────────────────────────────────────────────────────────
 
-  drawSlingshot(sl, ballX, ballY, isDragging) {
+  drawPullLine(ox, oy, ballX, ballY) {
     const { ctx } = this;
-    const cx = sl.x, cy = sl.y;
-    const lx = sl.leftTip.x,  ly = sl.leftTip.y;
-    const rx = sl.rightTip.x, ry = sl.rightTip.y;
-
-    // Handle / stem
+    const pull = Math.sqrt((ballX - ox) ** 2 + (ballY - oy) ** 2);
+    const t = Math.min(pull / MAX_PULL, 1);
+    const r = Math.round(t * 255);
+    const g = Math.round((1 - t) * 160);
+    const b = Math.round((1 - t) * 255);
+    const color = `rgb(${r},${g},${b})`;
     ctx.beginPath();
-    ctx.moveTo(cx - 6, cy);
-    ctx.lineTo(cx - 4, cy + 52);
-    ctx.moveTo(cx + 6, cy);
-    ctx.lineTo(cx + 4, cy + 52);
-    ctx.strokeStyle = '#1a1a3a';
-    ctx.lineWidth = 10;
-    ctx.lineCap = 'round';
-    this.noGlow();
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - 5);
-    ctx.lineTo(cx, cy + 52);
-    ctx.strokeStyle = '#2a2a5a';
-    ctx.lineWidth = 6;
-    this.glow('#4040a0', 6);
-    ctx.stroke();
-
-    // Left prong
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - 5);
-    ctx.lineTo(lx, ly);
-    ctx.strokeStyle = '#2a2a5a';
-    ctx.lineWidth = 6;
-    ctx.lineCap = 'round';
-    this.glow('#4040a0', 6);
-    ctx.stroke();
-
-    // Right prong
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - 5);
-    ctx.lineTo(rx, ry);
-    ctx.strokeStyle = '#2a2a5a';
-    ctx.lineWidth = 6;
-    this.glow('#4040a0', 6);
-    ctx.stroke();
-
-    if (!isDragging) { this.noGlow(); return; }
-
-    // Elastic bands (only while dragging)
-    const pull = Math.min(Math.sqrt((ballX-cx)**2 + (ballY-cy)**2), MAX_PULL);
-    const t = pull / MAX_PULL;
-    const bandR = Math.round(t * 255);
-    const bandG = Math.round((1 - t) * 160);
-    const bandB = Math.round((1 - t) * 255);
-    const bandColor = `rgb(${bandR},${bandG},${bandB})`;
-
-    ctx.beginPath();
-    ctx.moveTo(lx, ly);
+    ctx.moveTo(ox, oy);
     ctx.lineTo(ballX, ballY);
-    ctx.strokeStyle = bandColor;
-    ctx.lineWidth = 2.5;
-    this.glow(bandColor, 12);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    this.glow(color, 8);
     ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(rx, ry);
-    ctx.lineTo(ballX, ballY);
-    ctx.strokeStyle = bandColor;
-    ctx.lineWidth = 2.5;
-    this.glow(bandColor, 12);
-    ctx.stroke();
-
+    ctx.setLineDash([]);
     this.noGlow();
   }
 
   // ── Trajectory preview ─────────────────────────────────────────────────────
 
-  drawTrajectory(sl, ballX, ballY, platforms) {
+  drawTrajectory(ox, oy, ballX, ballY, platforms) {
     const { ctx } = this;
-    const dx = sl.x - ballX;
-    const dy = sl.y - ballY;
+    const dx = ox - ballX;
+    const dy = oy - ballY;
     const vx = dx * POWER;
     const vy = dy * POWER;
 
