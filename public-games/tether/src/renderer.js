@@ -1,12 +1,13 @@
+const GRAVITY = 0.50;
+const MAX_PULL = 110;
+const POWER    = 0.21;
+
 export class Renderer {
   constructor(ctx, W, H) {
     this.ctx = ctx;
     this.W = W;
     this.H = H;
-    this.frame = 0;
   }
-
-  // ── Helpers ────────────────────────────────────────────────────────────────
 
   glow(color, blur) { this.ctx.shadowColor = color; this.ctx.shadowBlur = blur; }
   noGlow()          { this.ctx.shadowBlur = 0; }
@@ -15,14 +16,11 @@ export class Renderer {
 
   clear() {
     const { ctx, W, H } = this;
-    this.frame++;
-
     ctx.fillStyle = '#06060e';
     ctx.fillRect(0, 0, W, H);
 
-    // subtle grid
     ctx.save();
-    ctx.strokeStyle = 'rgba(30, 30, 70, 0.45)';
+    ctx.strokeStyle = 'rgba(28, 28, 65, 0.45)';
     ctx.lineWidth = 1;
     const gs = 55;
     for (let x = gs; x < W; x += gs) {
@@ -39,10 +37,8 @@ export class Renderer {
   drawPlatforms(platforms) {
     const { ctx } = this;
     for (const p of platforms) {
-      // body
       ctx.fillStyle = '#0b0b1e';
       ctx.fillRect(p.x, p.y, p.w, p.h);
-      // neon border
       ctx.strokeStyle = '#00bfff';
       ctx.lineWidth = 2;
       this.glow('#00bfff', 14);
@@ -58,8 +54,7 @@ export class Renderer {
     for (const h of hazards) {
       ctx.fillStyle = '#1a0008';
       ctx.fillRect(h.x, h.y, h.w, h.h);
-      // spike teeth
-      const toothW = 20;
+      const toothW = 18;
       const count = Math.floor(h.w / toothW);
       ctx.fillStyle = '#ff1050';
       this.glow('#ff1050', 10);
@@ -67,7 +62,7 @@ export class Renderer {
       for (let i = 0; i < count; i++) {
         const tx = h.x + i * toothW;
         ctx.moveTo(tx, h.y + h.h);
-        ctx.lineTo(tx + toothW / 2, h.y + 4);
+        ctx.lineTo(tx + toothW / 2, h.y + 3);
         ctx.lineTo(tx + toothW, h.y + h.h);
       }
       ctx.closePath();
@@ -76,51 +71,12 @@ export class Renderer {
     }
   }
 
-  // ── Anchors ────────────────────────────────────────────────────────────────
-
-  drawAnchors(anchors, nearestId) {
-    const { ctx } = this;
-    anchors.forEach((a, i) => {
-      const pulse = 0.55 + 0.45 * Math.sin(a.phase);
-      const isNear = i === nearestId;
-      const isAttached = a.attached;
-      const color = isAttached ? '#ffffff' : isNear ? '#e0b0ff' : '#a060ff';
-      const blurBase = isAttached ? 30 : isNear ? 20 : 12;
-
-      // outer ring
-      ctx.beginPath();
-      ctx.arc(a.x, a.y, a.r + 5, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(160, 96, 255, ${pulse * (isNear ? 0.6 : 0.25)})`;
-      ctx.lineWidth = 1.5;
-      this.glow('#a060ff', blurBase * pulse);
-      ctx.stroke();
-
-      // core
-      ctx.beginPath();
-      ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
-      ctx.fillStyle = color;
-      this.glow(color, blurBase * 1.5 * pulse);
-      ctx.fill();
-
-      // crosshair lines
-      ctx.strokeStyle = `rgba(6, 6, 14, 0.7)`;
-      ctx.lineWidth = 1.5;
-      this.noGlow();
-      ctx.beginPath();
-      ctx.moveTo(a.x - a.r + 3, a.y); ctx.lineTo(a.x + a.r - 3, a.y);
-      ctx.moveTo(a.x, a.y - a.r + 3); ctx.lineTo(a.x, a.y + a.r - 3);
-      ctx.stroke();
-    });
-    this.noGlow();
-  }
-
   // ── Portal ─────────────────────────────────────────────────────────────────
 
   drawPortal(portal) {
     const { ctx } = this;
     const pulse = 0.7 + 0.3 * Math.sin(portal.phase);
 
-    // inner fill
     const grad = ctx.createRadialGradient(portal.x, portal.y, 0, portal.x, portal.y, portal.r * 2);
     grad.addColorStop(0, `rgba(0, 255, 170, ${0.28 * pulse})`);
     grad.addColorStop(1, 'rgba(0,255,170,0)');
@@ -129,7 +85,6 @@ export class Renderer {
     ctx.arc(portal.x, portal.y, portal.r * 2.2, 0, Math.PI * 2);
     ctx.fill();
 
-    // rotating arcs
     const segs = 6;
     for (let i = 0; i < segs; i++) {
       const a0 = portal.angle + (i / segs) * Math.PI * 2;
@@ -142,7 +97,6 @@ export class Renderer {
       ctx.stroke();
     }
 
-    // center dot
     ctx.beginPath();
     ctx.arc(portal.x, portal.y, 5, 0, Math.PI * 2);
     ctx.fillStyle = '#00ffaa';
@@ -151,29 +105,125 @@ export class Renderer {
     this.noGlow();
   }
 
-  // ── Tether ─────────────────────────────────────────────────────────────────
+  // ── Slingshot structure ────────────────────────────────────────────────────
 
-  drawTether(ball, tether) {
+  drawSlingshot(sl, ballX, ballY, isDragging) {
     const { ctx } = this;
-    const dx = ball.x - tether.anchor.x;
-    const dy = ball.y - tether.anchor.y;
-    const d = Math.sqrt(dx * dx + dy * dy);
-    const t = Math.min(d / tether.length, 1);
+    const cx = sl.x, cy = sl.y;
+    const lx = sl.leftTip.x,  ly = sl.leftTip.y;
+    const rx = sl.rightTip.x, ry = sl.rightTip.y;
 
-    // color: slack=cyan, taut=magenta
-    const r = Math.round(t * 255);
-    const g = Math.round((1 - t) * 80 + t * 20);
-    const b = Math.round((1 - t) * 255 + t * 200);
-    const color = `rgb(${r},${g},${b})`;
+    // Handle / stem
+    ctx.beginPath();
+    ctx.moveTo(cx - 6, cy);
+    ctx.lineTo(cx - 4, cy + 52);
+    ctx.moveTo(cx + 6, cy);
+    ctx.lineTo(cx + 4, cy + 52);
+    ctx.strokeStyle = '#1a1a3a';
+    ctx.lineWidth = 10;
+    ctx.lineCap = 'round';
+    this.noGlow();
+    ctx.stroke();
 
     ctx.beginPath();
-    ctx.moveTo(tether.anchor.x, tether.anchor.y);
-    ctx.lineTo(ball.x, ball.y);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    this.glow(color, 12);
+    ctx.moveTo(cx, cy - 5);
+    ctx.lineTo(cx, cy + 52);
+    ctx.strokeStyle = '#2a2a5a';
+    ctx.lineWidth = 6;
+    this.glow('#4040a0', 6);
     ctx.stroke();
+
+    // Left prong
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - 5);
+    ctx.lineTo(lx, ly);
+    ctx.strokeStyle = '#2a2a5a';
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
+    this.glow('#4040a0', 6);
+    ctx.stroke();
+
+    // Right prong
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - 5);
+    ctx.lineTo(rx, ry);
+    ctx.strokeStyle = '#2a2a5a';
+    ctx.lineWidth = 6;
+    this.glow('#4040a0', 6);
+    ctx.stroke();
+
+    if (!isDragging) { this.noGlow(); return; }
+
+    // Elastic bands (only while dragging)
+    const pull = Math.min(Math.sqrt((ballX-cx)**2 + (ballY-cy)**2), MAX_PULL);
+    const t = pull / MAX_PULL;
+    const bandR = Math.round(t * 255);
+    const bandG = Math.round((1 - t) * 160);
+    const bandB = Math.round((1 - t) * 255);
+    const bandColor = `rgb(${bandR},${bandG},${bandB})`;
+
+    ctx.beginPath();
+    ctx.moveTo(lx, ly);
+    ctx.lineTo(ballX, ballY);
+    ctx.strokeStyle = bandColor;
+    ctx.lineWidth = 2.5;
+    this.glow(bandColor, 12);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(rx, ry);
+    ctx.lineTo(ballX, ballY);
+    ctx.strokeStyle = bandColor;
+    ctx.lineWidth = 2.5;
+    this.glow(bandColor, 12);
+    ctx.stroke();
+
     this.noGlow();
+  }
+
+  // ── Trajectory preview ─────────────────────────────────────────────────────
+
+  drawTrajectory(sl, ballX, ballY, platforms) {
+    const { ctx } = this;
+    const dx = sl.x - ballX;
+    const dy = sl.y - ballY;
+    const vx = dx * POWER;
+    const vy = dy * POWER;
+
+    const steps = 80;
+    const stepDt = 1.4;
+
+    let px = ballX, py = ballY, pvx = vx, pvy = vy;
+
+    for (let i = 1; i <= steps; i++) {
+      pvy += GRAVITY * stepDt;
+      px += pvx * stepDt;
+      py += pvy * stepDt;
+
+      // simple platform bounce in preview
+      for (const p of platforms) {
+        const cx2 = Math.max(p.x, Math.min(px, p.x + p.w));
+        const cy2 = Math.max(p.y, Math.min(py, p.y + p.h));
+        const ddx = px - cx2, ddy = py - cy2;
+        const dd = Math.sqrt(ddx*ddx + ddy*ddy);
+        if (dd < 14 && dd > 0) {
+          const nx2 = ddx/dd, ny2 = ddy/dd;
+          px = cx2 + nx2 * 14;
+          py = cy2 + ny2 * 14;
+          const dot = pvx*nx2 + pvy*ny2;
+          if (dot < 0) { pvx -= 1.45*dot*nx2; pvy -= 1.45*dot*ny2; }
+        }
+      }
+
+      if (px < -50 || px > this.W + 50 || py > this.H + 50) break;
+
+      const alpha = (1 - i / steps) * 0.55;
+      const r = i / steps;
+      ctx.beginPath();
+      ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${Math.round(r*255)}, ${Math.round((1-r)*200)}, 255, ${alpha})`;
+      ctx.fill();
+    }
   }
 
   // ── Particles ──────────────────────────────────────────────────────────────
@@ -199,17 +249,17 @@ export class Renderer {
   drawBall(ball) {
     const { ctx } = this;
 
-    // motion trail
+    // trail
     for (let i = 0; i < ball.trail.length; i++) {
       const t = ball.trail[i];
       const frac = (i + 1) / ball.trail.length;
       ctx.beginPath();
-      ctx.arc(t.x, t.y, ball.r * 0.55 * frac, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(0, 210, 255, ${frac * 0.18})`;
+      ctx.arc(t.x, t.y, ball.r * 0.5 * frac, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0, 210, 255, ${frac * 0.16})`;
       ctx.fill();
     }
 
-    // outer glow halo
+    // outer glow
     const grad = ctx.createRadialGradient(ball.x, ball.y, ball.r * 0.5, ball.x, ball.y, ball.r * 2.2);
     grad.addColorStop(0, 'rgba(0,229,255,0.18)');
     grad.addColorStop(1, 'rgba(0,229,255,0)');
@@ -218,7 +268,7 @@ export class Renderer {
     ctx.arc(ball.x, ball.y, ball.r * 2.2, 0, Math.PI * 2);
     ctx.fill();
 
-    // main sphere
+    // sphere
     const sgrad = ctx.createRadialGradient(
       ball.x - ball.r * 0.3, ball.y - ball.r * 0.3, 0,
       ball.x, ball.y, ball.r
@@ -232,11 +282,11 @@ export class Renderer {
     this.glow('#00e5ff', 22);
     ctx.fill();
 
-    // spin indicator line
+    // spin line
     ctx.save();
     ctx.translate(ball.x, ball.y);
     ctx.rotate(ball.angle);
-    ctx.strokeStyle = 'rgba(0, 60, 100, 0.5)';
+    ctx.strokeStyle = 'rgba(0,60,100,0.45)';
     ctx.lineWidth = 2;
     this.noGlow();
     ctx.beginPath();
@@ -244,7 +294,6 @@ export class Renderer {
     ctx.lineTo(ball.r - 4, 0);
     ctx.stroke();
     ctx.restore();
-
     this.noGlow();
   }
 
@@ -257,7 +306,6 @@ export class Renderer {
     ctx.fillStyle = 'rgba(0, 200, 255, 0.65)';
     ctx.textAlign = 'left';
     ctx.fillText(`LEVEL  ${levelNum} / ${total}`, 22, 32);
-
     if (showHint && hint) {
       ctx.font = '13px "Trebuchet MS", monospace';
       ctx.fillStyle = 'rgba(160, 100, 255, 0.55)';
@@ -267,23 +315,30 @@ export class Renderer {
     ctx.restore();
   }
 
+  drawRetryHint() {
+    const { ctx, W, H } = this;
+    ctx.save();
+    ctx.font = '14px "Trebuchet MS", monospace';
+    ctx.fillStyle = 'rgba(180, 140, 255, 0.55)';
+    ctx.textAlign = 'center';
+    ctx.fillText('CLICK TO RETRY', W / 2, H - 24);
+    ctx.restore();
+  }
+
   // ── Overlays ───────────────────────────────────────────────────────────────
 
   drawMenu() {
     const { ctx, W, H } = this;
     ctx.save();
     ctx.textAlign = 'center';
-
     ctx.font = 'bold 80px "Trebuchet MS", sans-serif';
     ctx.fillStyle = '#ffffff';
     this.glow('#00e5ff', 36);
-    ctx.fillText('TETHER', W / 2, H / 2 - 52);
-
+    ctx.fillText('SLINGSHOT', W / 2, H / 2 - 52);
     ctx.font = '19px "Trebuchet MS", monospace';
     ctx.fillStyle = 'rgba(0, 229, 255, 0.8)';
     this.glow('#00e5ff', 10);
-    ctx.fillText('click anchors to tether · click again to release', W / 2, H / 2 + 16);
-
+    ctx.fillText('drag the ball back · release to launch', W / 2, H / 2 + 16);
     ctx.font = '14px "Trebuchet MS", monospace';
     ctx.fillStyle = 'rgba(180, 140, 255, 0.55)';
     this.noGlow();
@@ -297,12 +352,10 @@ export class Renderer {
     ctx.fillStyle = 'rgba(6,6,14,0.72)';
     ctx.fillRect(0, 0, W, H);
     ctx.textAlign = 'center';
-
     ctx.font = 'bold 58px "Trebuchet MS", sans-serif';
     ctx.fillStyle = '#00ffaa';
     this.glow('#00ffaa', 32);
     ctx.fillText(levelNum >= total ? 'YOU WIN!' : 'LEVEL CLEAR', W / 2, H / 2 - 18);
-
     ctx.font = '17px "Trebuchet MS", monospace';
     ctx.fillStyle = 'rgba(0, 255, 170, 0.65)';
     this.glow('#00ffaa', 10);
@@ -317,12 +370,10 @@ export class Renderer {
     ctx.fillStyle = 'rgba(6,6,14,0.72)';
     ctx.fillRect(0, 0, W, H);
     ctx.textAlign = 'center';
-
     ctx.font = 'bold 58px "Trebuchet MS", sans-serif';
     ctx.fillStyle = '#ff1050';
     this.glow('#ff1050', 32);
-    ctx.fillText('FELL', W / 2, H / 2 - 18);
-
+    ctx.fillText('MISSED', W / 2, H / 2 - 18);
     ctx.font = '17px "Trebuchet MS", monospace';
     ctx.fillStyle = 'rgba(255, 16, 80, 0.65)';
     this.glow('#ff1050', 10);

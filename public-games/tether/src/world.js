@@ -3,7 +3,7 @@ export function dist(ax, ay, bx, by) {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-// ── Ball ─────────────────────────────────────────────────────────────────────
+// ── Ball ──────────────────────────────────────────────────────────────────────
 
 export class Ball {
   constructor(x, y) {
@@ -15,51 +15,46 @@ export class Ball {
     this.justBounced = false;
     this.onGround = false;
     this.speed = 0;
+    this.launched = false;
+    this.restTimer = 0;  // frames spent nearly still after launch
   }
 
-  update(dt, tether, platforms) {
+  update(dt, platforms) {
     this.justBounced = false;
 
-    // gravity
-    this.vy += 0.48 * dt;
+    if (!this.launched) return;
 
-    // integrate
+    this.vy += 0.50 * dt;
+
     this.x += this.vx * dt;
     this.y += this.vy * dt;
 
-    // tether rope constraint
-    if (tether) {
-      const dx = this.x - tether.anchor.x;
-      const dy = this.y - tether.anchor.y;
-      const d = Math.sqrt(dx * dx + dy * dy);
-      if (d > tether.length && d > 0) {
-        const nx = dx / d, ny = dy / d;
-        this.x = tether.anchor.x + nx * tether.length;
-        this.y = tether.anchor.y + ny * tether.length;
-        // remove outward velocity component
-        const outward = this.vx * nx + this.vy * ny;
-        if (outward > 0) {
-          this.vx -= outward * nx;
-          this.vy -= outward * ny;
-        }
-      }
-      // gentle air drag while swinging
-      const f = Math.pow(0.9985, dt);
-      this.vx *= f; this.vy *= f;
-    }
-
-    // platform collisions
     this.onGround = false;
     for (const p of platforms) this._collidePlatform(p);
 
-    // spin
-    this.angle += this.vx * 0.04 * dt;
+    // gentle rolling friction on ground
+    if (this.onGround) this.vx *= Math.pow(0.88, dt);
 
-    // trail
+    this.angle += this.vx * 0.045 * dt;
+
     this.trail.push({ x: this.x, y: this.y });
-    if (this.trail.length > 14) this.trail.shift();
+    if (this.trail.length > 16) this.trail.shift();
 
     this.speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+
+    if (this.launched && this.onGround && this.speed < 0.8) {
+      this.restTimer += dt;
+    } else {
+      this.restTimer = 0;
+    }
+  }
+
+  launch(vx, vy) {
+    this.vx = vx;
+    this.vy = vy;
+    this.launched = true;
+    this.trail = [];
+    this.restTimer = 0;
   }
 
   _collidePlatform(p) {
@@ -70,20 +65,19 @@ export class Ball {
     if (d >= this.r || d === 0) return;
 
     const nx = dx / d, ny = dy / d;
-    const overlap = this.r - d;
-    this.x += nx * overlap;
-    this.y += ny * overlap;
+    this.x += nx * (this.r - d);
+    this.y += ny * (this.r - d);
 
     const dot = this.vx * nx + this.vy * ny;
     if (dot < 0) {
-      const bounce = 0.3;
+      const bounce = 0.45;
       this.vx -= (1 + bounce) * dot * nx;
       this.vy -= (1 + bounce) * dot * ny;
       if (ny < -0.6) {
-        this.vx *= 0.82;
+        this.vx *= 0.80;
         this.onGround = true;
       }
-      if (Math.abs(dot) > 2) this.justBounced = true;
+      if (Math.abs(dot) > 2.5) this.justBounced = true;
     }
   }
 }
@@ -94,14 +88,13 @@ export class Platform {
   constructor(x, y, w, h) { this.x = x; this.y = y; this.w = w; this.h = h; }
 }
 
-export class Anchor {
+export class Slingshot {
   constructor(x, y) {
-    this.x = x; this.y = y; this.r = 11;
-    this.phase = Math.random() * Math.PI * 2;
-    this.hovered = false;
-    this.attached = false;
+    this.x = x; this.y = y;
+    // prong tips relative to center
+    this.leftTip  = { x: x - 24, y: y - 38 };
+    this.rightTip = { x: x + 24, y: y - 38 };
   }
-  update(dt) { this.phase += 0.055 * dt; }
 }
 
 export class Portal {
@@ -116,8 +109,6 @@ export class Hazard {
   constructor(x, y, w, h) { this.x = x; this.y = y; this.w = w; this.h = h; }
 }
 
-// ── Particle ──────────────────────────────────────────────────────────────────
-
 export class Particle {
   constructor(x, y, vx, vy, color, life, r) {
     this.x = x; this.y = y;
@@ -127,8 +118,8 @@ export class Particle {
     this.r = r;
   }
   update(dt) {
-    this.x += this.vx * dt;
-    this.y += this.vy * dt;
+    this.x  += this.vx * dt;
+    this.y  += this.vy * dt;
     this.vy += 0.12 * dt;
     this.vx *= Math.pow(0.97, dt);
     this.life -= dt * 0.045;

@@ -1,80 +1,82 @@
 // Canvas: 1120 × 630
+// slingshot.x/y = ball rest position (center of fork)
 export const LEVELS = [
-  // ── 1: First Swing ────────────────────────────────────────────────────────
+  // ── 1: LAUNCH PAD ────────────────────────────────────────────────────────
   {
-    title: 'FIRST SWING',
-    hint: 'Click an anchor to tether · click again to release',
+    title: 'LAUNCH PAD',
+    hint: 'Drag the ball back and release',
+    slingshot: { x: 200, y: 450 },
     platforms: [
-      { x: 0,   y: 510, w: 280, h: 120 },  // left ground
-      { x: 820, y: 510, w: 300, h: 120 },  // right ground
+      { x: 0,   y: 450, w: 170, h: 180 },  // left base
+      { x: 0,   y: 548, w: 1120, h: 82 },  // floor
+      { x: 790, y: 438, w: 330, h: 110 },  // right landing
     ],
-    anchors:  [{ x: 535, y: 155 }],
-    ball:     { x: 140, y: 478 },
-    portal:   { x: 975, y: 476 },
+    portal:   { x: 965, y: 406 },
     hazards:  [],
   },
 
-  // ── 2: Chain ──────────────────────────────────────────────────────────────
+  // ── 2: OVER THE WALL ─────────────────────────────────────────────────────
   {
-    title: 'CHAIN',
-    hint: 'Use both anchors in sequence',
+    title: 'OVER THE WALL',
+    hint: 'Arc over the wall',
+    slingshot: { x: 200, y: 450 },
     platforms: [
-      { x: 0,   y: 530, w: 180, h: 100 },  // left start
-      { x: 460, y: 420, w: 140, h: 25 },   // mid shelf
-      { x: 880, y: 490, w: 240, h: 140 },  // right end
+      { x: 0,   y: 450, w: 170, h: 180 },  // left base
+      { x: 0,   y: 548, w: 1120, h: 82 },  // floor
+      { x: 455, y: 218, w: 55,  h: 330 },  // blocking wall
+      { x: 730, y: 418, w: 390, h: 130 },  // right landing
     ],
-    anchors:  [{ x: 275, y: 175 }, { x: 680, y: 190 }],
-    ball:     { x: 90,  y: 498 },
-    portal:   { x: 1020, y: 457 },
+    portal:   { x: 945, y: 386 },
     hazards:  [],
   },
 
-  // ── 3: The Climb ──────────────────────────────────────────────────────────
+  // ── 3: THE NOTCH ─────────────────────────────────────────────────────────
   {
-    title: 'THE CLIMB',
-    hint: 'Swing upward using ceiling anchors',
+    title: 'THE NOTCH',
+    hint: 'Thread the gap',
+    slingshot: { x: 200, y: 450 },
     platforms: [
-      { x: 0,    y: 580, w: 1120, h: 50 },  // floor
-      { x: 0,    y: 0,   w: 50,  h: 460 },  // left wall
-      { x: 1070, y: 0,   w: 50,  h: 480 },  // right wall
-      { x: 420,  y: 290, w: 130, h: 20  },  // mid blocker
-      { x: 900,  y: 380, w: 170, h: 25  },  // exit ledge
+      { x: 0,    y: 450, w: 170, h: 180 },  // left base
+      { x: 0,    y: 548, w: 1120, h: 82 },  // floor
+      { x: 390,  y: 0,   w: 280, h: 230 },  // upper blocker
+      { x: 390,  y: 340, w: 280, h: 210 },  // lower blocker  (gap: y 230→340 = 110px)
+      { x: 820,  y: 390, w: 300, h: 160 },  // right landing
     ],
-    anchors:  [{ x: 200, y: 30 }, { x: 560, y: 30 }, { x: 820, y: 30 }],
-    ball:     { x: 100, y: 545 },
-    portal:   { x: 985, y: 350 },
+    portal:   { x: 970, y: 358 },
     hazards:  [],
   },
 
-  // ── 4: Spike Pit ─────────────────────────────────────────────────────────
+  // ── 4: THE ISLAND ────────────────────────────────────────────────────────
   {
-    title: 'SPIKE PIT',
-    hint: 'Don\'t fall into the spikes',
+    title: 'THE ISLAND',
+    hint: 'Land on the island — spikes below',
+    slingshot: { x: 200, y: 470 },
     platforms: [
-      { x: 0,   y: 510, w: 200, h: 120 },  // left start
-      { x: 900, y: 510, w: 220, h: 120 },  // right end
-      { x: 420, y: 380, w: 120, h: 20  },  // floating shelf
+      { x: 0,   y: 470, w: 170, h: 160 },  // left base
+      { x: 0,   y: 558, w: 1120, h: 72 },  // floor
+      { x: 520, y: 330, w: 200, h: 22 },   // floating island
+      { x: 830, y: 440, w: 290, h: 118 },  // far right safe zone
     ],
-    anchors:  [{ x: 310, y: 140 }, { x: 600, y: 110 }, { x: 820, y: 160 }],
-    ball:     { x: 100, y: 478 },
-    portal:   { x: 1010, y: 477 },
-    hazards:  [{ x: 200, y: 545, w: 700, h: 85 }],
+    portal:   { x: 620, y: 298 },
+    hazards:  [
+      { x: 170, y: 542, w: 660, h: 16 },   // spike strip across floor
+    ],
   },
 
-  // ── 5: Grand Finale ───────────────────────────────────────────────────────
+  // ── 5: GAUNTLET ──────────────────────────────────────────────────────────
   {
-    title: 'GRAND FINALE',
-    hint: 'Everything you know',
+    title: 'GAUNTLET',
+    hint: 'Three walls stand between you and freedom',
+    slingshot: { x: 160, y: 468 },
     platforms: [
-      { x: 0,   y: 570, w: 140, h: 60 },   // start
-      { x: 280, y: 470, w: 100, h: 20 },   // shelf A
-      { x: 520, y: 340, w: 100, h: 20 },   // shelf B
-      { x: 760, y: 210, w: 100, h: 20 },   // shelf C
-      { x: 940, y: 360, w: 180, h: 30 },   // exit
+      { x: 0,   y: 468, w: 130, h: 162 },  // left base
+      { x: 0,   y: 548, w: 1120, h: 82 },  // floor
+      { x: 295, y: 268, w: 48,  h: 280 },  // wall 1
+      { x: 565, y: 148, w: 48,  h: 320 },  // wall 2 (taller)
+      { x: 815, y: 268, w: 48,  h: 280 },  // wall 3
+      { x: 940, y: 428, w: 180, h: 120 },  // exit platform
     ],
-    anchors:  [{ x: 175, y: 200 }, { x: 400, y: 150 }, { x: 640, y: 90 }, { x: 880, y: 120 }],
-    ball:     { x: 70,  y: 538 },
-    portal:   { x: 1045, y: 328 },
-    hazards:  [{ x: 140, y: 580, w: 840, h: 50 }],
+    portal:   { x: 1038, y: 396 },
+    hazards:  [],
   },
 ];

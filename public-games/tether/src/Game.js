@@ -1,9 +1,12 @@
-export const VERSION = '1.0.1';
+export const VERSION = '2.0.0';
 
-import { LEVELS }                                    from './levels.js';
-import { Ball, Platform, Anchor, Portal, Hazard, Particle, dist } from './world.js';
-import { Renderer }                                  from './renderer.js';
-import { Input }                                     from './input.js';
+import { LEVELS }                                        from './levels.js';
+import { Ball, Platform, Slingshot, Portal, Hazard, Particle, dist } from './world.js';
+import { Renderer }                                      from './renderer.js';
+import { Input }                                         from './input.js';
+
+const MAX_PULL = 110;
+const POWER    = 0.21;
 
 const S = { MENU: 0, PLAYING: 1, WIN: 2, DEATH: 3 };
 
@@ -20,29 +23,33 @@ export class Game {
     this.state      = S.MENU;
     this.levelIndex = 0;
     this.particles  = [];
+    this.dragging   = false;
+    this.dragX      = 0;
+    this.dragY      = 0;
     this.showHint   = true;
     this.hintTimer  = 0;
 
     this._buildLevel(0);
   }
 
-  // ── Level loading ──────────────────────────────────────────────────────────
+  // ── Level setup ────────────────────────────────────────────────────────────
 
   _buildLevel(idx) {
-    const d        = LEVELS[idx];
-    this.ball      = new Ball(d.ball.x, d.ball.y);
-    this.platforms = d.platforms.map(p => new Platform(p.x, p.y, p.w, p.h));
-    this.anchors   = d.anchors.map(a  => new Anchor(a.x, a.y));
-    this.portal    = new Portal(d.portal.x, d.portal.y);
-    this.hazards   = (d.hazards || []).map(h => new Hazard(h.x, h.y, h.w, h.h));
-    this.tether    = null;
-    this.particles = [];
-    this.showHint  = true;
-    this.hintTimer = 0;
-    this._nearestAnchorId = -1;
+    const d          = LEVELS[idx];
+    this.slingshot   = new Slingshot(d.slingshot.x, d.slingshot.y);
+    this.ball        = new Ball(d.slingshot.x, d.slingshot.y);
+    this.platforms   = d.platforms.map(p => new Platform(p.x, p.y, p.w, p.h));
+    this.portal      = new Portal(d.portal.x, d.portal.y);
+    this.hazards     = (d.hazards || []).map(h => new Hazard(h.x, h.y, h.w, h.h));
+    this.particles   = [];
+    this.dragging    = false;
+    this.showHint    = true;
+    this.hintTimer   = 0;
+    this.retryTimer  = 0;
+    this.showRetry   = false;
   }
 
-  // ── Main update ────────────────────────────────────────────────────────────
+  // ── Update ─────────────────────────────────────────────────────────────────
 
   update(dt) {
     const inp = this.input;
@@ -74,137 +81,160 @@ export class Game {
 
     // ── Hint timer ─────────────────────────────────────────────────────────
     this.hintTimer += dt;
-    if (this.hintTimer > 200) this.showHint = false;
+    if (this.hintTimer > 240) this.showHint = false;
 
-    // ── Find nearest anchor to mouse ───────────────────────────────────────
-    const mp = inp.mousePos;
-    this._nearestAnchorId = -1;
-    let bestD = 90;
-    this.anchors.forEach((a, i) => {
-      const d = dist(mp.x, mp.y, a.x, a.y);
-      if (d < bestD) { bestD = d; this._nearestAnchorId = i; }
-      a.hovered  = false;
-      a.attached = this.tether && this.tether.anchorIdx === i;
-    });
-    if (this._nearestAnchorId >= 0) {
-      this.anchors[this._nearestAnchorId].hovered = true;
-    }
+    const sl  = this.slingshot;
+    const mp  = inp.mousePos;
+    const ball = this.ball;
 
-    // ── Tether input ───────────────────────────────────────────────────────
-    if (inp.justDown()) {
-      if (this.tether) {
-        // release → burst particles
-        this._emitRelease();
-        this.tether = null;
-      } else if (this._nearestAnchorId >= 0) {
-        const a = this.anchors[this._nearestAnchorId];
-        const len = dist(this.ball.x, this.ball.y, a.x, a.y);
-        this.tether = { anchor: a, anchorIdx: this._nearestAnchorId, length: len };
-        // Impulse toward anchor so the ball lifts off and starts swinging
-        if (len > 0) {
-          const str = 4;
-          this.ball.vx += ((a.x - this.ball.x) / len) * str;
-          this.ball.vy += ((a.y - this.ball.y) / len) * str;
+    // ── Aiming (ball not launched) ─────────────────────────────────────────
+    if (!ball.launched) {
+      if (inp.justDown()) {
+        const dToBall = dist(mp.x, mp.y, ball.x, ball.y);
+        if (dToBall < 40) {
+          this.dragging = true;
         }
-        this._emitAttach(a);
       }
-    }
 
-    // ── Physics ────────────────────────────────────────────────────────────
-    this.ball.update(dt, this.tether, this.platforms);
+      if (this.dragging) {
+        // clamp drag to max pull circle around slingshot center
+        const dx = mp.x - sl.x;
+        const dy = mp.y - sl.y;
+        const d  = Math.sqrt(dx * dx + dy * dy);
+        if (d <= MAX_PULL) {
+          this.dragX = mp.x;
+          this.dragY = mp.y;
+        } else {
+          this.dragX = sl.x + (dx / d) * MAX_PULL;
+          this.dragY = sl.y + (dy / d) * MAX_PULL;
+        }
+        ball.x = this.dragX;
+        ball.y = this.dragY;
+      }
 
-    // ── Particles ──────────────────────────────────────────────────────────
-    for (const p of this.particles) p.update(dt);
-    this.particles = this.particles.filter(p => p.alive);
+      if (inp.justUp() && this.dragging) {
+        // launch!
+        const dx = sl.x - ball.x;
+        const dy = sl.y - ball.y;
+        if (Math.sqrt(dx*dx + dy*dy) > 8) {
+          ball.launch(dx * POWER, dy * POWER);
+          this._emitLaunch();
+        }
+        this.dragging = false;
+      }
 
-    if (this.ball.justBounced) this._emitBounce();
+    // ── Ball in flight ──────────────────────────────────────────────────────
+    } else {
+      ball.update(dt, this.platforms);
 
-    // ── Anchors & portal ───────────────────────────────────────────────────
-    for (const a of this.anchors) a.update(dt);
-    this.portal.update(dt);
+      // particles
+      for (const p of this.particles) p.update(dt);
+      this.particles = this.particles.filter(p => p.alive);
+      if (ball.justBounced) this._emitBounce();
 
-    // ── Win condition ──────────────────────────────────────────────────────
-    if (dist(this.ball.x, this.ball.y, this.portal.x, this.portal.y) < this.portal.r + this.ball.r) {
-      this._emitWin();
-      this.state = S.WIN;
-    }
+      // win check
+      if (dist(ball.x, ball.y, this.portal.x, this.portal.y) < this.portal.r + ball.r) {
+        this._emitWin();
+        this.state = S.WIN;
+        inp.endFrame();
+        return;
+      }
 
-    // ── Death conditions ───────────────────────────────────────────────────
-    for (const h of this.hazards) {
-      if (this.ball.x + this.ball.r > h.x && this.ball.x - this.ball.r < h.x + h.w &&
-          this.ball.y + this.ball.r > h.y && this.ball.y - this.ball.r < h.y + h.h) {
+      // hazard check
+      for (const h of this.hazards) {
+        if (ball.x + ball.r > h.x && ball.x - ball.r < h.x + h.w &&
+            ball.y + ball.r > h.y && ball.y - ball.r < h.y + h.h) {
+          this.state = S.DEATH;
+          inp.endFrame();
+          return;
+        }
+      }
+
+      // fell off screen
+      if (ball.y > this.H + 80 || ball.x < -80 || ball.x > this.W + 80) {
         this.state = S.DEATH;
+        inp.endFrame();
+        return;
+      }
+
+      // ball came to rest on wrong platform → show retry hint
+      if (ball.restTimer > 90) {
+        this.showRetry = true;
+        if (inp.justDown()) {
+          this._buildLevel(this.levelIndex);
+          this.state = S.PLAYING;
+          inp.endFrame();
+          return;
+        }
       }
     }
-    if (this.ball.y > this.H + 120) this.state = S.DEATH;
 
+    this.portal.update(dt);
     inp.endFrame();
   }
 
   // ── Draw ───────────────────────────────────────────────────────────────────
 
   draw() {
-    const r = this.renderer;
+    const r    = this.renderer;
+    const ball = this.ball;
+    const sl   = this.slingshot;
+
     r.clear();
 
-    if (this.state === S.MENU) {
-      r.drawMenu(); return;
-    }
+    if (this.state === S.MENU) { r.drawMenu(); return; }
 
     r.drawPlatforms(this.platforms);
     r.drawHazards(this.hazards);
     r.drawPortal(this.portal);
-    r.drawAnchors(this.anchors, this._nearestAnchorId);
-    if (this.tether) r.drawTether(this.ball, this.tether);
+
+    // trajectory preview while dragging
+    if (this.dragging && (Math.abs(ball.x - sl.x) > 8 || Math.abs(ball.y - sl.y) > 8)) {
+      r.drawTrajectory(sl, ball.x, ball.y, this.platforms);
+    }
+
+    r.drawSlingshot(sl, ball.x, ball.y, this.dragging);
     r.drawParticles(this.particles);
-    r.drawBall(this.ball);
+    r.drawBall(ball);
     r.drawHUD(this.levelIndex + 1, LEVELS.length, LEVELS[this.levelIndex].hint, this.showHint);
 
+    if (this.showRetry) r.drawRetryHint();
     if (this.state === S.WIN)   r.drawWin(this.levelIndex + 1, LEVELS.length);
     if (this.state === S.DEATH) r.drawDeath();
   }
 
-  // ── Particle helpers ───────────────────────────────────────────────────────
+  // ── Particles ──────────────────────────────────────────────────────────────
 
-  _emitRelease() {
-    const spd = Math.sqrt(this.ball.vx ** 2 + this.ball.vy ** 2);
-    for (let i = 0; i < 10; i++) {
+  _emitLaunch() {
+    const ball = this.ball;
+    for (let i = 0; i < 12; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const s = 1.5 + Math.random() * 3 + spd * 0.08;
+      const s = 2 + Math.random() * 5;
       this.particles.push(new Particle(
-        this.ball.x, this.ball.y,
+        ball.x, ball.y,
         Math.cos(angle) * s, Math.sin(angle) * s,
-        '#00e5ff', 18, 2.5 + Math.random() * 2
-      ));
-    }
-  }
-
-  _emitAttach(a) {
-    for (let i = 0; i < 6; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      this.particles.push(new Particle(
-        a.x, a.y,
-        Math.cos(angle) * (1 + Math.random() * 2), Math.sin(angle) * (1 + Math.random() * 2),
-        '#c080ff', 14, 2 + Math.random() * 1.5
+        '#00e5ff', 18, 2 + Math.random() * 2.5
       ));
     }
   }
 
   _emitBounce() {
+    const ball = this.ball;
     for (let i = 0; i < 5; i++) {
       const angle = Math.random() * Math.PI * 2;
       this.particles.push(new Particle(
-        this.ball.x, this.ball.y,
-        Math.cos(angle) * (1 + Math.random() * 2.5), Math.sin(angle) * (1.5 + Math.random() * 2) - 1.5,
+        ball.x, ball.y,
+        Math.cos(angle) * (1 + Math.random() * 2.5),
+        Math.sin(angle) * (1.5 + Math.random() * 2) - 1.5,
         '#60b0ff', 12, 1.5 + Math.random() * 1.5
       ));
     }
   }
 
   _emitWin() {
-    for (let i = 0; i < 24; i++) {
-      const angle = (i / 24) * Math.PI * 2;
-      const s = 2 + Math.random() * 5;
+    for (let i = 0; i < 28; i++) {
+      const angle = (i / 28) * Math.PI * 2;
+      const s = 2 + Math.random() * 6;
       this.particles.push(new Particle(
         this.portal.x, this.portal.y,
         Math.cos(angle) * s, Math.sin(angle) * s,
