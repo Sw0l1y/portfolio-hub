@@ -46,6 +46,42 @@
   /** @type {Project[]} */
   const projects = [
     {
+      id: "wobble-wars",
+      slug: "wobble-wars",
+      title: "Wobble Wars",
+      status: "playable",
+      publicStatus: "live",
+      genre: "Battle Simulator",
+      platform: "Browser",
+      tech: ["Vanilla JavaScript", "Canvas", "Verlet Ragdolls", "Deterministic Sim", "WebAudio"],
+      shortSummary: "A TABS-style battle simulator: place an army of wobbly stick figures, press fight, and watch physics sort it out.",
+      detailSummary:
+        "Wobble Wars is a zero-dependency canvas game built around one promise: every battle should be a physics comedy. Sixteen units across four factions (farmers, knights, vikings, wizards) fight with real ballistics, frontal shield blocks, splash damage, taunts, and a necromancer that recycles corpses. Living units are cheap capsules driven by a procedural wobble-walk with googly eyes; the instant one dies it becomes a jointed verlet ragdoll that drops its weapon and gets re-tossed by the next explosion. A 16-level campaign with coin budgets and unlocks sits alongside a full sandbox, and the simulation is fully deterministic — the same placements and seed replay tick-for-tick, which is how the headless balance harnesses work.",
+      controls: [
+        "Click a unit card, then click your side to place it",
+        "Right-click a unit to remove it",
+        "Scroll to zoom, drag to pan",
+        "SPACE to fight / pause",
+        "1 / 2 / 3 for speed, R to restart",
+      ],
+      visualTheme: {
+        accent: "#f2c14e",
+        accentAlt: "#8fd0ff",
+        glow: "rgba(242, 193, 78, 0.28)",
+        base: "#0b1a10",
+      },
+      featured: true,
+      sortOrder: 0,
+      year: 2026,
+      q: "Q3",
+      cover: "./covers/wobble-wars.svg",
+      repoUrl: "https://github.com/Sw0l1y/wobble-wars",
+      actions: [
+        { label: "Play", href: "/games/wobble-wars/", kind: "primary" },
+        { label: "GitHub", href: "https://github.com/Sw0l1y/wobble-wars", kind: "secondary" },
+      ],
+    },
+    {
       id: "tether",
       slug: "tether",
       title: "Tether",

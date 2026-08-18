@@ -33,6 +33,10 @@ const EXTERNAL_GAME_SOURCES = {
     sourceDir: "dungeon-v2",
     buildDir: "dist",
   },
+  "wobble-wars": {
+    sourceDir: "wobble-wars",
+    buildDir: "dist",
+  },
 "momentum-trial": {
     sourceDir: "momentum-trial",
     entryFile: "game/Game.html",

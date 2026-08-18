@@ -36,4 +36,4 @@ To host a real game under `/games/<slug>/`:
 3. set that project's `publicStatus` to `live` in `catalog.js`
 4. push to `main`
 
-`clicker-game` currently uses the second path and is pulled from its own GitHub repo during deploy.
+`clicker-game`, `dungeon-v2` and `wobble-wars` use the second path and are pulled from their own GitHub repos during deploy (see the "Check out … source" / "Prepare … for deploy" steps in `.github/workflows/deploy.yml` and `EXTERNAL_GAME_SOURCES` in `scripts/build-site.mjs`).

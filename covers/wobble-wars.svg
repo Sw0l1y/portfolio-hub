@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="8" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Night-meadow background -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#050b0e"/>
+      <stop offset="60%" stop-color="#0b1a10"/>
+      <stop offset="100%" stop-color="#0d1f12"/>
+    </linearGradient>
+
+    <!-- Moon -->
+    <radialGradient id="moonglow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f2c14e" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#f2c14e" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Bale glow -->
+    <radialGradient id="baleglow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f2c14e" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#f2c14e" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Hit flash -->
+    <radialGradient id="hitglow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="40%" stop-color="#f2c14e" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#f2c14e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="400" fill="url(#bg)"/>
+
+  <!-- Subtle grid -->
+  <g stroke="rgba(40,80,50,0.35)" stroke-width="0.5">
+    <line x1="55"  y1="0" x2="55"  y2="400"/>
+    <line x1="110" y1="0" x2="110" y2="400"/>
+    <line x1="165" y1="0" x2="165" y2="400"/>
+    <line x1="220" y1="0" x2="220" y2="400"/>
+    <line x1="275" y1="0" x2="275" y2="400"/>
+    <line x1="330" y1="0" x2="330" y2="400"/>
+    <line x1="385" y1="0" x2="385" y2="400"/>
+    <line x1="440" y1="0" x2="440" y2="400"/>
+    <line x1="495" y1="0" x2="495" y2="400"/>
+    <line x1="550" y1="0" x2="550" y2="400"/>
+    <line x1="0" y1="55"  x2="600" y2="55"/>
+    <line x1="0" y1="110" x2="600" y2="110"/>
+    <line x1="0" y1="165" x2="600" y2="165"/>
+    <line x1="0" y1="220" x2="600" y2="220"/>
+    <line x1="0" y1="275" x2="600" y2="275"/>
+    <line x1="0" y1="330" x2="600" y2="330"/>
+    <line x1="0" y1="385" x2="600" y2="385"/>
+  </g>
+
+  <!-- ── MOON ── -->
+  <circle cx="470" cy="78" r="70" fill="url(#moonglow)"/>
+  <circle cx="470" cy="78" r="26" fill="#f2c14e" opacity="0.9" filter="url(#softglow)"/>
+  <circle cx="470" cy="78" r="26" fill="#f6d27a"/>
+  <circle cx="462" cy="70" r="5" fill="#e6b84a" opacity="0.5"/>
+  <circle cx="478" cy="88" r="3.5" fill="#e6b84a" opacity="0.5"/>
+
+  <!-- ── HILLS ── -->
+  <path d="M0 250 C 90 200, 160 235, 240 215 S 400 205, 470 225 S 560 235, 600 210 L600 400 L0 400 Z" fill="#0f2416"/>
+  <path d="M0 285 C 80 262, 150 280, 230 268 S 380 258, 460 274 S 550 282, 600 262 L600 400 L0 400 Z" fill="#132d1a"/>
+
+  <!-- ── GROUND ── -->
+  <rect x="0" y="312" width="600" height="88" fill="#173821"/>
+  <line x1="0" y1="312" x2="600" y2="312" stroke="#8fd0ff" stroke-width="1.2" opacity="0.35" filter="url(#glow)"/>
+  <line x1="0" y1="312" x2="600" y2="312" stroke="#8fd0ff" stroke-width="1" opacity="0.4"/>
+
+  <!-- Placement midline -->
+  <line x1="300" y1="200" x2="300" y2="312" stroke="#8fd0ff" stroke-width="1" stroke-dasharray="4 5" opacity="0.35"/>
+
+  <!-- ── BLUE ARMY (left, running right) ── -->
+  <g stroke="#4f8fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#glow)" opacity="0.95">
+    <!-- farmer 1 -->
+    <path d="M110 312 L118 292 L124 312"/>          <!-- legs -->
+    <path d="M118 292 L121 268"/>                    <!-- torso -->
+    <path d="M121 268 L108 278 M121 268 L136 274"/>  <!-- arms -->
+    <path d="M136 274 L150 258"/>                    <!-- pitchfork -->
+    <!-- farmer 2 -->
+    <path d="M160 312 L170 294 L178 312"/>
+    <path d="M170 294 L172 270"/>
+    <path d="M172 270 L160 282 M172 270 L188 276"/>
+    <path d="M188 276 L204 262"/>
+    <!-- knight-ish with shield -->
+    <path d="M214 312 L222 292 L232 312"/>
+    <path d="M222 292 L226 266"/>
+    <path d="M226 266 L214 280 M226 266 L242 270"/>
+  </g>
+  <!-- heads (blue) -->
+  <g fill="#f4d9a8" stroke="#4f8fff" stroke-width="2.5">
+    <circle cx="123" cy="259" r="8"/>
+    <circle cx="174" cy="261" r="8"/>
+    <circle cx="229" cy="257" r="8"/>
+  </g>
+  <!-- googly eyes (blue) -->
+  <g fill="#fff">
+    <circle cx="126" cy="258" r="2.6"/><circle cx="177" cy="260" r="2.6"/><circle cx="232" cy="256" r="2.6"/>
+  </g>
+  <g fill="#0b0f14">
+    <circle cx="127" cy="258" r="1.2"/><circle cx="178" cy="260" r="1.2"/><circle cx="233.5" cy="256" r="1.2"/>
+  </g>
+  <!-- shield -->
+  <ellipse cx="246" cy="276" rx="7" ry="11" fill="#1a3a6a" stroke="#8fd0ff" stroke-width="2" filter="url(#glow)"/>
+
+  <!-- ── RED ARMY (right, running left) ── -->
+  <g stroke="#ff5a5a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#glow)" opacity="0.95">
+    <!-- squire -->
+    <path d="M470 312 L478 292 L488 312"/>
+    <path d="M478 292 L476 268"/>
+    <path d="M476 268 L462 272 M476 268 L490 280"/>
+    <path d="M462 272 L446 260"/>                    <!-- sword -->
+    <!-- archer -->
+    <path d="M530 312 L538 294 L546 312"/>
+    <path d="M538 294 L537 270"/>
+    <path d="M537 270 L522 268 M537 270 L548 282"/>
+    <path d="M522 268 C 512 258, 512 278, 522 268"/>  <!-- bow -->
+  </g>
+  <g fill="#f4d9a8" stroke="#ff5a5a" stroke-width="2.5">
+    <circle cx="474" cy="259" r="8"/>
+    <circle cx="536" cy="261" r="8"/>
+  </g>
+  <g fill="#fff">
+    <circle cx="470" cy="258" r="2.6"/><circle cx="532" cy="260" r="2.6"/>
+  </g>
+  <g fill="#0b0f14">
+    <circle cx="469" cy="258" r="1.2"/><circle cx="531" cy="260" r="1.2"/>
+  </g>
+  <!-- helm plume -->
+  <path d="M474 251 C 470 240, 486 236, 484 248" fill="none" stroke="#ff5a5a" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ── ARROW IN FLIGHT ── -->
+  <path d="M520 262 Q 420 150, 320 230" fill="none" stroke="#8fd0ff" stroke-width="1" stroke-dasharray="3 5" opacity="0.4"/>
+  <line x1="352" y1="206" x2="332" y2="222" stroke="#8fd0ff" stroke-width="2" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M332 222 L340 220 M332 222 L334 214" stroke="#8fd0ff" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+  <!-- ── RAGDOLL LAUNCHED (red, mid-air, upside down) ── -->
+  <g stroke="#ff5a5a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9" filter="url(#glow)">
+    <path d="M392 176 L404 190 L418 182"/>          <!-- legs up -->
+    <path d="M404 190 L398 212"/>                    <!-- torso -->
+    <path d="M398 212 L384 204 M398 212 L410 226"/>  <!-- arms -->
+  </g>
+  <circle cx="395" cy="221" r="8" fill="#f4d9a8" stroke="#ff5a5a" stroke-width="2.5"/>
+  <circle cx="392" cy="223" r="2.6" fill="#fff"/><circle cx="391" cy="224.5" r="1.2" fill="#0b0f14"/>
+  <circle cx="399" cy="223" r="2.6" fill="#fff"/><circle cx="400" cy="221.5" r="1.2" fill="#0b0f14"/>
+  <!-- dropped sword tumbling -->
+  <line x1="424" y1="236" x2="438" y2="222" stroke="#c9d6e6" stroke-width="2.5" stroke-linecap="round" filter="url(#glow)"/>
+  <line x1="428" y1="226" x2="434" y2="232" stroke="#c9d6e6" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- motion arc -->
+  <path d="M356 300 Q 372 210, 400 200" fill="none" stroke="#ff5a5a" stroke-width="1" stroke-dasharray="3 5" opacity="0.35"/>
+
+  <!-- ── HIT FLASH ── -->
+  <circle cx="356" cy="292" r="34" fill="url(#hitglow)"/>
+  <g stroke="#ffe08a" stroke-width="2" stroke-linecap="round" opacity="0.85">
+    <line x1="356" y1="272" x2="356" y2="262"/>
+    <line x1="372" y1="278" x2="380" y2="270"/>
+    <line x1="340" y1="278" x2="332" y2="270"/>
+    <line x1="376" y1="294" x2="386" y2="294"/>
+  </g>
+
+  <!-- ── HAY BALE (rolling, glowing) ── -->
+  <circle cx="300" cy="284" r="46" fill="url(#baleglow)"/>
+  <circle cx="300" cy="284" r="28" fill="#c9962e" filter="url(#softglow)"/>
+  <circle cx="300" cy="284" r="28" fill="#d9a63a" stroke="#f2c14e" stroke-width="2.5"/>
+  <circle cx="300" cy="284" r="18" fill="none" stroke="#a87b22" stroke-width="2"/>
+  <circle cx="300" cy="284" r="8" fill="none" stroke="#a87b22" stroke-width="2"/>
+  <line x1="272" y1="284" x2="328" y2="284" stroke="#a87b22" stroke-width="2"/>
+  <line x1="300" y1="256" x2="300" y2="312" stroke="#a87b22" stroke-width="2"/>
+  <!-- speed lines -->
+  <g stroke="#f2c14e" stroke-width="1.5" stroke-linecap="round" opacity="0.5">
+    <line x1="238" y1="272" x2="262" y2="272"/>
+    <line x1="230" y1="284" x2="258" y2="284"/>
+    <line x1="238" y1="296" x2="262" y2="296"/>
+  </g>
+
+  <!-- ── AMBIENT PARTICLES / FIREFLIES ── -->
+  <circle cx="80"  cy="150" r="1.5" fill="#f2c14e" opacity="0.35"/>
+  <circle cx="140" cy="120" r="1"   fill="#f2c14e" opacity="0.28"/>
+  <circle cx="250" cy="140" r="1.5" fill="#8fd0ff" opacity="0.25"/>
+  <circle cx="330" cy="100" r="1"   fill="#f2c14e" opacity="0.3"/>
+  <circle cx="560" cy="170" r="1.5" fill="#8fd0ff" opacity="0.22"/>
+  <circle cx="40"  cy="230" r="1"   fill="#f2c14e" opacity="0.3"/>
+
+  <!-- ── HUD LABELS ── -->
+  <text x="30" y="18" font-family="monospace" font-size="10" fill="rgba(143,208,255,0.55)" letter-spacing="1">BLUE 3  vs  RED 3</text>
+  <text x="570" y="395" font-family="monospace" font-size="9" fill="rgba(242,193,78,0.3)" text-anchor="end" letter-spacing="0.5">PHYSICS · RAGDOLL · WOBBLE</text>
+</svg>

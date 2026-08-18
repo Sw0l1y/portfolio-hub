@@ -55,10 +55,23 @@ jobs:
           token: ${{ secrets.CONTENT_REPO_TOKEN }}
           path: external-games/dungeon-v2
 
+      - name: Check out wobble-wars source
+        uses: actions/checkout@v5
+        with:
+          repository: Sw0l1y/wobble-wars
+          token: ${{ secrets.CONTENT_REPO_TOKEN }}
+          path: external-games/wobble-wars
+
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
           node-version: "22"
+
+      - name: Prepare wobble-wars for deploy
+        run: |
+          mkdir -p external-games/wobble-wars/dist
+          cp external-games/wobble-wars/index.html external-games/wobble-wars/dist/
+          cp -r external-games/wobble-wars/js external-games/wobble-wars/css external-games/wobble-wars/dist/
 
       - name: Prepare dungeon-v2 for deploy
         run: |
