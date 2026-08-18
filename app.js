@@ -93,40 +93,6 @@
       : projects.filter(p => p.kind === state.filter);
   }
 
-  function relativeTime(dateStr) {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 60) return `${mins}m`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `${hrs}h`;
-    const days = Math.floor(hrs / 24);
-    if (days < 7) return `${days}d`;
-    return `${Math.floor(days / 7)}w`;
-  }
-
-  function eventKind(ev) {
-    switch (ev.type) {
-      case 'PushEvent': return 'push';
-      case 'CreateEvent': return ev.payload?.ref_type === 'tag' ? 'tag' : 'create';
-      case 'IssuesEvent': return 'issue';
-      case 'PullRequestEvent': return 'pr';
-      case 'ReleaseEvent': return 'release';
-      case 'WatchEvent': return 'star';
-      case 'ForkEvent': return 'fork';
-      default: return ev.type.replace('Event', '').toLowerCase();
-    }
-  }
-
-  function eventMsg(ev) {
-    if (ev.type === 'PushEvent') {
-      const commits = ev.payload?.commits || [];
-      return commits[0]?.message?.split('\n')[0] || 'push';
-    }
-    if (ev.type === 'CreateEvent') return `created ${ev.payload?.ref || ev.payload?.ref_type || 'ref'}`;
-    if (ev.type === 'ReleaseEvent') return ev.payload?.release?.tag_name || 'release';
-    return '—';
-  }
-
   // ── HTML blocks ──────────────────────────────────────────────────────────
 
   function topbarHtml() {
@@ -137,7 +103,6 @@
         <span class="topbar-status">OPERATOR: SW0L1Y · STATUS: ACTIVE</span>
         <nav class="topbar-nav">
           <span class="nav-link ${page === 'works' || page === 'detail' ? 'is-active' : ''}" data-nav="works">WORKS</span>
-          <span class="nav-link ${page === 'info' ? 'is-active' : ''}" data-nav="info">INFO</span>
         </nav>
       </header>`;
   }
@@ -380,76 +345,6 @@
       </div>`;
   }
 
-  // ── Info page ────────────────────────────────────────────────────────────
-
-  function infoHtml() {
-    let feedContent;
-    if (state.gitLoading) {
-      feedContent = `<div class="feed-empty">— FETCHING ACTIVITY …</div>`;
-    } else if (!state.gitFeed || !state.gitFeed.length) {
-      feedContent = `<div class="feed-empty">— NO RECENT ACTIVITY FOUND</div>`;
-    } else {
-      feedContent = state.gitFeed.map(ev => `
-        <div class="feed-row">
-          <span class="feed-when">${esc(ev.when)}</span>
-          <span class="feed-repo">${esc(ev.repo.toUpperCase())}</span>
-          <span class="feed-kind">${esc(ev.kind)}</span>
-          <span class="feed-msg">· ${esc(ev.msg)}</span>
-        </div>`).join('');
-    }
-
-    const idRows = [
-      ['HANDLE', 'Sw0l1y'],
-      ['DESIGNATION', 'OPERATOR / DEV'],
-      ['DOMAIN', 'sw0l1ylab.com'],
-      ['GITHUB', '@sw0l1y'],
-      ['STATUS', 'ACTIVE'],
-    ];
-
-    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
-
-    return `
-      ${topbarHtml()}
-      <div class="page">
-        <div class="record-header">
-          <div class="doc-label">FILE 002 · OPERATOR PROFILE · LAST REVISION ${today}</div>
-          <h2 class="record-title">OPERATOR<br>PROFILE.</h2>
-        </div>
-
-        <div class="info-body">
-          <aside>
-            <div class="id-plate">
-              <div class="id-plate-fig">FIG. 02 — ID PHOTO · 4×5</div>
-              <div class="crops"><span></span></div>
-            </div>
-            <div class="spec-table" style="border-top:none">
-              ${idRows.map(([k, v], i) => `
-                <div class="spec-row ${i === idRows.length - 1 ? 'spec-row--last' : ''}">
-                  <span class="spec-row-key">${esc(k)}</span>
-                  <span class="spec-row-val">${esc(v)}</span>
-                </div>`).join('')}
-            </div>
-          </aside>
-
-          <div>
-            <div class="info-section">
-              <div class="doc-label">§ 1 — DESCRIPTION</div>
-              <p style="font-size:15px;line-height:1.65;margin-top:12px;max-width:640px;letter-spacing:0.02em;text-transform:uppercase">
-                INDEPENDENT OPERATOR. DESIGNS AND SHIPS BROWSER-BASED INTERACTIVE BUILDS — PRIMARILY SMALL-SCOPE GAMES AND EXPERIMENTS. ALL OUTPUT PUBLISHED PUBLICLY UNDER THIS ARCHIVE.
-              </p>
-            </div>
-
-            <div class="info-section">
-              <div class="doc-label">§ 2 — FEED <span class="live-dot" style="margin-left:6px"></span></div>
-              <div class="git-feed">${feedContent}</div>
-            </div>
-          </div>
-        </div>
-
-        ${footerHtml(4)}
-      </div>`;
-  }
-
   // ── Render ───────────────────────────────────────────────────────────────
 
   function render() {
@@ -471,9 +366,6 @@
     } else if (state.page === 'detail') {
       app.innerHTML = detailHtml(state.detailId);
       attachDetailKeyboard();
-    } else if (state.page === 'info') {
-      app.innerHTML = infoHtml();
-      if (state.gitFeed === null && !state.gitLoading) fetchGitFeed();
     }
 
     window.scrollTo(0, 0);
@@ -624,12 +516,7 @@
       });
       if (!res.ok) throw new Error(`${res.status}`);
       const data = await res.json();
-      state.gitFeed = data.slice(0, 14).map(ev => ({
-        when: relativeTime(ev.created_at),
-        repo: ev.repo.name.replace(`${GITHUB_USER}/`, ''),
-        kind: eventKind(ev),
-        msg: eventMsg(ev),
-      }));
+      state.gitFeed = data; // marks the fetch as done (null = not yet fetched)
 
       // Derive latest push timestamp and project from events
       const slugToId = new Map(projects.map(p => [p.slug, p.id]));
@@ -641,26 +528,7 @@
       state.gitFeed = [];
     } finally {
       state.gitLoading = false;
-      if (state.page === 'works') {
-        render();
-        return;
-      }
-      if (state.page === 'info') {
-        const feedEl = document.querySelector('.git-feed');
-        if (feedEl) {
-          if (!state.gitFeed || !state.gitFeed.length) {
-            feedEl.innerHTML = `<div class="feed-empty">— NO RECENT ACTIVITY FOUND</div>`;
-          } else {
-            feedEl.innerHTML = state.gitFeed.map(ev => `
-              <div class="feed-row">
-                <span class="feed-when">${esc(ev.when)}</span>
-                <span class="feed-repo">${esc(ev.repo.toUpperCase())}</span>
-                <span class="feed-kind">${esc(ev.kind)}</span>
-                <span class="feed-msg">· ${esc(ev.msg)}</span>
-              </div>`).join('');
-          }
-        }
-      }
+      if (state.page === 'works') render();
     }
   }
 
